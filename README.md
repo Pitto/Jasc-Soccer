@@ -1,4 +1,6 @@
 Jasc-Soccer
 ===========
 
-another Arcade soccer game
+Just Another Sensi Clone.
+
+Jasc Soccer is written in FreeBasic
