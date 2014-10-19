@@ -1,0 +1,40 @@
+*** J A S C * S O C C E R ***
+Just Another Sensi Clone
+
+#### AKNOWLEDGEMENTS ####
+
+*LACHIE DAZDARIAN*
+for his tutorials about creating a game in FB
+
+*I3I2UI/I0 and VANYA*
+for their useful feedbacks
+
+*THE FREEBASIC DEVELOPERS*
+www.freebasic.net
+
+*THE FBGFX DEVELOPERS*
+
+*THE FBIDE DEVELOPERS*
+
+*THE GEANY EDITOR DEVELOPERS*
+www.geany.org
+
+*ALL THOSE CONTIBUTED TO THE FREEBASIC MANUAL*
+
+*EBBEN FEAGAN AND RICHARD CLARK*
+for their useful book 'A Beginner's Guide to FreeBasic'
+
+*ALL THE FOLLOWERS of the*
+www.freebasic.net/forum/viewtopic.php?f=15&t=20637
+thread... thank you for your feedbacks!
+
+THE EDITORS of
+hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra13
+very useful for the ball trajectory calc
+
+Original font printing routine
+created by CHIS CHADWICK
+and it came as a part of his Pixel Plus 256 package.
+Additional code (font loading subs, font formats,
+font files, changes...) by DEAN JANJIC
+
