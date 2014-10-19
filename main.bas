@@ -4,7 +4,6 @@
    'but WITHOUT ANY WARRANTY; without even the implied warranty of
    'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
    
-   'You may copy and modify this program only for NON-commercial purposes.
 '------------------------------------------------------------------------   
 ' a must
 #include "fbgfx.bi"
