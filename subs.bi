@@ -710,11 +710,14 @@ Sub Draw_main_menu()
     PUT (0, 0), Wallpaper(1),pset
     for a = 0 to int (SCREEN_W \ 32) +1 
         PUT (32*a, 0), shadowed_sprite, trans
-        PUT (32*a, SCREEN_H - 32), shadowed_sprite, trans
+       ' PUT (32*a, SCREEN_H - 32), shadowed_sprite, trans
     next
     
     PrintFont SCREEN_W\2 - len(str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR))*5, 16,_
-    str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR), Unifont, 1, 1 
+    str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR), UniFont, 1, 1 
+    
+    PrintFont 20, SCREEN_H - 16, _
+    str("This software is released under the Terms of the GNU GPL license v. 2.0"), SmallFont, 1, 1 
     
     For a = 0 To 6
         Line (SCREEN_W\2 - 100,a*30 + 75)-(SCREEN_W\2 + 100,a*30 + 100),Rgb(63,0,0),BF
@@ -737,9 +740,8 @@ Sub Draw_main_menu()
                 end if
             end if
         Case 1
-            Draw String (SCREEN_W\2 - len(Main_Menu_List_Teams(Main_menu_Team_1_selected).label)*4,_
-            a*30 + top_margin),_
-            str(Main_Menu_List_Teams(Main_menu_Team_1_selected).label) 
+            PrintFont SCREEN_W\2 - len(Main_Menu_List_Teams(Main_menu_Team_1_selected).label)*4,_
+            a*30 + top_margin, str(Main_Menu_List_Teams(Main_menu_Team_1_selected).label) , UniFont, 1,1
             If a = Main_menu_Item_selected Then
                 if Main_menu_Team_1_selected > lbound(Main_Menu_List_Teams) then
                         Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
@@ -749,9 +751,8 @@ Sub Draw_main_menu()
                 end if
             end if
         Case 2
-            Draw String (SCREEN_W\2 - len(Pitch_data(Main_menu_pitch_type_selected).label)*4,_
-            a*30 + top_margin),_
-            Str(Pitch_data(Main_menu_pitch_type_selected).label)
+            PrintFont SCREEN_W\2 - len(Pitch_data(Main_menu_pitch_type_selected).label)*4,_
+            a*30 + top_margin, Str(Pitch_data(Main_menu_pitch_type_selected).label), UniFont, 1, 1
             If a = Main_menu_Item_selected Then
                 if Main_menu_pitch_type_selected > lbound(Pitch_data) then
                         Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
@@ -761,9 +762,8 @@ Sub Draw_main_menu()
                 end if
             end if
         Case 3
-            Draw String (SCREEN_W\2 - len(Str(Main_Menu_List_mins(Main_menu_mins_selected)))*4,_
-            a*30 + top_margin),_
-            Str(Main_Menu_List_mins(Main_menu_mins_selected))
+            PrintFont SCREEN_W\2 - len(Str(Main_Menu_List_mins(Main_menu_mins_selected)))*4,_
+            a*30 + top_margin, Str(Main_Menu_List_mins(Main_menu_mins_selected)), UniFont, 1, 1
             If a = Main_menu_Item_selected Then
                 if Main_menu_mins_selected > lbound(Main_Menu_List_mins) then
                         Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
@@ -774,9 +774,8 @@ Sub Draw_main_menu()
             end if
             
         Case 4
-            Draw String (SCREEN_W\2 - len(Str(Main_Menu_Mode(Main_Menu_mode_selected)))*4,_
-            a*30 + top_margin),_
-            Str(Main_Menu_Mode(Main_Menu_mode_selected))
+            PrintFont SCREEN_W\2 - len(Str(Main_Menu_Mode(Main_Menu_mode_selected)))*4,_
+            a*30 + top_margin, Str(Main_Menu_Mode(Main_Menu_mode_selected)), UniFont, 1,1
             If a = Main_menu_Item_selected Then
                 if Main_Menu_mode_selected > lbound(Main_Menu_Mode) then
                         Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
@@ -786,9 +785,8 @@ Sub Draw_main_menu()
                 end if
             end if
         Case 5
-            Draw String (SCREEN_W\2 - len(Str(Main_Menu_control(Main_Menu_control_selected)))*4,_
-            a*30 + top_margin),_
-            Str(Main_Menu_control(Main_Menu_control_selected))
+            PrintFont SCREEN_W\2 - len(Str(Main_Menu_control(Main_Menu_control_selected)))*4,_
+            a*30 + top_margin, Str(Main_Menu_control(Main_Menu_control_selected)), Unifont, 1,1
             If a = Main_menu_Item_selected Then
                 if Main_menu_control_selected > lbound(Main_Menu_control) then
                         Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
@@ -833,7 +831,7 @@ SUB draw_pitch()
     'banner
     PUT (PITCH_X + 10 - c_x_o, PITCH_Y - 27 - c_y_o), banner_sprite, trans
     banner_message = GAME_NAME + " " + str(GAME_VERSION) + " ::: "
-    draw string (PITCH_X + 15 - c_x_o,  PITCH_Y - 20 - c_y_o), banner_message, RGB(50,50,50)
+    PrintFont PITCH_X + 15 - c_x_o,  PITCH_Y - 20 - c_y_o, banner_message, SmallFont, 1,1
     
     PUT (PITCH_X + PITCH_W - 266 - c_x_o, PITCH_Y - 27 - c_y_o), banner_sprite, trans
     banner_message = GAME_AUTHOR_SITE
