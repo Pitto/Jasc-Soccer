@@ -2,7 +2,7 @@
 #define GAME_NAME "JASC SOCCER"
 #define GAME_VERSION "0.24.1"
 #define GAME_AUTHOR "Pitto"
-#define GAME_AUTHOR_SITE "Sorry... my site is down"
+#define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 7
 
 'USEFUL CONSTS###########################################################################
@@ -12,8 +12,8 @@ const M_PIXEL as single = 9.5 '9.5 pixel = 1m
 const PITCH_X as Integer = 50
 const PITCH_Y as Integer = 50
 'pitch dimensions
-const PITCH_W as Integer = 832'use a 32 multiplier… the pitch texture may fit better!
-const PITCH_H as Integer = 992 'idem
+const PITCH_W as Integer = 608'832'use a 32 multiplier… the pitch texture may fit better!
+const PITCH_H as Integer = 458'992 'idem
 
 const PITCH_PENALTY_AREA as Single = PITCH_W*0.30 'see update players sub for details
 'net dimensions

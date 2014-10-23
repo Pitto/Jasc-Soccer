@@ -46,12 +46,15 @@ DEV LOG -------------------------------------
 · Repository available from GitHub
 · ball can hit net wood
 · code cleanup
-· changed check_ball_goals() sub
 · added is_goal() function
 · added record_ball_position() function
 · added SUB update_ball_on_goal()
 · custom font - important! only ASCII charset in range 0-127
 · enhanced Debug messages display
+· Key "R" in debug mode reverses the attack direction of the teams
+· changed on Find_shoot_angle() Function
+· changed on get_ball_tile() Function
+· changed SUB check_ball_goals() SUB
 
 0.23.5
 · minor changes on update_ball SUB

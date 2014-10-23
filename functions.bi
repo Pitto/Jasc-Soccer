@@ -117,28 +117,24 @@ function start_frame (radiants as single) as integer
 end function
 
 function find_shoot_angle (pl_id as Integer) as single
-    dim alfa_1 as single
-    dim alfa_2 as single
-    dim dist_1 as single
-    dim dist_2 as single
-    dim dist_to_gk as single
-    dim gk_id as Integer
-    dim shoot_angle as single
+    dim as single alfa_1, alfa_2, dist_1, dist_2, dist_to_gk, shoot_angle
+    dim as Integer gk_id, att_dir
+    
+    att_dir = 1 - Team(pl(pl_id).team).att_dir
     
     if pl(pl_id).team = 0 then
         gk_id = 0
     else
         gk_id = 11
     end if
-    
   
     dist_to_gk = d_b_t_p(pl(pl_id).x, pl(pl_id).y,pl(gk_id).x, pl(gk_id).y)
     
     alfa_2 = abs (_abtp (pl(pl_id).x, pl(pl_id).y, _
-                PITCH_MIDDLE_W - PITCH_NET_W\2, PITCH_Y + PITCH_H * pl(pl_id).team)_
+                PITCH_NET_L_WOOD, PITCH_Y + PITCH_H * att_dir)_
                 - _abtp (pl(pl_id).x, pl(pl_id).y,pl(gk_id).x, pl(gk_id).y))
     alfa_1 = abs (_abtp (pl(pl_id).x, pl(pl_id).y, _
-                PITCH_MIDDLE_W + PITCH_NET_W\2, PITCH_Y + PITCH_H * pl(pl_id).team)_
+                PITCH_NET_R_WOOD, PITCH_Y + PITCH_H * att_dir)_
                 - _abtp (pl(pl_id).x, pl(pl_id).y,pl(gk_id).x, pl(gk_id).y))
     
     dist_1 = dist_to_gk * sin(alfa_1)
@@ -146,14 +142,14 @@ function find_shoot_angle (pl_id as Integer) as single
     
     if dist_1 < dist_2 then
        shoot_angle = _abtp (pl(pl_id).x, pl(pl_id).y,_
-                            PITCH_MIDDLE_W - PITCH_NET_W\2 +_
-                            abs (PITCH_MIDDLE_W - PITCH_NET_W\2 - pl(gk_id).x)/3,_
-                            PITCH_Y + PITCH_H * pl(pl_id).team)
+                            PITCH_NET_L_WOOD +_
+                            abs (PITCH_NET_L_WOOD - pl(gk_id).x)/3,_
+                            PITCH_Y + PITCH_H * att_dir)
     else
          shoot_angle = _abtp (pl(pl_id).x, pl(pl_id).y,_
-                            PITCH_MIDDLE_W + PITCH_NET_W\2 -_
-                            abs (PITCH_MIDDLE_W + PITCH_NET_W\2 - pl(gk_id).x)/3,_
-                            PITCH_Y + PITCH_H * pl(pl_id).team)
+                            PITCH_NET_R_WOOD -_
+                            abs (PITCH_NET_R_WOOD - pl(gk_id).x)/3,_
+                            PITCH_Y + PITCH_H * att_dir)
     end if
     
     return shoot_angle

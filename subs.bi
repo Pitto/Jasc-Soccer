@@ -152,13 +152,23 @@ END SUB
 SUB check_ball_goals()
     'first of all, checks if the ball goes into any net
     if is_goal(0) or is_goal(1) then
-        if is_goal(0) + Team(0).att_dir > 1 then
+        if is_goal(0) and (Team(0).att_dir = 1) then
             Team(0).goal += 1
             match_event = happy_t0
-        else
+        end if
+        if is_goal(0) and (Team(0).att_dir = 0) then
             Team(1).goal += 1
             match_event = happy_t1
         end if
+        if is_goal(1) and (Team(0).att_dir = 1) then
+            Team(1).goal += 1
+            match_event = happy_t1
+        end if
+        if is_goal(1) and (Team(0).att_dir = 0) then
+            Team(0).goal += 1
+            match_event = happy_t0
+        end if
+
         match_event_delay = MATCH_EVENT_DEFAULT_DELAY*2
         camera.speed = 0
         PL_ball_owner_id = -1
@@ -397,7 +407,7 @@ SUB display_menu()
 		Cls
 		draw_main_menu()
 		workpage xor = 1 ' Swap work pages.
-		'locate 10,10 : print str(get_ball_tile())
+		
 		Screenunlock
 		SLEEP SLEEP_TIME, 1
 	LOOP UNTIL Exit_flag = 1
@@ -612,29 +622,30 @@ SUB draw_debug()
         end if
     
         for c = 0 to Ubound(pl)-1
-            PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o, "NUM: " +str(pl(c).number), SmallFont, 1, 1
-            PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+6, "LBL: " +str(pl(c).label), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+12, "ID: " + str(pl(c).id), SmallFont, 1, 1
-            PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+18, "ROL: " + str(pl(c).role), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+24, "ACT: " + str(print_pl_action(pl(c).action)), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+30, "DLY: " + str(pl(c).delay), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+36, "TID: " + str(pl(c).tct_id), SmallFont, 1, 1
         next c
         
-        PrintFont DBG_TXT_OFFSET, 6,  "Team(0).label: " + str(Team(0).label) + _
-                                    " - Team(1).label: " + str(Team(1).label), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 12, "PL_Team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 18, "Ball Spin: " + str(Ball.spin), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 24, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 30, "Team(1).att_dir: " + str(Team(1).att_dir), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 36, "Match_event_delay: " + str(Match_event_delay), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 42, "Match Event: " + str(print_match_event(Match_Event)), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 48, "Match_event_last_tile: " + str(Match_event_last_tile), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 54, "Dt: " + str(Dt), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 60, "PL_ball_owner_delay: " + str(PL_ball_owner_delay), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 66, "PL_target_id: " + str(PL_target_id), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 72, "PL_ball_owner_id: " + str(PL_ball_owner_id), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 78, "PL_team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
+        draw_arrow (20,206, (PI * Team(0).att_dir - PI_2), 10, Team(0).c_1)
+        PrintFont 30, 200, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
+        PrintFont 30, 206, Team(0).label, SmallFont, 1, 1
+        
+        draw_arrow (20,246, (PI * Team(1).att_dir - PI_2), 10, Team(1).c_1)
+        PrintFont 30, 240, "Team(1).att_dir: " + str(Team(1).att_dir), SmallFont, 1, 1
+        PrintFont 30, 246, Team(1).label, SmallFont, 1, 1
+        
+        PrintFont DBG_TXT_OFFSET, 50, "PL_Team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 56, "Ball Spin: " + str(Ball.spin), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 74, "Match_event_delay: " + str(Match_event_delay), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 80, "Match Event: " + str(print_match_event(Match_Event)), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 86, "Match_event_last_tile: " + str(Match_event_last_tile), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 92, "Dt: " + str(Dt), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 98, "PL_ball_owner_delay: " + str(PL_ball_owner_delay), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 104, "PL_target_id: " + str(PL_target_id), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 110, "PL_ball_owner_id: " + str(PL_ball_owner_id), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 116, "PL_team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
         'display ball traectory
         frame +=1
         for frame = 0 to BALL_FRAMES_RECORD - 1
@@ -679,7 +690,7 @@ SUB draw_grid()
             x2 = x + PITCH_W \ COL_TOT_N
             y2 = y + PITCH_H \ ROW_TOT_N
             line (x-c_x_o,y-c_y_o)-(x2-c_x_o,y2-c_y_o),C_GRAY,b 
-            draw string (x+ 30-c_x_o,y+5-c_y_o), str(TILES_BALL_N - count) + ":" + str(count), C_GRAY
+            draw string (x+ 30-c_x_o,y+5-c_y_o), str(count), C_GRAY
             'check if the ball is into a box of the grid and fill it using paint function
             if (ball.x > x) and (ball.x < x2) and (ball.y>y) and (ball.y < y2) then
                 paint (ball.x-c_x_o, ball.y-c_y_o),C_DARK_GREEN,C_GRAY
@@ -957,6 +968,7 @@ SUB draw_players()
         
         'puts the right set of sprites depending on the pl.action
         if is_in_camera_crop (pl(a(c,0)).x, pl(a(c,0)).y, 128) then
+            PrintFont pl(a(c,0)).x - 5 - c_x_o, pl(a(c,0)).y-22-c_y_o, str(pl(a(c,0)).number), Unifont, 1,1 
             select case pl(a(c,0)).action
             case 0 '*** at this moment undefined***
             case running
@@ -1195,6 +1207,11 @@ SUB get_user_input()
             If (e.scancode = SC_D) Then
                 DEBUG = DEBUG xor 1
             End If
+            'reverse attack direction of the teams
+            If DEBUG and (e.scancode = SC_R) Then
+                Team(0).att_dir = 1 - Team(0).att_dir 
+                Team(1).att_dir = 1 - Team(1).att_dir 
+            End if
             If (e.scancode = SC_P) Then
                 'pause
                 SLEEP
@@ -1685,6 +1702,7 @@ SUB reset_ball_z()
 END SUB
 
 SUB reset_gk_net_position (c as integer, distance_from_net as Integer)
+    
     ' if the gk is far away from the net then he comeback to the net
     if d_b_t_p(pl(c).x, pl(c).y, _
     PITCH_MIDDLE_W, PITCH_Y + PITCH_H * (Team(pl(c).team).att_dir)_
@@ -1744,8 +1762,7 @@ SUB run_tactic(c as Integer)
         'if get_ball_tile(pl(c).team) >= 0 and get_ball_tile(pl(c).team) <= TILES_BALL_N then
 		'tile = tct_tile(Team(pl(c).team).tact_module, pl(c).tct_id, get_ball_tile(pl(c).team))
 			
-			
-		if (pl(c).team = 0) then
+		if (team(pl(c).team).att_dir) then
 			tile = TILES_PL_N - tile
 		end if
 		
