@@ -7,7 +7,7 @@ Declare Sub Update_main_menu()
 Declare Sub Draw_main_menu()
 'draw and update the main menu
 DECLARE SUB display_menu()
-'load fonts
+'load fontsd
 DECLARE SUB load_fonts()
 'load the pitchs variables
 DECLARE SUB load_pitch_data()
@@ -626,12 +626,14 @@ SUB draw_debug()
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+24, "ACT: " + str(print_pl_action(pl(c).action)), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+30, "DLY: " + str(pl(c).delay), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+36, "TID: " + str(pl(c).tct_id), SmallFont, 1, 1
+            PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+42, "SPD: " + str(pl(c).speed), SmallFont, 1, 1
+            PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+48, "LBL: " + str(pl(c).label), SmallFont, 1, 1
         next c
         
         draw_arrow (20,206, (PI * Team(0).att_dir - PI_2), 10, Team(0).c_1)
         PrintFont 30, 200, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
         PrintFont 30, 206, Team(0).label, SmallFont, 1, 1
-        
+       
         draw_arrow (20,246, (PI * Team(1).att_dir - PI_2), 10, Team(1).c_1)
         PrintFont 30, 240, "Team(1).att_dir: " + str(Team(1).att_dir), SmallFont, 1, 1
         PrintFont 30, 246, Team(1).label, SmallFont, 1, 1
@@ -1395,7 +1397,7 @@ SUB init_players_proprietes()
             pl(c).y = PITCH_Y + (PITCH_H\4) + ((PITCH_H\2)*(t xor 1))
             'assign id
             pl(c).id = c
-            pl(c).x = c * ((PITCH_W-10)\PL_N_TOT*2) + 10 + PITCH_X
+            pl(c).x = pl(c).number * 60 + PITCH_X
             
         next c
     Close #ff
@@ -1581,7 +1583,7 @@ Sub Load_teams_list()
     Dim ff As Ubyte
     ff = Freefile
     Dim flc As Integer = 0
-    Open "_data/List_Teams.team" For Input As #ff
+    Open "_data/list_teams.team" For Input As #ff
     Do Until Eof(ff) 
         Input #ff, Main_Menu_List_Teams(flc).id, Main_Menu_List_Teams(flc).label,_
         Main_Menu_List_Teams(flc).c_1,Main_Menu_List_Teams(flc).c_2,Main_Menu_List_Teams(flc).c_3,_

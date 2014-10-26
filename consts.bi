@@ -12,8 +12,8 @@ const M_PIXEL as single = 9.5 '9.5 pixel = 1m
 const PITCH_X as Integer = 50
 const PITCH_Y as Integer = 50
 'pitch dimensions
-const PITCH_W as Integer = 608'832'use a 32 multiplier… the pitch texture may fit better!
-const PITCH_H as Integer = 458'992 'idem
+const PITCH_W as Integer = 832'832'use a 32 multiplier… the pitch texture may fit better!
+const PITCH_H as Integer = 992'992 'idem
 
 const PITCH_PENALTY_AREA as Single = PITCH_W*0.30 'see update players sub for details
 'net dimensions
@@ -64,8 +64,8 @@ const SQR_2 as single = 1.4142135f
 'DISPLAY CONSTS -------------------------------------------------------------------------
 'screen width and height
 'IMPORTANT! -> Not less than 450 x 200 or the sprites may load badly
-const SCREEN_W as Integer = 640 
-const SCREEN_H as Integer = 480
+const SCREEN_W as Integer = 800 
+const SCREEN_H as Integer = 600
 'useful to don't allow the camera to move everywere, this sets a limit
 const CAMERA_PADDING as Integer = 45
 'ratio of the xy movements of the camera having the ball as reference point
