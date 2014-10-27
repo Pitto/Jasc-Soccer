@@ -339,40 +339,68 @@ SUB check_throw_in_corner_kick()
     end if
     'throw in tside check
     if Ball.y < PITCH_Y - 1 then
-        select case PL_team_owner_id
-        case 0
+        if Team(0).att_dir = 1 and PL_team_owner_id = 0 then
             if Ball.x < PITCH_MIDDLE_W then
                 Match_event = throw_in_tl_side_t1
             else
                 Match_event = throw_in_tr_side_t1
             end if
-        case 1
+        end if
+        if Team(0).att_dir = 1 and PL_team_owner_id = 1 then
             if Ball.x < PITCH_MIDDLE_W then
                 Match_event = corner_tl_side_t0
             else
                 Match_event = corner_tr_side_t0
             end if
-        end select
+        end if
+        if Team(0).att_dir = 0 and PL_team_owner_id = 0 then
+            if Ball.x < PITCH_MIDDLE_W then
+                Match_event = corner_tl_side_t1
+            else
+                Match_event = corner_tr_side_t1
+            end if
+        end if
+        if Team(0).att_dir = 0 and PL_team_owner_id = 1 then
+            if Ball.x < PITCH_MIDDLE_W then
+                Match_event = throw_in_tl_side_t0
+            else
+                Match_event = throw_in_tl_side_t0
+            end if
+        end if
         Match_event_delay = MATCH_EVENT_DEFAULT_DELAY
         PL_team_owner_id = -1
         PL_ball_owner_id = -1
     end if
     'throw in bside check
     if Ball.y > PITCH_Y + PITCH_H + 1 then
-        select case PL_team_owner_id
-        case 0
+        if Team(0).att_dir = 1 and PL_team_owner_id = 0 then
             if Ball.x < PITCH_MIDDLE_W then
                 Match_event = corner_bl_side_t1
             else
                 Match_event = corner_br_side_t1
             end if
-        case 1
+        end if
+        if Team(0).att_dir = 1 and PL_team_owner_id = 1 then
             if Ball.x < PITCH_MIDDLE_W then
                 Match_event = throw_in_bl_side_t0
             else
                 Match_event = throw_in_br_side_t0
             end if
-        end select
+        end if
+        if Team(0).att_dir = 0 and PL_team_owner_id = 0 then
+            if Ball.x < PITCH_MIDDLE_W then
+                Match_event = throw_in_bl_side_t1
+            else
+                Match_event = throw_in_br_side_t1
+            end if
+        end if
+        if Team(0).att_dir = 0 and PL_team_owner_id = 1 then
+            if Ball.x < PITCH_MIDDLE_W then
+                Match_event = corner_bl_side_t0
+            else
+                Match_event = corner_bl_side_t1
+            end if
+        end if
         Match_event_delay = MATCH_EVENT_DEFAULT_DELAY
         PL_team_owner_id = -1
         PL_ball_owner_id = -1
@@ -2361,6 +2389,7 @@ SUB update_players()
                         ball.y = pl(c).y
                         ball.x +=  5 *cos(pl(c).rds)'*pl(c).speed*Dt
                         ball.y +=  5 *-sin(pl(c).rds)'*pl(c).speed*Dt
+                        'if (rnd * 10 > 8) then ball.speed += 10 
                     end if
                     PL_ball_owner_id = c
                     PL_team_owner_id = pl(c).team
