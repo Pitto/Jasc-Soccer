@@ -443,6 +443,8 @@ SUB display_menu()
 END SUB
 
 SUB display_match()
+Timing.time_last = 0
+Timing.time_current = 0
 	DO
 		If InKey = Chr(255,107) Then Exit Do 'if the user clicks the X button on the window then ... bye bye JASC
 		update_match_event()
@@ -453,27 +455,28 @@ SUB display_match()
 		update_camera_position()
 		
 		Timing.time_current = Timer
-		Dt = Timing.time_current - Timing.time_last
-		'' Fix frame-skipping by limiting the value of our dt
-		'' to the maximum of FIXED_TIME_STEP
-		if( Dt > FIXED_TIME_STEP ) then
-			Dt = FIXED_TIME_STEP
-			screensync
-		else
-			screensync 'wait for vsync
-			'graphic output
-			screenlock ' Lock the screen
-			screenset workpage, workpage xor 1 ' Swap work pages.
-			draw_pitch()
-			draw_pitch_lines()
-			draw_debug()
-			draw_top_net()
-			draw_players()
-			draw_bottom_net()
-			draw_bottom_info()
-			workpage xor = 1 ' Swap work pages.
-			screenunlock ' Unlock the page to display what has been drawn on the screen
-		end if
+		Dt = FIXED_TIME_STEP ''Timing.time_current - Timing.time_last
+		' Fix frame-skipping by limiting the value of our dt
+		' to the maximum of FIXED_TIME_STEP
+		'if( Dt > FIXED_TIME_STEP ) then
+		'	Dt = FIXED_TIME_STEP
+		'	screensync
+		'else
+		screensync 'wait for vsync
+		'graphic output
+		screenlock ' Lock the screen
+		screenset workpage, workpage xor 1 ' Swap work pages.
+		draw_pitch()
+		draw_pitch_lines()
+		draw_debug()
+		draw_top_net()
+		draw_players()
+		draw_bottom_net()
+		draw_bottom_info()
+		workpage xor = 1 ' Swap work pages.
+		screenunlock ' Unlock the page to display what has been drawn on the screen
+	'end if
+		
 		if Timer - Timing.time_start > 1 then
 			Timing.actual_fps = Timing.fps
 			Timing.fps = 0
@@ -483,7 +486,7 @@ SUB display_match()
 			Timing.fps +=1
 		end if
 		if int(90/Timing.secs_to_play*Timing.seconds_elapsed)>90 + Timing.injury_time then Exit_flag = 1
-		Timing.time_last = Timing.time_current
+		Timing.time_last = Timer
 	LOOP UNTIL MULTIKEY(SC_ESCAPE) or Exit_flag = 1
 END SUB
 

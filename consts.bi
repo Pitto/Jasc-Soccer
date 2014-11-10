@@ -6,7 +6,7 @@
 #define GAME_N_TOT_TEAMS 7
 
 'USEFUL CONSTS###########################################################################
-const FIXED_TIME_STEP as double = 1/60.0 'useful for Delta Timing
+const FIXED_TIME_STEP as double = 1/60.0f 'useful for Delta Timing
 const M_PIXEL as single = 9.5 '9.5 pixel = 1m
 'no change x and y, please, or the gk may get crazy :O
 const PITCH_X as Integer = 50
@@ -64,8 +64,8 @@ const SQR_2 as single = 1.4142135f
 'DISPLAY CONSTS -------------------------------------------------------------------------
 'screen width and height
 'IMPORTANT! -> Not less than 450 x 200 or the sprites may load badly
-const SCREEN_W as Integer = 800 
-const SCREEN_H as Integer = 600
+const SCREEN_W as Integer = 640 
+const SCREEN_H as Integer = 480
 'useful to don't allow the camera to move everywere, this sets a limit
 const CAMERA_PADDING as Integer = 45
 'ratio of the xy movements of the camera having the ball as reference point

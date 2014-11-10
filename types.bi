@@ -96,11 +96,11 @@ Type Match_timing_proto
 	fps as integer
 	actual_fps as integer
 	time_start as double
-	time_last as single
-	time_current as single
-	seconds_elapsed as single
-	secs_to_play as single
-	injury_time as single
+	time_last as double
+	time_current as double
+	seconds_elapsed as double
+	secs_to_play as double
+	injury_time as double
 End Type
 
 Type proto_Joystick
