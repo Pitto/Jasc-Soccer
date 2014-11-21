@@ -30,11 +30,14 @@ Acknowledgements:
 · get_short_side_pl_to_pass
 · get_short_endline_pl_to_pass
 · New sprite set
+· Use of custom font
+· Game menu :) - maybe fantastic!
 · 3 kind of skin for the player
 · Replais
 · Public
 · change other #define with consts
 · Sound effects
+· Merge tactic editor into Main program
 
   
 DEV LOG -------------------------------------
@@ -44,7 +47,6 @@ DEV LOG -------------------------------------
 · Repository available from GitHub
 · ball can hit net wood
 · code cleanup
-· fixed Dt (Delta Timing) in Linux
 · added is_goal() function
 · added record_ball_position() function
 · added SUB update_ball_on_goal()

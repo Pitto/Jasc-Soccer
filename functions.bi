@@ -9,8 +9,10 @@ declare function d_b_t_p (x1 as single, y1 as single, x2 as single, y2 as single
 declare function start_frame (radiants as single) as integer
 ' return the right angle where to shoot the ball to score a goal
 declare function find_shoot_angle (pl_id as Integer) as single
-' returns in wich tile is the ball
+' returns in wich ball tile is the ball
 declare function get_ball_tile(att_dir as Integer) as Integer
+'returns the in which tile is currently the slected pl
+declare function get_pl_tile(pl_id as Integer) as Integer
 ' calculate the distance between player and the tile where he must go
 declare function get_dist_from_tile(tile as Integer, pl_x as single, pl_y as single) as single
 ' return the nearest player to the ball
@@ -66,6 +68,8 @@ declare function print_match_event(event as Integer) as String
 declare function get_nrst_pl_ball_free_kick(n_team as Integer) as Integer
 'returns the action the player is performing
 declare function print_pl_action(action as integer) as string
+'TACTIC EDITOR FUNCTIONS
+declare function tct_ed_get_ball_tile() as integer
 
 function d_t_r (degree as integer) as single
     return int (degree * PI/180)
@@ -383,11 +387,27 @@ function get_ball_tile(att_dir as Integer) as Integer
     else
         return tile
     end if
-'    if team = 0 then    
-'        return TILES_BALL_N - tile
-'    else
-'        return tile
-'    end if
+end function
+
+function get_pl_tile (pl_id as integer) as integer
+    dim as Integer col, row, tile
+    dim as single x, y, x2, y2
+    tile = 0
+    for row = 0 to 15 step 1
+        for col = 0 to 15 step 1
+            x = col * TILE_PL_W + PITCH_X 
+            y = row * TILE_PL_H + PITCH_Y
+            x2 = x + TILE_PL_W
+            y2 = y + TILE_PL_H
+            'check if the player is into a box of the grid
+            if (pl(pl_id).x >= x) and (pl(pl_id).x < x2)_
+            and (pl(pl_id).y>=y) and (pl(pl_id).y < y2) then
+                exit for, for
+            end if
+            tile +=1
+        next col
+    next row
+    return tile
 end function
 
 FUNCTION is_PL_input_rds() as integer
@@ -679,4 +699,25 @@ function print_pl_action(action as integer) as string
         case else
             return "INDEFINED"
     end select
+end function
+
+function tct_ed_get_ball_tile() as integer
+    dim as integer x2, y2, x, y, col, row, tile 
+    tile = 0
+    for row = 0 to 5 step 1
+        for col = 0 to 5 step 1
+            'draw the grid
+            x = col * tct_ed_PITCH_W \ 6 + tct_ed_PITCH_X 
+            y = row * tct_ed_PITCH_H \ 6 + tct_ed_PITCH_Y
+            x2 = x + tct_ed_PITCH_W \ 6
+            y2 = y + tct_ed_PITCH_H \ 6
+            'check if the ball is into a box of the grid
+            if (tct_ed_ball_x > x) and (tct_ed_ball_x < x2)_
+            and (tct_ed_ball_y>y) and (tct_ed_ball_y < y2) then
+            exit for, for
+            end if
+            tile +=1
+        next col
+    next row
+    return tile
 end function

@@ -6,7 +6,7 @@
 #define GAME_N_TOT_TEAMS 7
 
 'USEFUL CONSTS###########################################################################
-const FIXED_TIME_STEP as double = 1/60.0f 'useful for Delta Timing
+const FIXED_TIME_STEP as double = 1/60.0 'useful for Delta Timing
 const M_PIXEL as single = 9.5 '9.5 pixel = 1m
 'no change x and y, please, or the gk may get crazy :O
 const PITCH_X as Integer = 50
@@ -33,7 +33,9 @@ const PITCH_MIDDLE_H as Integer = PITCH_H\2 + PITCH_Y
 'TACTIC CONSTS --------------------------------------------------------------------------
 'tiles on the pitch *NO CHANGE THIS VALUE PLEASE!*** JASC MAY CRASH :(
 const TILES_BALL_N as Integer = 35
-const TILES_PL_N as Integer = 255
+const TILES_PL_N as Integer = 255 '16x16 -1
+const TILE_PL_W as single = PITCH_W / 16 
+const TILE_PL_H as single = PITCH_H / 16
 const COL_TOT_N as Integer = 6
 const ROW_TOT_N as Integer = 6
 const COL_W as single = PITCH_W / COL_TOT_N
@@ -129,3 +131,12 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 #define MATCH_EVENT_DEFAULT_DELAY 100
 #define DBG_TXT_OFFSET 10
 #define BALL_FRAMES_RECORD 100
+
+'----- TACTIC EDITOR CONSTS
+const tct_ed_PITCH_W as integer = 388
+const tct_ed_PITCH_H as integer = 448
+const tct_ed_PITCH_X as integer = 20
+const tct_ed_PITCH_Y as integer = 20
+const tct_ed_PITCH_PENALTY_AREA as integer = tct_ed_PITCH_W\3
+const tct_ed_TILES as integer = 36
+const tct_ed_PL_TILES as integer = 256

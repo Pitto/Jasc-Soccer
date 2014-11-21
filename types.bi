@@ -1,4 +1,3 @@
-
 TYPE camera_proto
     x as single
     y as single
@@ -12,7 +11,21 @@ TYPE pitch_proto
     label as string
     friction_ratio as single
     bounce_ratio as single
-END TYPE
+    x as integer    'x of the pitch
+    y as integer    'y of the pitch
+    w as integer    'width of the pitch
+    h as integer    'heigth of the pitch
+    xm as integer   'horizontal middle line of the pitch
+    ym as integer   'vertical middle line of the pitch
+    paw as integer  'half of penalty area width 
+    pah as integer  'penalty area height
+    pac as integer  'penalty area circle diameter
+    padw as integer  'penalty dish diameter
+    padd as integer  'penalty dish distance from net
+    gkw as integer  'half goalkeeper area
+    gkh as integer  'goalkeeper area height
+    cdw as integer  'corner dish diameter
+end type
 
 TYPE player_proto
     id as Integer       'unique id of the player 0-PL_N_TOT*2
@@ -96,11 +109,11 @@ Type Match_timing_proto
 	fps as integer
 	actual_fps as integer
 	time_start as double
-	time_last as double
-	time_current as double
-	seconds_elapsed as double
-	secs_to_play as double
-	injury_time as double
+	time_last as single
+	time_current as single
+	seconds_elapsed as single
+	secs_to_play as single
+	injury_time as single
 End Type
 
 Type proto_Joystick
@@ -108,4 +121,16 @@ Type proto_Joystick
     buttons as integer
     x as single
     y as single
+End Type
+
+Type mouse
+    As Integer res, x, y, wheel, clip, old_wheel, diff_wheel
+    Union
+        buttons As Integer
+        Type
+            Left:1 As Integer
+            Right:1 As Integer
+            middle:1 As Integer
+        End Type
+    End Union
 End Type

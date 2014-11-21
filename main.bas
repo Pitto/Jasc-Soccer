@@ -61,6 +61,9 @@ load_pitch_data()
 display_menu()
 'initalize the teams
 init_team_data()
+'initialize pitch dimensions
+init_pitch_dimensions(PITCH_X, PITCH_Y, PITCH_W, PITCH_H, _
+                    Main_menu_pitch_type_selected)
 'initialize the player proprietes for the match seleceted
 init_players_proprietes()
 

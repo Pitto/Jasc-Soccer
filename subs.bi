@@ -1,4 +1,21 @@
 'SUBS DECLARATIONS-----------------------------------------------------------------------
+'draw pitch lines
+declare sub draw_pitch_lines (   x as integer,_
+                        y as integer,_
+                        w as integer,_
+                        h as integer,_
+                        xm as integer,_
+                        ym as integer,_
+                        paw as integer,_
+                        pah as integer,_  'penalty area height
+                        pac as integer,_  'penalty area circle diameter
+                        padw as integer,_  'penalty dish diameter
+                        padd as integer,_  'penalty dish distance from net
+                        gkw as integer,_  'half goalkeeper area
+                        gkh as integer,_
+                        lc as integer, _
+                        cxo as integer,_
+                        cyo as integer)
 'load into an aray the teams data for the main menu
 Declare Sub Load_teams_list()
 'gets user input along the main menu
@@ -40,6 +57,7 @@ DECLARE SUB draw_pitch()
 DECLARE SUB update_ball()
 'draw the grid
 DECLARE SUB draw_grid()
+DECLARE SUB draw_pl_tile(tile as integer, tile_color as uinteger)
 'draws the players
 DECLARE SUB draw_players()
 'resets the position of the players (0's ids on the left side, 1's ids on the right side)
@@ -61,8 +79,6 @@ DECLARE SUB reset_ball_z()
 DECLARE SUB display_match()
 'draws the ball
 DECLARE SUB draw_ball()
-'draws the lines of the pitch
-DECLARE SUB draw_pitch_lines()
 'giving the id of the player who owns the ball, calculate in wich tile is,
 'it manages the player behavior (for example: running to the net, passing, shooting, etc...)
 DECLARE SUB get_pl_behavior(pl_id as Integer)
@@ -113,6 +129,24 @@ declare sub draw_arrow(x as single, y as single, rds as single, a_l as single, c
 declare sub check_ball_woods()
 'update the ball into the goal
 declare sub update_ball_on_goal()
+'TACTIC EDITOR SUBS
+declare sub tct_ed_key_input_listener() 'checks if some input key are pressed
+declare sub tct_ed_pos_copy()'copy on clipboard the pl positions 
+declare sub tct_ed_pos_paste() 'paste the pl positions
+declare sub tct_ed_draw_players()
+declare sub tct_ed_init_pl_proprietes()
+declare sub tct_ed_draw_pitch_lines()
+declare sub tct_ed_update_pl_on_tact_tile()
+declare sub tct_ed_draw_ball_grid(pitch_x as integer, pitch_y as integer, pitch_w as integer, pitch_h as integer)
+declare sub tct_ed_draw_pitch(pitch_x as integer, pitch_y as integer, pitch_w as integer, pitch_h as integer)
+declare sub tct_ed_draw_pl_grid(pitch_x as integer, pitch_y as integer, pitch_w as integer, pitch_h as integer)
+declare sub tct_ed_load_default_tact()
+declare sub tct_ed_print_tact_data()
+declare sub tct_ed_save_data(slot_to_save as integer)
+declare sub init_pitch_dimensions(x as integer, y as integer,_
+                        w as integer, h as integer, slot as integer)
+
+
 
 
 sub draw_arrow(x as single, y as single, rds as single, a_l as single, cl as Uinteger)
@@ -443,8 +477,6 @@ SUB display_menu()
 END SUB
 
 SUB display_match()
-Timing.time_last = 0
-Timing.time_current = 0
 	DO
 		If InKey = Chr(255,107) Then Exit Do 'if the user clicks the X button on the window then ... bye bye JASC
 		update_match_event()
@@ -455,28 +487,40 @@ Timing.time_current = 0
 		update_camera_position()
 		
 		Timing.time_current = Timer
-		Dt = FIXED_TIME_STEP ''Timing.time_current - Timing.time_last
-		' Fix frame-skipping by limiting the value of our dt
-		' to the maximum of FIXED_TIME_STEP
-		'if( Dt > FIXED_TIME_STEP ) then
-		'	Dt = FIXED_TIME_STEP
-		'	screensync
-		'else
-		screensync 'wait for vsync
-		'graphic output
-		screenlock ' Lock the screen
-		screenset workpage, workpage xor 1 ' Swap work pages.
-		draw_pitch()
-		draw_pitch_lines()
-		draw_debug()
-		draw_top_net()
-		draw_players()
-		draw_bottom_net()
-		draw_bottom_info()
-		workpage xor = 1 ' Swap work pages.
-		screenunlock ' Unlock the page to display what has been drawn on the screen
-	'end if
-		
+		Dt = Timing.time_current - Timing.time_last
+		'' Fix frame-skipping by limiting the value of our dt
+		'' to the maximum of FIXED_TIME_STEP
+		if( Dt > FIXED_TIME_STEP ) then
+			Dt = FIXED_TIME_STEP
+			screensync
+		else
+			screensync 'wait for vsync
+			'graphic output
+			screenlock ' Lock the screen
+			screenset workpage, workpage xor 1 ' Swap work pages.
+			draw_pitch()
+			draw_pitch_lines ( Pitch_data(Main_menu_pitch_type_selected).x,_
+                            Pitch_data(Main_menu_pitch_type_selected).y,_
+                            Pitch_data(Main_menu_pitch_type_selected).w,_
+                            Pitch_data(Main_menu_pitch_type_selected).h,_
+                            Pitch_data(Main_menu_pitch_type_selected).xm,_
+                            Pitch_data(Main_menu_pitch_type_selected).ym,_
+                            Pitch_data(Main_menu_pitch_type_selected).paw,_
+                            Pitch_data(Main_menu_pitch_type_selected).pah,_
+                            Pitch_data(Main_menu_pitch_type_selected).pac,_
+                            Pitch_data(Main_menu_pitch_type_selected).padw,_
+                            Pitch_data(Main_menu_pitch_type_selected).padd,_
+                            Pitch_data(Main_menu_pitch_type_selected).gkw,_
+                            Pitch_data(Main_menu_pitch_type_selected).gkh,_
+                            C_WHITE, c_x_o, c_y_o)
+			draw_debug()
+			draw_top_net()
+			draw_players()
+			draw_bottom_net()
+			draw_bottom_info()
+			workpage xor = 1 ' Swap work pages.
+			screenunlock ' Unlock the page to display what has been drawn on the screen
+		end if
 		if Timer - Timing.time_start > 1 then
 			Timing.actual_fps = Timing.fps
 			Timing.fps = 0
@@ -486,7 +530,7 @@ Timing.time_current = 0
 			Timing.fps +=1
 		end if
 		if int(90/Timing.secs_to_play*Timing.seconds_elapsed)>90 + Timing.injury_time then Exit_flag = 1
-		Timing.time_last = Timer
+		Timing.time_last = Timing.time_current
 	LOOP UNTIL MULTIKEY(SC_ESCAPE) or Exit_flag = 1
 END SUB
 
@@ -597,12 +641,10 @@ SUB draw_debug()
         'Draw String 
         PrintFont 20, 20, pl(PL_ball_owner_id).label, UniFont, 1, 1
         PrintFont 20, 38, SHELL_Message, SmallFont, 1, 1
-   end if
+    end if
 
-    
     if (DEBUG) then
         draw_grid()
-        
         'draw woods hit area
         circle (PITCH_NET_L_WOOD -c_x_o, PITCH_NET_TOP_Y - c_y_o), PITCH_NET_WOOD_RADIUS, C_DARK_RED,,,,F
         circle (PITCH_NET_R_WOOD -c_x_o, PITCH_NET_TOP_Y - c_y_o), PITCH_NET_WOOD_RADIUS, C_DARK_RED,,,,F
@@ -620,7 +662,6 @@ SUB draw_debug()
             (PITCH_NET_R_WOOD + PITCH_NET_WOOD_RADIUS - c_x_o, PITCH_NET_BOTTOM_Y - PITCH_NET_H + PITCH_NET_WOOD_RADIUS - c_y_o),C_DARK_RED, BF
         line (PITCH_NET_L_WOOD - PITCH_NET_WOOD_RADIUS - c_x_o, PITCH_NET_TOP_Y - PITCH_NET_H - PITCH_NET_WOOD_RADIUS- c_y_o)- _
             (PITCH_NET_R_WOOD + PITCH_NET_WOOD_RADIUS - c_x_o, PITCH_NET_TOP_Y - PITCH_NET_H + PITCH_NET_WOOD_RADIUS - c_y_o),C_DARK_RED, BF
-        
         
         if get_pl_to_pass(Pl_ball_owner_id) then
             line (pl(get_nrst_pl_ball(0)).x-c_x_o, pl(get_nrst_pl_ball(0)).y-c_y_o)-_
@@ -659,8 +700,15 @@ SUB draw_debug()
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+36, "TID: " + str(pl(c).tct_id), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+42, "SPD: " + str(pl(c).speed), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+48, "LBL: " + str(pl(c).label), SmallFont, 1, 1
+            PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+54, "PTL: " + str(get_pl_tile(pl(c).id)), SmallFont, 1, 1
+            if PL_ball_owner_id > -1 then
+                if pl(c).team then
+                    draw_pl_tile(get_pl_tile(pl(c).id), C_GREEN)
+                else
+                    draw_pl_tile(get_pl_tile(pl(c).id), C_GRAY)
+                end if
+            end if        
         next c
-        
         draw_arrow (20,206, (PI * Team(0).att_dir - PI_2), 10, Team(0).c_1)
         PrintFont 30, 200, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
         PrintFont 30, 206, Team(0).label, SmallFont, 1, 1
@@ -740,6 +788,20 @@ SUB draw_grid()
         circle (ball.x - c_x_o, ball.y - c_y_o), 16, C_BLUE,,,,F
     end if
 END SUB
+
+sub draw_pl_tile(tile as integer, tile_color as Uinteger)
+    dim as integer tile_row, tile_col, x1, x2, y1, y2
+    tile_row = tile MOD 16
+	tile_col = int(tile\16)
+    'draw the box
+    x1 = TILE_PL_W * tile_row + PITCH_X
+    x2 = TILE_PL_W * tile_row + PITCH_X + TILE_PL_W
+    y1 = TILE_PL_H * tile_col + PITCH_Y
+    y2 = TILE_PL_H * tile_col + PITCH_Y + TILE_PL_H
+    line (x1 - c_x_o, y1 - c_y_o)-(x2 - c_x_o, y2 - c_y_o),tile_color,BF
+   ' draw string (x1 -c_x_o,y1 - c_y_o), str(tile) + ":" + str(TILES_PL_N - tile)
+    PrintFont x1-c_x_o, y1-c_y_o, str(tile) + ":" + str(TILES_PL_N - tile), SmallFont, 1, 1
+end sub
 
 SUB draw_intro()
     
@@ -883,53 +945,45 @@ SUB draw_pitch()
     
 END SUB
 
-SUB draw_pitch_lines()
+sub draw_pitch_lines (   x as integer,_
+                        y as integer,_
+                        w as integer,_
+                        h as integer,_
+                        xm as integer,_
+                        ym as integer,_
+                        paw as integer,_
+                        pah as integer,_  'penalty area height
+                        pac as integer,_  'penalty area circle diameter
+                        padw as integer,_  'penalty dish diameter
+                        padd as integer,_  'penalty dish distance from net
+                        gkw as integer,_  'half goalkeeper area
+                        gkh as integer,_
+                        lc as integer, _
+                        cxo as integer,_
+                        cyo as integer)
     'drawing the pitch's border lines
-    Line (PITCH_X - c_x_o, PITCH_Y - c_y_o)-(PITCH_W+PITCH_X- c_x_o, PITCH_H+PITCH_Y- c_y_o),RGB (255,255,255),b
-    
+    Line (x - cxo, y - cyo)-(w + x - cxo, h + y - cyo), lc, b
     'middle line and circle
-    Line (PITCH_X - c_x_o, PITCH_MIDDLE_H - c_y_o)-(PITCH_X + PITCH_W - c_x_o, PITCH_MIDDLE_H - c_y_o),RGB (255,255,255)
-    Circle (PITCH_MIDDLE_W - c_x_o, PITCH_Y + PITCH_H\2- c_y_o), 84,RGB (255,255,255),,,0.8
-    Circle (PITCH_MIDDLE_W - c_x_o, PITCH_Y + PITCH_H\2- c_y_o), 2,RGB (255,255,255),,,,F
-    
+    Line (x - cxo, ym - cyo)-(x + w - cxo, ym - cyo),lc
+    Circle (xm - cxo, ym - cyo), pac,lc
+    Circle (xm - cxo, ym - cyo), padw,lc
     'Top penalty area
-    Line    (PITCH_MIDDLE_W - PITCH_PENALTY_AREA - c_x_o,_
-    PITCH_Y - c_y_o)-_
-    (PITCH_MIDDLE_W + PITCH_PENALTY_AREA - c_x_o,_
-    PITCH_Y + PITCH_PENALTY_AREA/1.5 - c_y_o), RGB (255,255,255),B
+    Line (xm - paw - cxo, y - cyo)-(xm + paw - cxo, y + pah - cyo), lc,B
     'Top Gk area
-    Line    (PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2 - c_x_o,_
-    PITCH_Y - c_y_o)-_
-    (PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2 - c_x_o,_
-    PITCH_Y + PITCH_PENALTY_AREA/4 - c_y_o), RGB (255,255,255),B
+    Line (xm - gkw - cxo, y - cyo)-(xm + gkw - cxo, y + gkh - cyo), lc,B
     'top penalty dish
-    Circle (PITCH_MIDDLE_W - c_x_o, PITCH_Y + PITCH_PENALTY_AREA/1.5 - 48 - c_y_o), 2,RGB (255,255,255),,,,F
+    Circle (xm - cxo, y + padd - cyo), padw,lc,,,,F
     'top penalty circle
-    Circle (PITCH_MIDDLE_W - c_x_o, PITCH_Y + PITCH_PENALTY_AREA/1.5 - 48 - c_y_o),_
-    84,RGB (255,255,255),3.75,5.65
-    
-    'bottom penalty area
-    Line    (PITCH_MIDDLE_W - PITCH_PENALTY_AREA - c_x_o,_
-    PITCH_Y + PITCH_H - c_y_o)-_
-    (PITCH_MIDDLE_W + PITCH_PENALTY_AREA - c_x_o,_
-    PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/1.5 - c_y_o), RGB (255,255,255),B
-    'bottom Gk area
-    Line    (PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2 - c_x_o,_
-    PITCH_Y + PITCH_H - c_y_o)-_
-    (PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2 - c_x_o,_
-    PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4 - c_y_o), RGB (255,255,255),B
-    'bottom penalty dish
-    Circle (PITCH_MIDDLE_W - c_x_o, PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/1.5 + 48 - c_y_o), 2,RGB (255,255,255),,,,F
-    'bottom penalty circle        
-    Circle (PITCH_MIDDLE_W - c_x_o, PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/1.5 + 48 - c_y_o),_
-    84,RGB (255,255,255),0.61,2.52
-    
-    Circle (PITCH_X - c_x_o, PITCH_Y - c_y_o), 9, RGB(255,255,255),pi*1.5,0
-    Circle (PITCH_X - c_x_o, PITCH_Y + PITCH_H - c_y_o), 9, RGB(255,255,255),0,pi/2
-    Circle (PITCH_X+PITCH_W - c_x_o, PITCH_Y - c_y_o), 9, RGB(255,255,255),pi,pi*1.5
-    Circle (PITCH_X+PITCH_W - c_x_o, PITCH_Y + PITCH_H - c_y_o), 9, RGB(255,255,255),pi/2,pi
-    
-END SUB
+    'Circle (xm - cxo, y + padd - cyo), pac,lc,3.75,5.65
+    'Bottom penalty area
+    Line (xm - paw - cxo, y + h - cyo)-(xm + paw - cxo, y + h - pah - cyo), lc,B
+    'Bottom Gk area
+    Line (xm - gkw - cxo, y + h - cyo)-(xm + gkw - cxo, y + h - gkh - cyo), lc,B
+    'Bottom penalty dish
+    Circle (xm - cxo, y + h - padd - cyo), padw,lc,,,,F
+    'Bottom penalty circle
+    'Circle (xm - cxo, y + h - padd - cyo), pac,lc,0.61,2.52
+end sub
 
 SUB draw_players()
     dim as Integer b, c, lowest, start, change, ref, frame_offset
@@ -974,7 +1028,7 @@ SUB draw_players()
                 if pl(a(c,0)).team = 0 then
                     'another one ring if the pl is the ball owner
                     if a(c,0) = PL_ball_owner_id then
-                        circle (pl(a(c,0)).x - c_x_o, pl(a(c,0)).y - c_y_o + 10),11, RGB (255,255,255),,,,F
+                        circle (pl(a(c,0)).x - c_x_o, pl(a(c,0)).y - c_y_o + 10),11, C_WHITE,,,,F
                     end if
                     circle (pl(a(c,0)).x - c_x_o, pl(a(c,0)).y - c_y_o + 10),9, RGB (200,0,100),,,,F
                     circle (pl(a(c,0)).x - c_x_o, pl(a(c,0)).y - c_y_o + 10),6, RGB (0,50,0),,,,F
@@ -1590,6 +1644,24 @@ SUB load_pitch_data()
     Close #ff
 END SUB
 
+Sub init_pitch_dimensions(x as integer, y as integer,_
+                        w as integer, h as integer, slot as integer)
+    Pitch_data(slot).x = x
+    Pitch_data(slot).y = y
+    Pitch_data(slot).w = w
+    Pitch_data(slot).h = h
+    Pitch_data(slot).xm = Pitch_data(slot).w \ 2 + Pitch_data(slot).x
+    Pitch_data(slot).ym = Pitch_data(slot).h \ 2 + Pitch_data(slot).y
+    Pitch_data(slot).paw = Pitch_data(slot).w \ 3 'half penalty area width
+    Pitch_data(slot).pah = Pitch_data(slot).h \ 6 'penalty area height
+    Pitch_data(slot).pac = Pitch_data(slot).w \ 10 'penalty area circle diameter
+    Pitch_data(slot).padw = 2 'penalty dish diameter
+    Pitch_data(slot).padd = Pitch_data(slot).pah \ 2'penalty dish distance from net
+    Pitch_data(slot).gkw = Pitch_data(slot).paw \ 2 'half goalkeeper area width
+    Pitch_data(slot).gkh = Pitch_data(slot).pah \ 3 'goalkeeper area height
+    Pitch_data(slot).cdw = 2 'corner dish diameter
+end sub
+
 SUB load_tact()
     'the "tct_tile" array indicates in wich tile the player must be with corresponding
     'ball position. For example: ball in tile 0 -> read from tct_tile array = player in tile 1
@@ -1792,10 +1864,7 @@ SUB run_tactic(c as Integer)
                             pl(c).tct_id, _
                             get_ball_tile(team(pl(c).team).att_dir))
         
-        'if get_ball_tile(pl(c).team) >= 0 and get_ball_tile(pl(c).team) <= TILES_BALL_N then
-		'tile = tct_tile(Team(pl(c).team).tact_module, pl(c).tct_id, get_ball_tile(pl(c).team))
-			
-		if (team(pl(c).team).att_dir) then
+       if (team(pl(c).team).att_dir) then
 			tile = TILES_PL_N - tile
 		end if
 		
@@ -2659,4 +2728,90 @@ if pl(c).y < PITCH_Y then pl(c).rds = _abtp(pl(c).x, pl(c).y,PITCH_MIDDLE_W,PITC
 'update pl position moving him
 move_player(c)
 next c
+END SUB
+
+sub tct_ed_draw_ball_grid(px as integer, py as integer, pw as integer, ph as integer)
+    dim as integer x, y, x2,y2, col, row, count
+    count = 0
+    for row = 0 to 5 step 1
+        for col = 0 to 5 step 1
+            'draw the grid
+            x = col * pw \ 6 + x
+            y = row * ph \ 6 + y
+            x2 = x + pw \ 6
+            y2 = y + ph \ 6
+            if count = tct_ed_Ball_Current_Tile then
+                line (x,y)-(x2,y2),rgb(200,200,200),b
+                PUT (x + pw\ 12 - 4,y + ph \ 12 - 4), ball_sprite(12), trans
+            end if
+            'check if the ball is into a box of the grid and fill it using paint function
+            count +=1
+        next col
+    next row
+end sub
+
+sub tct_ed_draw_pitch(px as integer, py as integer, pw as integer, ph as integer)
+    dim as Integer pitch_rows, pitch_cols, a, b
+    pitch_rows = ph \ 32 
+    pitch_cols = pw \ 32 
+    'drawing the grass
+    for a = 0 to pitch_rows -1
+        for b = 0 to pitch_cols -1
+           PUT (px + (b*32), py  + (a*32)),pitch_sprite(0),Pset
+        next b
+    next a
+END SUB
+
+sub tct_ed_draw_pl_grid(px as integer, py as integer, pw as integer, ph as integer)
+    dim as integer x, y, x2,y2, col, row, count, c, tl
+    count = 0
+    for row = 0 to 15 step 1
+        for col = 0 to 15 step 1
+            'draw the grid
+            x = col * pw \ 16 + pitch_x 
+            y = row * ph \ 16 + pitch_y
+            x2 = x + pw \ 16
+            y2 = y + ph \ 16
+            line (x,y)-(x2,y2),rgb(125,125,125),b, &b0001000100010001
+            if  tct_ed_mouse.x > x and tct_ed_mouse.x <= x2 _
+                and tct_ed_mouse.y > y and tct_ed_mouse.y <= y2 then
+                line (x,y)-(x2,y2),&hFFFFFF,b
+                draw string (x,y), hex(count)
+                tct_ed_Pl_Current_Tile = count
+            end if
+            count +=1
+        next col
+    next row
+end sub
+
+sub tct_ed_load_default_tact()
+    'the "tct_tile" array indicates in wich tile the player must be with corresponding
+    'ball position. For example: ball in tile 0 -> read from tct_tile(0) = player in tile 1
+    Dim ff As UByte
+    dim as integer slot, c, tl
+    dim path as string*32
+    ff = FreeFile
+    
+    for slot = 0 to 9
+        path = "_data/" + tct_ed_tct_tile_label(slot) +".tac"
+        Open path For input As #ff
+        for c = 0 to 9
+            for tl = 0 to 35
+                Input #ff, tct_ed_tct_tile(slot,c,tl)
+            next tl
+        next c
+        Close #ff
+    next slot
+END SUB
+
+sub tct_ed_draw_players()
+    dim c as integer
+    For c = 0 To 9
+        if c = tct_ed_Pl_Selected and Timer*7 mod 2 = 0 then
+            Circle (pl(c).x, pl(c).y),12, &h3F9E4F,,,,F
+        end if
+            Circle (pl(c).x, pl(c).y),8, &h073C10,,,,F
+        PUT (pl(c).x-10,pl(c).y-20),pl_sprite_1(102), trans
+        draw string (pl(c).x-5,pl(c).y-30), str(c + 2)
+    Next c
 END SUB

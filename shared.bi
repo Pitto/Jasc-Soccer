@@ -90,3 +90,23 @@ dim shared main_menu_selected_item as UShort = 0
 Dim shared Timing as Match_timing_proto
 dim shared Joystick as proto_Joystick
 Joystick.id = 0
+
+'TACTIC EDITOR SHARED VARIABLES
+dim shared tct_ed_TILE_W as integer = tct_ed_PITCH_W\6
+dim shared tct_ed_TILE_H as integer = tct_ed_PITCH_H\6
+dim shared tct_ed_ball_x as integer = PITCH_W + 20
+dim shared tct_ed_ball_y as integer = PITCH_Y + 20
+dim shared tct_ed_Ball_Current_Tile as integer = 0
+dim shared tct_ed_Tactic_slot as integer = 0
+dim shared tct_ed_Pl_Current_Tile as integer = 0
+dim shared tct_ed_Pl_Selected as integer = 0
+'[0-9]Tactic slot; '[0-9]Player slot; '[0-35]Tile slot
+dim shared tct_ed_tct_tile(0 to 9, 0 to 9, 0 to 35) as Integer 'tactic array
+dim shared tct_ed_tct_tile_label(10) as String*3 = {"442","433","352","532","424","451","541","swp","att","def"} 
+'label of the tactic slot selected
+dim shared tct_ed_copypaste(10) as Integer 'store the pl position for copy & paste
+dim shared tct_ed_Has_copyed as Ubyte = 0
+dim shared tct_ed_Has_saved as Ubyte = 0
+dim shared tct_ed_Has_saved_display_time as Double
+Dim shared tct_ed_mouse as mouse
+Dim shared tct_ed_pl(10) as player_proto
