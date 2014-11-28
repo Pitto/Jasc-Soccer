@@ -488,6 +488,9 @@ SUB display_match()
 					Game_section = credits
 					Exit_flag = 1
 				End If
+				If (e.scancode = SC_D) Then
+					Debug = 1 - Debug
+				End If
 			End Select
 		End If
 	
