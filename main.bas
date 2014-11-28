@@ -39,7 +39,8 @@ randomize timer()
 #include "functions.bi"
 #include "subs.bi"
 
-'initialize gfx engine
+'initializing and loading variables ---------------------
+'---------------------------------------------------------
 init_gfx()
 'IMPORTANT: respect this order 1) load_behavior; 2) load_tact
 load_behavior()
@@ -48,33 +49,50 @@ load_tact()
 'load player sprites, pitch... and so on...
 load_bitmap()
 'debug stuff
-if (Debug) then
+'if (Debug) then
 	'check if the correct loading of the tactic file
-	dbg_display_tct_file_check()
+	'dbg_display_tct_file_check()
 	'check if the bitmaps have been correctly loaded
-	check_bitmap()
-end if
+	'check_bitmap()
+'end if
 'loads the teams
 load_teams_list()
 load_pitch_data()
-'display main menu
-display_menu()
-'initalize the teams
-init_team_data()
-'initialize pitch dimensions
-init_pitch_dimensions(PITCH_X, PITCH_Y, PITCH_W, PITCH_H, _
-                    Main_menu_pitch_type_selected)
-'initialize the player proprietes for the match seleceted
-init_players_proprietes()
-
-put_ball_on_centre()
-'initialize the Timer
-init_timing()
-'THE MATCH ITSELF####
-display_match()   '##
-'####################
-'I wish aksnowledege everyone
-draw_aknowledgements()
+'---------------------------------------------------------
+DO
+	Select case Game_section
+		'MAIN MENU
+		case main_menu
+			'display main menu
+			display_menu()
+		'TACTIC EDITOR
+		case tactic_editor
+			display_tactic_editor()
+		'GAME
+		case game
+			'initalize the teams selected
+			init_team_data()
+			'initialize pitch dimensions
+			init_pitch_dimensions(PITCH_X, PITCH_Y, PITCH_W, PITCH_H, _
+						Main_menu_pitch_type_selected)
+			'initialize the player proprietes for the match seleceted
+			init_players_proprietes()
+			put_ball_on_centre()
+			'initialize the Timer
+			init_timing()
+			'THE MATCH ITSELF####
+			display_match()   '##
+			'####################
+		'ENDING CREDITS
+		case credits
+			'I wish aknowledege everyone
+			draw_aknowledgements()
+		'EXIT FROM THE MAIN GAME
+		case exit_game
+			exit do
+	end select
+	'If InKey = Chr(255,107) Then Exit Do
+LOOP
 'remove bitmap data from memory
 delete_bitmap()
 END

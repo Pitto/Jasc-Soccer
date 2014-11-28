@@ -15,6 +15,14 @@ enum proto_pl_action
     bench = 12
 end enum
 
+enum proto_game_section
+	main_menu = 0
+	tactic_editor = 1
+	game = 2
+	credits = 3
+	exit_game = 4
+end enum
+
 enum proto_match_event
     none = 0
     ball_in_game

@@ -145,6 +145,7 @@ declare sub tct_ed_print_tact_data()
 declare sub tct_ed_save_data(slot_to_save as integer)
 declare sub init_pitch_dimensions(x as integer, y as integer,_
                         w as integer, h as integer, slot as integer)
+declare sub display_tactic_editor()
 
 
 
@@ -477,8 +478,19 @@ SUB display_menu()
 END SUB
 
 SUB display_match()
+	dim e As EVENT
+
 	DO
-		If InKey = Chr(255,107) Then Exit Do 'if the user clicks the X button on the window then ... bye bye JASC
+		If (ScreenEvent(@e)) Then
+			Select Case e.type
+			Case EVENT_KEY_RELEASE
+				If (e.scancode = SC_Escape) Then
+					Game_section = credits
+					Exit_flag = 1
+				End If
+			End Select
+		End If
+	
 		update_match_event()
 		check_ball_woods()
 		check_ball_limits()
@@ -531,8 +543,51 @@ SUB display_match()
 		end if
 		if int(90/Timing.secs_to_play*Timing.seconds_elapsed)>90 + Timing.injury_time then Exit_flag = 1
 		Timing.time_last = Timing.time_current
-	LOOP UNTIL MULTIKEY(SC_ESCAPE) or Exit_flag = 1
+	LOOP UNTIL Exit_flag = 1
+	game_section = main_menu
 END SUB
+
+SUB display_tactic_editor()
+
+	dim e As EVENT
+
+	DO
+		If (ScreenEvent(@e)) Then
+			Select Case e.type
+			Case EVENT_KEY_RELEASE
+				If (e.scancode = SC_Escape) Then
+					Game_section = credits
+					Exit_flag = 1
+				End If
+			End Select
+		End If
+	
+		tct_ed_key_input_listener()
+		
+		screenlock ' Lock the screen
+		screenset workpage, workpage xor 1 ' Swap work pages.
+		cls
+		
+		'tct_ed_draw_pitch()
+		'draw_pitch_lines()
+		tct_ed_draw_pl_grid(tct_ed_PITCH_X, tct_ed_PITCH_Y, tct_ed_PITCH_W, tct_ed_PITCH_H)
+		tct_ed_draw_ball_grid(tct_ed_PITCH_X, tct_ed_PITCH_Y, tct_ed_PITCH_W, tct_ed_PITCH_H)
+		tct_ed_update_pl_on_tact_tile()
+		tct_ed_draw_players()
+		
+		
+		line (tct_ed_mouse.x-5, tct_ed_mouse.y)-(tct_ed_mouse.x+5, tct_ed_mouse.y)
+		line (tct_ed_mouse.x, tct_ed_mouse.y-5)-(tct_ed_mouse.x, tct_ed_mouse.y+5)
+		
+		tct_ed_print_tact_data()
+
+		workpage xor = 1 ' Swap work pages.
+		'locate 10,10 : print str(get_ball_tile())
+		screenunlock
+		sleep 50,1
+	LOOP UNTIL Exit_flag = 1
+	game_section = main_menu
+end sub
 
 SUB draw_aknowledgements()
 	#define AKN_MAX_LINES 50
@@ -576,7 +631,11 @@ SUB draw_aknowledgements()
 		SLEEP SLEEP_TIME, 1
 		'if the credits have been entirely shown, exit from the loop
 		if txt_y < -AKN_MAX_LINES*10 then exit do
-	LOOP UNTIL MULTIKEY(SC_J)
+		if multikey(SC_J) then
+			Game_section = exit_game
+			exit do
+		end if
+	LOOP
 END SUB
 
 SUB draw_ball()
@@ -825,7 +884,7 @@ Sub Draw_main_menu()
     PrintFont 20, SCREEN_H - 16, _
     str("This software is released under the Terms of the GNU GPL license v. 2.0"), SmallFont, 1, 1 
     
-    For a = 0 To 6
+    For a = 0 To 7
         Line (SCREEN_W\2 - 100,a*30 + 75)-(SCREEN_W\2 + 100,a*30 + 100),Rgb(63,0,0),BF
         If a = Main_menu_Item_selected Then
             Line (SCREEN_W\2 - 100,a*30 + 75)-(SCREEN_W\2 + 100,a*30 + 100),Rgb(127,0,0),BF
@@ -908,6 +967,9 @@ Sub Draw_main_menu()
             Else
                 Draw String (SCREEN_W\2 - len("WATCH THE MATCH")*4,a*30 + 80), "WATCH THE MATCH"
             End If
+        Case 7
+            Line (SCREEN_W\2 - 96,a*30 + 79)-(SCREEN_W\2 + 96,a*30 + 96),Rgb(63,63,0),BF
+            Draw String (SCREEN_W\2 - len("EDIT TACTICS")*4,a*30 + 80), "EDIT TACTICS"
         End Select
     Next a
 End Sub
@@ -2029,10 +2091,14 @@ Sub Update_main_menu()
             If (e.scancode = SC_LEFT) Then
                 scroll = -1
             End If
+            If (e.scancode = SC_Escape) Then
+                Game_section = credits
+                Exit_flag = 1
+            End If
         End Select
     End If
 
-    If Main_menu_Item_selected > 6 Then Main_menu_Item_selected = 6
+    If Main_menu_Item_selected > 7 Then Main_menu_Item_selected = 7
     If Main_menu_Item_selected < 0 Then Main_menu_Item_selected = 0
     
     Select Case Main_menu_Item_selected
@@ -2097,7 +2163,14 @@ Sub Update_main_menu()
             end if
             Training_mode = 0
             Exit_flag = 1
-            Debug = 0
+            Game_section = game
+        End If
+	Case 7
+        If Multikey(SC_ENTER) Then
+			tct_ed_load_default_tact()
+			tct_ed_init_pl_proprietes()
+			Exit_flag = 1
+			Game_section = Tactic_editor
         End If
     End Select
     'important! resets to 0 the horizontal scroll of the selected item
@@ -2808,10 +2881,217 @@ sub tct_ed_draw_players()
     dim c as integer
     For c = 0 To 9
         if c = tct_ed_Pl_Selected and Timer*7 mod 2 = 0 then
-            Circle (pl(c).x, pl(c).y),12, &h3F9E4F,,,,F
+            Circle (tct_ed_pl(c).x, pl(c).y),12, &h3F9E4F,,,,F
         end if
-            Circle (pl(c).x, pl(c).y),8, &h073C10,,,,F
-        PUT (pl(c).x-10,pl(c).y-20),pl_sprite_1(102), trans
-        draw string (pl(c).x-5,pl(c).y-30), str(c + 2)
+            Circle (tct_ed_pl(c).x, tct_ed_pl(c).y),8, &h073C10,,,,F
+        PUT (tct_ed_pl(c).x-10,tct_ed_pl(c).y-20),pl_sprite_1(102), trans
+        draw string (tct_ed_pl(c).x-5,tct_ed_pl(c).y-30), str(c + 2)
     Next c
 END SUB
+
+
+sub tct_ed_key_input_listener()
+
+    dim e As EVENT
+    If (ScreenEvent(@e)) Then
+        Select Case e.type
+        Case EVENT_KEY_RELEASE
+            If (e.scancode = SC_S) Then
+                tct_ed_Save_data(tct_ed_tactic_slot)
+                tct_ed_Has_Saved = 1
+                tct_ed_Has_saved_display_time = Timer
+            End If
+            If (e.scancode = SC_A) Then
+                tct_ed_Save_data(-1)
+                tct_ed_Has_Saved = 1
+                tct_ed_Has_saved_display_time = Timer
+            End If
+        End Select
+    End If
+    'ball tile position update by user
+    if MULTIKEY(SC_RIGHT) and tct_ed_Ball_Current_Tile + 1 < 36 and (tct_ed_Ball_Current_Tile + 1)mod 6 <>0 then
+        tct_ed_Ball_Current_Tile +=1
+    end if
+    if MULTIKEY(SC_LEFT) and tct_ed_Ball_Current_Tile - 1 >= 0 and tct_ed_Ball_Current_Tile mod 6 <>0  then
+		tct_ed_Ball_Current_Tile -=1
+    end if
+    if MULTIKEY(SC_UP) and tct_ed_Ball_Current_Tile - 6 >= 0 then
+        tct_ed_Ball_Current_Tile -=6
+    end if
+    if MULTIKEY(SC_DOWN) and tct_ed_Ball_Current_Tile + 6 < 36 then
+        tct_ed_Ball_Current_Tile +=6
+    end if
+    'pl selected updated by user
+    tct_ed_mouse.res = GetMouse( tct_ed_mouse.x, tct_ed_mouse.y, tct_ed_mouse.wheel, tct_ed_mouse.buttons, tct_ed_mouse.clip)
+    tct_ed_mouse.diff_wheel = tct_ed_mouse.old_wheel - tct_ed_mouse.wheel
+    tct_ed_mouse.old_wheel = tct_ed_mouse.wheel
+    tct_ed_Pl_Selected = tct_ed_Pl_Selected + tct_ed_mouse.diff_wheel
+    if tct_ed_Pl_Selected < 0 then tct_ed_Pl_Selected = 0
+    if tct_ed_Pl_Selected > 9 then tct_ed_Pl_Selected = 9
+    'on clik refresh the field
+    if tct_ed_mouse.buttons = 1 then tct_ed_tct_tile(tct_ed_Tactic_slot, tct_ed_Pl_selected, tct_ed_Ball_Current_Tile) = tct_ed_Pl_Current_Tile
+    'tactic slot selected updated by user
+    if MULTIKEY(SC_0) then tct_ed_Tactic_slot = 0
+    if MULTIKEY(SC_1) then tct_ed_Tactic_slot = 1
+    if MULTIKEY(SC_2) then tct_ed_Tactic_slot = 2
+    if MULTIKEY(SC_3) then tct_ed_Tactic_slot = 3
+    if MULTIKEY(SC_4) then tct_ed_Tactic_slot = 4
+    if MULTIKEY(SC_5) then tct_ed_Tactic_slot = 5
+    if MULTIKEY(SC_6) then tct_ed_Tactic_slot = 6
+    if MULTIKEY(SC_7) then tct_ed_Tactic_slot = 7
+    if MULTIKEY(SC_8) then tct_ed_Tactic_slot = 8
+    if MULTIKEY(SC_9) then tct_ed_Tactic_slot = 9
+    
+    'copy and paste pl postion along the ball tiles
+    if MULTIKEY(SC_C) and MULTIKEY(SC_CONTROL) then tct_ed_pos_copy():tct_ed_Has_copyed = 1
+    if MULTIKEY(SC_V) and MULTIKEY(SC_CONTROL) then tct_ed_pos_paste()
+    
+END SUB
+
+sub tct_ed_save_data(slot_to_save as integer)
+    Dim path as String
+    Dim ff As UByte
+    dim as integer slot, c, tl
+    ff = FreeFile
+    'save all tactics
+    if slot_to_save = -1 then
+        for slot = 0 to 9
+            path = "_data/" + tct_ed_tct_tile_label(slot) + ".tac"
+            Open path For Output As #ff
+            for c = 0 to 9
+                for tl = 0 to 35
+                    Write #ff, tct_ed_tct_tile(slot,c, tl)
+                next tl
+            next c
+            Close #ff
+        next slot
+    'save only the selected tactics
+    else
+        path = "_data/" + tct_ed_tct_tile_label(tct_ed_tactic_slot) + ".tac"
+        Open path For Output As #ff
+        for c = 0 to 9
+            for tl = 0 to 35
+                Write #ff, tct_ed_tct_tile(tct_ed_tactic_slot,c, tl)
+            next tl
+        next c
+        Close #ff
+   end if
+END SUB
+
+sub tct_ed_update_pl_on_tact_tile()
+    dim as single x_trg, y_trg
+    dim as integer id, tile_row, tile_col, tile, c
+
+    'routine for all players
+    
+    for c = 0 to 9
+        'get the right tile to reach
+        tile = tct_ed_tct_tile(tct_ed_Tactic_slot, c,tct_ed_Ball_Current_Tile)
+        'get the row and the column
+        tile_row = tile MOD 16
+        tile_col = 16-int(tile\16)
+        'convert in xy coords
+        x_trg = (tile_row * tct_ed_TILE_W\16) + Pitch_data(0).x + Pitch_data(0).w\32
+        y_trg = Pitch_data(0).h - (tile_col * tct_ed_TILE_H\16) + Pitch_data(0).h\16 
+        'returns te right rds to the tile
+        tct_ed_pl(c).rds = _abtp (tct_ed_pl(c).x,tct_ed_pl(c).y,x_trg,y_trg)
+        'if the distance is less than 5 then the pl has reached the position
+        if d_b_t_p(pl(c).x,pl(c).y,x_trg,y_trg) < 5 then
+            tct_ed_pl(c).speed = 0
+            tct_ed_pl(c).x = x_trg
+            tct_ed_pl(c).y = y_trg
+        else
+            tct_ed_pl(c).speed = d_b_t_p(tct_ed_pl(c).x,tct_ed_pl(c).y,x_trg,y_trg) / 4
+            'update the pl position moving him
+            tct_ed_pl(c).x +=  cos(tct_ed_pl(c).rds) * tct_ed_pl(c).speed 
+            tct_ed_pl(c).y +=  -sin(tct_ed_pl(c).rds) * tct_ed_pl(c).speed
+        end if
+    next c
+END SUB
+
+sub tct_ed_init_pl_proprietes()
+    dim c as integer
+    for c = 0 to 9
+        tct_ed_pl(c).x = Pitch_data(0).x + Pitch_data(0).w\2
+        tct_ed_pl(c).y = Pitch_data(0).y + Pitch_data(0).h\2
+        tct_ed_pl(c).speed = 15
+        tct_ed_pl(c).rds = 0
+    next c
+END SUB
+
+sub tct_ed_pos_copy()
+    dim c as integer
+    for c = 0 to 9
+        tct_ed_copypaste(c) = tct_ed_tct_tile(tct_ed_Tactic_slot, c,tct_ed_Ball_Current_Tile)
+    next c
+END SUB
+
+sub tct_ed_pos_paste()
+    dim c as integer
+    if tct_ed_Has_copyed then
+        for c = 0 to 9
+            tct_ed_tct_tile(tct_ed_Tactic_slot, c,tct_ed_Ball_Current_Tile) = tct_ed_copypaste(c) 
+        next c
+    end if
+END SUB
+
+sub tct_ed_print_tact_data()
+    'the "tct_tile" array indicates in wich tile the player must be with corresponding
+    'ball position. For example: ball in tile 0 -> read from tct_tile(0) = player in tile 1
+    dim tl as Integer = 0
+    dim c as Integer = 0
+    dim offset_txt_x as integer = Pitch_data(0).x + Pitch_data(0).w + 32
+    
+    For c = 0 To 9
+        for tl = 0 to 35
+            if (tct_ed_Pl_selected = c) then
+                draw string (Pitch_data(0).x + (tl*21), Pitch_data(0).y + Pitch_data(0).h + 20 + c * 8), hex(tct_ed_tct_tile(tct_ed_Tactic_slot,c,tl)), RGB(100,100,100)
+                if (tl = tct_ed_Ball_Current_Tile) then
+                    draw string (Pitch_data(0).x + (tl*21), Pitch_data(0).y + Pitch_data(0).h + 20 + c * 8), hex(tct_ed_tct_tile(tct_ed_Tactic_slot,c,tl)), C_WHITE
+                end if
+            else
+                draw string (Pitch_data(0).x + (tl*21), Pitch_data(0).y + Pitch_data(0).h + 20 + c * 8), hex(tct_ed_tct_tile(tct_ed_Tactic_slot,c,tl)), RGB(25,25,25)
+            end if
+        next tl
+    Next c
+    
+    draw string (offset_txt_x, 20), "Tactic Name " + str(tct_tile_label(tct_ed_Tactic_slot))
+    draw string (offset_txt_x, 40), "Tactic Slot " + str(tct_ed_Tactic_slot)
+    draw string (offset_txt_x, 60), "PL Tile     " + hex(tct_ed_Pl_Current_Tile)
+    draw string (offset_txt_x, 80), "Ball Tile   " + str(tct_ed_Ball_Current_Tile)
+    draw string (offset_txt_x, 100), "Pl Selected " + str(tct_ed_Pl_Selected)
+
+    'instructions
+    draw string (offset_txt_x, 200), "CURSOR KEYS - Move the ball", RGB(63,63,63)
+    draw string (offset_txt_x, 220), "MOUSE WHEEL - Select previous player", RGB(63,63,63)
+    draw string (offset_txt_x, 240), "MOUSE CLICK - Set new tile for the player", RGB(63,63,63)
+    draw string (offset_txt_x, 260), "KEYS [0-9]  - Select a Tactic Slot", RGB(63,63,63)
+    draw string (offset_txt_x, 280), "CTRL + C    - Copy Pl pos. on Clipboard", RGB(63,63,63)
+    draw string (offset_txt_x, 300), "CTRL + V    - Paste Pl pos. from Clipboard",RGB(63,63,63)
+    draw string (offset_txt_x, 320), "S           - Save current Tactic Slot",RGB(63,63,63)
+    draw string (offset_txt_x, 340), "A           - Save all Tactic Slots",RGB(63,63,63)
+    draw string (offset_txt_x, 360), "Attack way is top-down",RGB(63,63,63)
+    
+    for c = 0 to 9
+        if c = tct_ed_Tactic_slot then
+            line (SCREEN_W - 72, 16 + c*20)-(SCREEN_W - 16, 30 + c*20), RGB(0,0,127), BF
+            draw string (SCREEN_W - 64, 20 + (c*20)), str(c) + " " + str(tct_tile_label(c)), C_WHITE
+        else
+            draw string (SCREEN_W - 64, 20 + (c*20)), str(c) + " " + str(tct_tile_label(c)), RGB(63,63,63)
+        end if
+    next c
+    
+    if tct_ed_Has_Saved then
+        line (Pitch_data(0).w + Pitch_data(0).x + 32, Pitch_data(0).y + Pitch_data(0).h - 32)-_
+             (SCREEN_W - 32, Pitch_data(0).y + Pitch_data(0).h), RGB(127,0,0), BF
+        line (Pitch_data(0).w + Pitch_data(0).x + 32, Pitch_data(0).y + Pitch_data(0).h - 32)-_
+             (SCREEN_W - 32, Pitch_data(0).y + Pitch_data(0).h), RGB(255,0,0), B
+        draw string (SCREEN_W - Pitch_data(0).w + Pitch_data(0).x + (len("DATA SUCCESSFULLY SAVED")*8)/2,_
+                    Pitch_data(0).h + Pitch_data(0).y - 20), "DATA SUCCESSFULLY SAVED", C_WHITE
+        if timer - tct_ed_Has_saved_display_time > 3 then tct_ed_Has_Saved = 0
+    end if
+END SUB
+
+
+
+

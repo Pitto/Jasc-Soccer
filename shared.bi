@@ -1,7 +1,7 @@
 DIM SHARED SmallFont AS FontType
 DIM SHARED UniFont AS FontType
 dim SHARED Dt as single ' Delta Timing
-DIM SHARED Debug as Integer = 0
+DIM SHARED Debug as Integer = 1
 'exit flag
 DIM shared Exit_flag as Integer = 0
 
@@ -110,3 +110,7 @@ dim shared tct_ed_Has_saved as Ubyte = 0
 dim shared tct_ed_Has_saved_display_time as Double
 Dim shared tct_ed_mouse as mouse
 Dim shared tct_ed_pl(10) as player_proto
+
+
+Dim shared Game_section as proto_game_section
+Game_section = main_menu
