@@ -67,6 +67,7 @@ DO
 			display_menu()
 		'TACTIC EDITOR
 		case tactic_editor
+			init_pitch_dimensions(10, 10, 320, 320, 0)
 			display_tactic_editor()
 		'GAME
 		case game

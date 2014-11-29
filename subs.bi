@@ -571,10 +571,26 @@ SUB display_tactic_editor()
 		screenset workpage, workpage xor 1 ' Swap work pages.
 		cls
 		
-		'tct_ed_draw_pitch()
-		'draw_pitch_lines()
-		tct_ed_draw_pl_grid(tct_ed_PITCH_X, tct_ed_PITCH_Y, tct_ed_PITCH_W, tct_ed_PITCH_H)
-		tct_ed_draw_ball_grid(tct_ed_PITCH_X, tct_ed_PITCH_Y, tct_ed_PITCH_W, tct_ed_PITCH_H)
+		tct_ed_draw_pitch(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
+		
+		draw_pitch_lines ( Pitch_data(0).x,_
+                            Pitch_data(0).y,_
+                            Pitch_data(0).w,_
+                            Pitch_data(0).h,_
+                            Pitch_data(0).xm,_
+                            Pitch_data(0).ym,_
+                            Pitch_data(0).paw,_
+                            Pitch_data(0).pah,_
+                            Pitch_data(0).pac,_
+                            Pitch_data(0).padw,_
+                            Pitch_data(0).padd,_
+                            Pitch_data(0).gkw,_
+                            Pitch_data(0).gkh,_
+                            C_WHITE, 0, 0)
+		
+		'draw_pitch_lines(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
+		tct_ed_draw_pl_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
+		tct_ed_draw_ball_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
 		tct_ed_update_pl_on_tact_tile()
 		tct_ed_draw_players()
 		
@@ -971,7 +987,7 @@ Sub Draw_main_menu()
                 Draw String (SCREEN_W\2 - len("WATCH THE MATCH")*4,a*30 + 80), "WATCH THE MATCH"
             End If
         Case 7
-            Line (SCREEN_W\2 - 96,a*30 + 79)-(SCREEN_W\2 + 96,a*30 + 96),Rgb(63,63,0),BF
+            Line (SCREEN_W\2 - 96,a*30 + 79)-(SCREEN_W\2 + 96,a*30 + 96),C_GRAY,BF
             Draw String (SCREEN_W\2 - len("EDIT TACTICS")*4,a*30 + 80), "EDIT TACTICS"
         End Select
     Next a
@@ -2172,6 +2188,11 @@ Sub Update_main_menu()
         If Multikey(SC_ENTER) Then
 			tct_ed_load_default_tact()
 			tct_ed_init_pl_proprietes()
+			init_pitch_dimensions(50, 50, 320, 400, _
+						Main_menu_pitch_type_selected)
+			tct_ed_TILE_W = 320 / 6
+			tct_ed_TILE_H = 400 / 6
+			
 			Exit_flag = 1
 			Game_section = Tactic_editor
         End If
@@ -2812,8 +2833,8 @@ sub tct_ed_draw_ball_grid(px as integer, py as integer, pw as integer, ph as int
     for row = 0 to 5 step 1
         for col = 0 to 5 step 1
             'draw the grid
-            x = col * pw \ 6 + x
-            y = row * ph \ 6 + y
+            x = col * pw \ 6 + px
+            y = row * ph \ 6 + py
             x2 = x + pw \ 6
             y2 = y + ph \ 6
             if count = tct_ed_Ball_Current_Tile then
@@ -2844,8 +2865,8 @@ sub tct_ed_draw_pl_grid(px as integer, py as integer, pw as integer, ph as integ
     for row = 0 to 15 step 1
         for col = 0 to 15 step 1
             'draw the grid
-            x = col * pw \ 16 + pitch_x 
-            y = row * ph \ 16 + pitch_y
+            x = col * pw \ 16 + px 
+            y = row * ph \ 16 + px
             x2 = x + pw \ 16
             y2 = y + ph \ 16
             line (x,y)-(x2,y2),rgb(125,125,125),b, &b0001000100010001
@@ -2884,7 +2905,7 @@ sub tct_ed_draw_players()
     dim c as integer
     For c = 0 To 9
         if c = tct_ed_Pl_Selected and Timer*7 mod 2 = 0 then
-            Circle (tct_ed_pl(c).x, pl(c).y),12, &h3F9E4F,,,,F
+            Circle (tct_ed_pl(c).x, tct_ed_pl(c).y),12, &h3F9E4F,,,,F
         end if
             Circle (tct_ed_pl(c).x, tct_ed_pl(c).y),8, &h073C10,,,,F
         PUT (tct_ed_pl(c).x-10,tct_ed_pl(c).y-20),pl_sprite_1(102), trans
@@ -2994,8 +3015,8 @@ sub tct_ed_update_pl_on_tact_tile()
         tile_row = tile MOD 16
         tile_col = 16-int(tile\16)
         'convert in xy coords
-        x_trg = (tile_row * tct_ed_TILE_W\16) + Pitch_data(0).x + Pitch_data(0).w\32
-        y_trg = Pitch_data(0).h - (tile_col * tct_ed_TILE_H\16) + Pitch_data(0).h\16 
+        x_trg = (tile_row * Pitch_data(0).w\16) + Pitch_data(0).x + Pitch_data(0).w\32
+        y_trg = Pitch_data(0).h - (tile_col * Pitch_data(0).h\16) + Pitch_data(0).h\16 
         'returns te right rds to the tile
         tct_ed_pl(c).rds = _abtp (tct_ed_pl(c).x,tct_ed_pl(c).y,x_trg,y_trg)
         'if the distance is less than 5 then the pl has reached the position

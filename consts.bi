@@ -1,6 +1,6 @@
 '#DEFINE################################################################
 #define GAME_NAME "JASC SOCCER"
-#define GAME_VERSION "0.24.1"
+#define GAME_VERSION "0.24.5"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 7
