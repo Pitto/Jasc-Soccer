@@ -1,4 +1,12 @@
 'SUBS DECLARATIONS-----------------------------------------------------------------------
+'draw the button
+declare sub draw_button (	x as integer, y as integer, w as integer,_
+							h as integer, label as string,_
+							stroke_color as Uinteger,_
+							fill_color as Uinteger,_
+							is_selected as integer,_
+							stroke_color_selected as integer)
+
 'draw pitch lines
 declare sub draw_pitch_lines (   x as integer,_
                         y as integer,_
@@ -885,24 +893,39 @@ SUB draw_intro()
     
 END SUB
 
+sub draw_button (x as integer, y as integer, w as integer,_
+							h as integer, label as string,_
+							stroke_color as Uinteger,_
+							fill_color as Uinteger,_
+							is_selected as integer,_
+							stroke_color_selected as integer)
+	Line (x,y)-(x+w,y+h),fill_color,BF
+	Line (x,y)-(x+w,y+h),stroke_color,B			
+	if (is_selected) then
+		Line (x,y)-(x+w,y+h),stroke_color_selected,B			
+	end if
+	
+	draw string (x + (w \ 2) - len(label)*4, y + 5), label		
+	
+end sub
+
+
 Sub Draw_main_menu()
-    
     Dim a As Integer
     Dim top_margin as integer = 80
     'graphic statements
     'wallpaper
     PUT (0, 0), Wallpaper(1),pset
-    for a = 0 to int (SCREEN_W \ 32) +1 
-        PUT (32*a, 0), shadowed_sprite, trans
-       ' PUT (32*a, SCREEN_H - 32), shadowed_sprite, trans
-    next
-    
-    PrintFont SCREEN_W\2 - len(str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR))*5, 16,_
-    str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR), UniFont, 1, 1 
-    
-    PrintFont 20, SCREEN_H - 16, _
-    str("This software is released under the Terms of the GNU GPL license v. 2.0"), SmallFont, 1, 1 
-    
+'    for a = 0 to int (SCREEN_W \ 32) +1 
+'        PUT (32*a, 0), shadowed_sprite, trans
+'    next
+    draw_button 	(SCREEN_W\2 - 150, 20, 300, 20, _
+					str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR),_
+					C_WHITE, C_GRAY,0,0)
+    draw_button 	(SCREEN_W\2 - 300, SCREEN_H - 30, 600, 20, _
+					str("This software is released under the Terms of the GNU GPL license v. 2.0"),_
+					C_WHITE, C_GRAY,0,0)
+   
     For a = 0 To 7
         Line (SCREEN_W\2 - 100,a*30 + 75)-(SCREEN_W\2 + 100,a*30 + 100),Rgb(63,0,0),BF
         If a = Main_menu_Item_selected Then
