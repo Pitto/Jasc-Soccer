@@ -899,10 +899,21 @@ sub draw_button (x as integer, y as integer, w as integer,_
 							fill_color as Uinteger,_
 							is_selected as integer,_
 							stroke_color_selected as integer)
+	dim offset_line as integer = 2
+	dim offset_shadow as integer = 1
+	
 	Line (x,y)-(x+w,y+h),fill_color,BF
-	Line (x,y)-(x+w,y+h),stroke_color,B			
+	Line (x,y)-(x+w,y+h),stroke_color,B
+	Line (x+w,y)-(x+w,y+h),stroke_color xor C_GRAY,B
+	Line (x,y+h)-(x+w,y+h),stroke_color xor C_GRAY,B
+	
 	if (is_selected) then
-		Line (x,y)-(x+w,y+h),stroke_color_selected,B			
+		Line (x,y)-(x+w,y+h),fill_color or C_GRAY,BF	
+		Line 	(x - offset_line,y - offset_line)-_
+				(x+w + offset_line,_
+				y+h + offset_line),stroke_color_selected,B
+		draw string 	(x + (w \ 2) - len(label)*4 + offset_shadow,_
+						y + 5 + offset_shadow), label, C_BLACK		
 	end if
 	
 	draw string (x + (w \ 2) - len(label)*4, y + 5), label		
@@ -912,108 +923,127 @@ end sub
 
 Sub Draw_main_menu()
     Dim a As Integer
+    dim i as integer
+    dim btn_w as integer = 160 'width of the button
+    dim btn_h as integer = 20 'width of the button
+    dim btn_v_space as integer = 10 'vertical spacing of each button
     Dim top_margin as integer = 80
     'graphic statements
     'wallpaper
     PUT (0, 0), Wallpaper(1),pset
-'    for a = 0 to int (SCREEN_W \ 32) +1 
-'        PUT (32*a, 0), shadowed_sprite, trans
-'    next
     draw_button 	(SCREEN_W\2 - 150, 20, 300, 20, _
 					str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR),_
 					C_WHITE, C_GRAY,0,0)
     draw_button 	(SCREEN_W\2 - 300, SCREEN_H - 30, 600, 20, _
 					str("This software is released under the Terms of the GNU GPL license v. 2.0"),_
 					C_WHITE, C_GRAY,0,0)
-   
     For a = 0 To 7
-        Line (SCREEN_W\2 - 100,a*30 + 75)-(SCREEN_W\2 + 100,a*30 + 100),Rgb(63,0,0),BF
-        If a = Main_menu_Item_selected Then
-            Line (SCREEN_W\2 - 100,a*30 + 75)-(SCREEN_W\2 + 100,a*30 + 100),Rgb(127,0,0),BF
-            Line (SCREEN_W\2 - 100,a*30 + 75)-(SCREEN_W\2 + 100,a*30 + 100),Rgb(255,0,0),B
-        End If
         Select Case a
         Case 0
-            PrintFont SCREEN_W\2 - len(Main_Menu_List_Teams(Main_menu_Team_0_selected).label)*4,_
-            a*30 + top_margin,_
-            str(Main_Menu_List_Teams(Main_menu_Team_0_selected).label), UniFont, 1,1
-            'left & right menu arrows
-            If a = Main_menu_Item_selected Then
-                if Main_menu_Team_0_selected > lbound(Main_Menu_List_Teams) then
-                        Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-                end if
-                if Main_menu_Team_0_selected < ubound(Main_Menu_List_Teams)-1 then
-                        Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-                end if
-            end if
+			for i = lbound(Main_Menu_List_Teams) to ubound (Main_Menu_List_Teams) - 1
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_Team_0_selected - i),_
+						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+						Main_Menu_List_Teams(i).label,_
+						C_GRAY, C_GRAY,0,0)
+			next i
+			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			Main_Menu_List_Teams(Main_menu_Team_0_selected).label,_
+			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 1
-            PrintFont SCREEN_W\2 - len(Main_Menu_List_Teams(Main_menu_Team_1_selected).label)*4,_
-            a*30 + top_margin, str(Main_Menu_List_Teams(Main_menu_Team_1_selected).label) , UniFont, 1,1
-            If a = Main_menu_Item_selected Then
-                if Main_menu_Team_1_selected > lbound(Main_Menu_List_Teams) then
-                        Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-                end if
-                if Main_menu_Team_1_selected < ubound(Main_Menu_List_Teams)-1 then
-                        Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-                end if
-            end if
+			for i = lbound(Main_Menu_List_Teams) to ubound (Main_Menu_List_Teams) - 1
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_Team_1_selected - i),_
+						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+						Main_Menu_List_Teams(i).label,_
+						C_GRAY, C_GRAY,0,0)
+			next i
+   			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			Main_Menu_List_Teams(Main_menu_Team_1_selected).label,_
+			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 2
-            PrintFont SCREEN_W\2 - len(Pitch_data(Main_menu_pitch_type_selected).label)*4,_
-            a*30 + top_margin, Str(Pitch_data(Main_menu_pitch_type_selected).label), UniFont, 1, 1
-            If a = Main_menu_Item_selected Then
-                if Main_menu_pitch_type_selected > lbound(Pitch_data) then
-                        Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-                end if
-                if Main_menu_pitch_type_selected < ubound(Pitch_data)-1 then
-                        Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-                end if
-            end if
+			for i = lbound(Pitch_data) to ubound (Pitch_data) - 1
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_pitch_type_selected - i),_
+						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+						Pitch_data(i).label,_
+						C_GRAY, C_GRAY,0,0)
+			next i
+			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			Pitch_data(Main_menu_pitch_type_selected).label,_
+			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 3
-            PrintFont SCREEN_W\2 - len(Str(Main_Menu_List_mins(Main_menu_mins_selected)))*4,_
-            a*30 + top_margin, Str(Main_Menu_List_mins(Main_menu_mins_selected)), UniFont, 1, 1
-            If a = Main_menu_Item_selected Then
-                if Main_menu_mins_selected > lbound(Main_Menu_List_mins) then
-                        Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-                end if
-                if Main_menu_mins_selected < ubound(Main_Menu_List_mins)-1 then
-                        Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-                end if
-            end if
-            
+			for i = lbound(Main_Menu_List_mins) to ubound (Main_Menu_List_mins) - 1
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_mins_selected - i),_
+						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+						Str(Main_Menu_List_mins(i)),_
+						C_GRAY, C_GRAY,0,0)
+			next i
+   			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			Str(Main_Menu_List_mins(Main_menu_mins_selected)) + " mins.",_
+			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 4
-            PrintFont SCREEN_W\2 - len(Str(Main_Menu_Mode(Main_Menu_mode_selected)))*4,_
-            a*30 + top_margin, Str(Main_Menu_Mode(Main_Menu_mode_selected)), UniFont, 1,1
-            If a = Main_menu_Item_selected Then
-                if Main_Menu_mode_selected > lbound(Main_Menu_Mode) then
-                        Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-                end if
-                if Main_Menu_mode_selected < ubound(Main_Menu_Mode)-1 then
-                        Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-                end if
-            end if
+			for i = lbound(Main_Menu_Mode) to ubound (Main_Menu_Mode) - 1
+				draw_button (SCREEN_W\2 - btn_w\2 - btn_w*(Main_Menu_mode_selected - i),_
+						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+						Str(Main_Menu_Mode(i)),_
+						C_GRAY, C_GRAY,0,0)
+			next i
+   			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			Str(Main_Menu_Mode(Main_Menu_mode_selected)),_
+			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 5
-            PrintFont SCREEN_W\2 - len(Str(Main_Menu_control(Main_Menu_control_selected)))*4,_
-            a*30 + top_margin, Str(Main_Menu_control(Main_Menu_control_selected)), Unifont, 1,1
-            If a = Main_menu_Item_selected Then
-                if Main_menu_control_selected > lbound(Main_Menu_control) then
-                        Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-                end if
-                if Main_Menu_control_selected < ubound(Main_Menu_control)-1 then
-                        Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-                end if
-            end if
+			for i = lbound(Main_Menu_control) to ubound (Main_Menu_control) - 1
+				draw_button (SCREEN_W\2 - btn_w\2 - btn_w*(Main_Menu_control_selected - i),_
+						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+						Str(Main_Menu_control(i)),_
+						C_GRAY, C_GRAY,0,0)
+			next i
+   			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			Str(Main_Menu_control(Main_Menu_control_selected)),_
+			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 6
-            Line (SCREEN_W\2 - 96,a*30 + 79)-(SCREEN_W\2 + 96,a*30 + 96),Rgb(63,63,0),BF
             If Main_Menu_mode_selected Then
-                Draw String (SCREEN_W\2 - len("PLAY")*4,a*30 + 80), "PLAY"
+				draw_button (SCREEN_W\2 - btn_w\2,_
+				top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+				"PLAY",_
+				C_WHITE, C_DARK_GREEN,is_equal(a,Main_menu_Item_selected),C_WHITE)
             Else
-                Draw String (SCREEN_W\2 - len("WATCH THE MATCH")*4,a*30 + 80), "WATCH THE MATCH"
-            End If
+            	draw_button (SCREEN_W\2 - btn_w\2,_
+				top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+				"WATCH MATCH",_
+				C_WHITE, C_GREEN,is_equal(a,Main_menu_Item_selected),C_WHITE)
+            end if
         Case 7
-            Line (SCREEN_W\2 - 96,a*30 + 79)-(SCREEN_W\2 + 96,a*30 + 96),C_GRAY,BF
-            Draw String (SCREEN_W\2 - len("EDIT TACTICS")*4,a*30 + 80), "EDIT TACTICS"
+			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			"Edit TACTICS",_
+			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         End Select
     Next a
+    
+    'If a = Main_menu_Item_selected Then
+             '   if Main_menu_Team_0_selected > lbound(Main_Menu_List_Teams) then
+             '           Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
+             '   end if
+             '   if Main_menu_Team_0_selected < ubound(Main_Menu_List_Teams)-1 then
+             '           Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
+             '   end if
+            'end if
+        'Case 1
+        '    PrintFont SCREEN_W\2 - len(Main_Menu_List_Teams(Main_menu_Team_1_selected).label)*4,_
+        '    a*30 + top_margin, str(Main_Menu_List_Teams(Main_menu_Team_1_selected).label) , UniFont, 1,1
+        '    If a = Main_menu_Item_selected Then
+        '        if Main_menu_Team_1_selected > lbound(Main_Menu_List_Teams) then
+        '                Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
+        '        end if
+        '        if Main_menu_Team_1_selected < ubound(Main_Menu_List_Teams)-1 then
+        '                Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
+        '        end if
+        '    end if
 End Sub
 
 SUB draw_pitch()
@@ -1159,7 +1189,11 @@ SUB draw_players()
         
         'puts the right set of sprites depending on the pl.action
         if is_in_camera_crop (pl(a(c,0)).x, pl(a(c,0)).y, 128) then
-            PrintFont pl(a(c,0)).x - 5 - c_x_o, pl(a(c,0)).y-22-c_y_o, str(pl(a(c,0)).number), Unifont, 1,1 
+			'pl number display
+			if (PL_ball_owner_id = pl(a(c,0)).id) then
+				PrintFont	pl(a(c,0)).x - 5 - c_x_o, pl(a(c,0)).y-28-c_y_o,_
+							str(pl(a(c,0)).number), Unifont, 1,1 
+			end if
             select case pl(a(c,0)).action
             case 0 '*** at this moment undefined***
             case running

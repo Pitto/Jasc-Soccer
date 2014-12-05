@@ -1,4 +1,6 @@
 ' FUNCTIONS DECLARATIONS---------------------------------------------------------------------
+'return 1 if two numers are equal
+declare function is_equal(a as integer, b as integer) as integer
 'converts radiants to degree
 declare function r_t_d (degree as integer) as integer
 ' converts degree to radiants
@@ -720,4 +722,13 @@ function tct_ed_get_ball_tile() as integer
         next col
     next row
     return tile
+end function
+
+function is_equal(a as integer, b as integer) as integer
+	if a = b then 
+		return 1
+	else
+		return 0
+	end if
+
 end function

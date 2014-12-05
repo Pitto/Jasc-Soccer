@@ -49,6 +49,7 @@ Acknowledgements:
 · change other #define with consts
 · Sound effects
 · Merge tactic editor into Main program
+· Fix paint_kits routine
 
   
 DEV LOG -------------------------------------
@@ -60,7 +61,7 @@ DEV LOG -------------------------------------
 · Little fix ond delta timing, now the game works fine also under Linux
   this fix has to be improved
 · minor changes on menu - now after the match the game doesn't ends but
-  comeback to main menu
+· enhanced menu navigation
 
 0.24
 · may be compiled with the new Freebasic compiler's release (1.00)
