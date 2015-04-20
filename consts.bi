@@ -1,6 +1,6 @@
 '#DEFINE################################################################
 #define GAME_NAME "JASC SOCCER"
-#define GAME_VERSION "0.24.5"
+#define GAME_VERSION "0.24.6"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 7
@@ -75,7 +75,7 @@ const CAMERA_EASING_RATIO as Single = 0.40f
 const PL_DEFAULT_SPEED as single = 15.5 * M_Pixel
 const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 'PLAYERS CONSTS--------------------------------------------------------------------------
-'players for each team *SAME AS ABOVE* :(
+
 #define PL_N_TOT 11
 'delay of the player before executing another action
 #define PL_DELAY_TIME 150

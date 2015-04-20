@@ -48,16 +48,18 @@ Acknowledgements:
 · Public
 · change other #define with consts
 · Sound effects
-· Merge tactic editor into Main program
+· Players have to go outside the penaldy area when there are some freekicks
+· direction of the player going to the ball has to be corrected
 · Fix paint_kits routine
-
+· Timing on/off when game is inactive
+· LESS Global variables!
+· Too much spaghetti code! Clean-up code & design!!!
   
 DEV LOG -------------------------------------
 0.24.5
 · Tactic editor merged into the main program
 · a dedicated sub routine to draw pitch lines
 · improved options available on debug mode 
-· repository available from github.com
 · Little fix ond delta timing, now the game works fine also under Linux
   this fix has to be improved
 · minor changes on menu - now after the match the game doesn't ends but

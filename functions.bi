@@ -89,36 +89,27 @@ function start_frame (radiants as single) as integer
     dim degree as Short
     'convert radiants to 360° degree
     degree = (180-int(radiants*180/PI))
-   ' if degree < 0 then
-   '     degree = -degree + 180
-   ' end if
-   ' if degree > 360 then
-   '     degree = degree - 360
-   ' end if
-    
-    
-    '0 17 34 51 68 85 102 119
     select case degree
-    case 0 to 22
-        return 68
-    case 23 to 67
-        return 51'tr
-    case 68 to 112
-        return 34
-    case 113 to 157
-        return 17
-    case 158 to 202
-        return 0
-    case 203 to 247
-        return 119'bL
-    case 248 to 292
-        return 102
-    case 292 to 337
-        return 85
-    case 337 to 360
-        return 68
-    case else
-        return 0
+		case 0 to 22
+			return 68
+		case 23 to 67
+			return 51'tr
+		case 68 to 112
+			return 34
+		case 113 to 157
+			return 17
+		case 158 to 202
+			return 0
+		case 203 to 247
+			return 119'bL
+		case 248 to 292
+			return 102
+		case 292 to 337
+			return 85
+		case 337 to 360
+			return 68
+		case else
+			return 0
     end select
 end function
 
@@ -350,38 +341,24 @@ function get_ball_tile(att_dir as Integer) as Integer
     dim as single x, y, x2, y2
     tile = 0
     select case Match_event
-    case ball_in_game
-        'this routine find in which tile is the ball
-        for row = 0 to ROW_TOT_N -1 step 1
-            for col = 0 to COL_TOT_N -1 step 1
-                x = col * COL_W + PITCH_X 
-                y = row * ROW_H + PITCH_Y
-                x2 = x + COL_W
-                y2 = y + ROW_H
-                'check if the ball is into a box of the grid
-                if (ball.x >= x) and (ball.x < x2)_
-                and (ball.y>=y) and (ball.y < y2) then
-                    exit for, for
-                end if
-				tile +=1
-			next col
-		next row
-    'case throw_in_lside_t0, throw_in_lside_t1, throw_in_rside_t0, throw_in_rside_t1
-    '    tile = TILES_BALL_N - Match_event_last_tile
-    'case corner_tl_side_t0, corner_tl_side_t1, corner_tr_side_t0, corner_tr_side_t1, _
-    '    corner_bl_side_t0, corner_bl_side_t1, corner_br_side_t0, corner_br_side_t1
-    '    tile = TILES_BALL_N - Match_event_last_tile
-    'in this case evey player run to the opponent net
-    'case throw_in_tl_side_t0, throw_in_tl_side_t1, throw_in_tr_side_t0, throw_in_tr_side_t1, _
-    '    throw_in_bl_side_t0, throw_in_bl_side_t1, throw_in_br_side_t0, throw_in_br_side_t1, _
-    '    gk_t0_owner, gk_t1_owner
-    '    tile = Match_event_last_tile
-    'case foul_t0, foul_t1
-    '    tile = TILES_BALL_N - Match_event_last_tile
-    'case penalty_t0, penalty_t1    
-    '    tile = TILES_BALL_N - Match_event_last_tile
-    case else
-        tile = Match_event_last_tile
+		case ball_in_game
+			'this routine find in which tile is the ball
+			for row = 0 to ROW_TOT_N -1 step 1
+				for col = 0 to COL_TOT_N -1 step 1
+					x = col * COL_W + PITCH_X 
+					y = row * ROW_H + PITCH_Y
+					x2 = x + COL_W
+					y2 = y + ROW_H
+					'check if the ball is into a box of the grid
+					if (ball.x >= x) and (ball.x < x2)_
+					and (ball.y>=y) and (ball.y < y2) then
+						exit for, for
+					end if
+					tile +=1
+				next col
+			next row
+		case else
+			tile = Match_event_last_tile
     end select
 
     if att_dir then

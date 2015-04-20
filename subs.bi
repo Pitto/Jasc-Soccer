@@ -486,6 +486,7 @@ SUB display_menu()
 END SUB
 
 SUB display_match()
+	
 	dim e As EVENT
 
 	DO
@@ -509,8 +510,10 @@ SUB display_match()
 		get_user_input()
 		update_camera_position()
 		
+		
 		Timing.time_current = Timer
 		Dt = Timing.time_current - Timing.time_last
+		
 		'' Fix frame-skipping by limiting the value of our dt
 		'' to the maximum of FIXED_TIME_STEP
 		if( Dt > FIXED_TIME_STEP ) then
@@ -544,7 +547,7 @@ SUB display_match()
 			workpage xor = 1 ' Swap work pages.
 			screenunlock ' Unlock the page to display what has been drawn on the screen
 		end if
-		if Timer - Timing.time_start > 1 then
+		if Timer - Timing.time_start > 1 and Timing.status = 1 then
 			Timing.actual_fps = Timing.fps
 			Timing.fps = 0
 			Timing.time_start = Timer
@@ -1641,14 +1644,7 @@ SUB init_timing()
 END SUB
 
 SUB load_bitmap()
-    dim img_x as integer
-    dim img_w as integer
-    dim img_y as integer
-    dim img_h as integer
-    dim count as Integer
-    dim action as Integer
-    dim offset as integer
-    dim c as integer
+    dim as integer img_x, img_w, img_y, img_h, count, action, offset, c
     
     'loading players sprites------------------------------------------------------------
     img_w = 21
@@ -2281,12 +2277,14 @@ sub update_match_event()
     
     select case match_event
         case ball_in_game
+			Timing.status = 1
             store_ball_position() 'store the ball position for free kicks
             check_ball_goals() 'only if the ball is in game, there may be goals
             check_pl_collisions() 'only with ball in game pl may collide each other
             update_players() ' IMPORTANT
             '--------------------------------------------------------------------------
         case penalty_t0, penalty_t1
+			Timing.status = 0
             reset_gk_net_position (0,0)
             reset_gk_net_position (11,0)
             if Match_event_delay then
@@ -2322,6 +2320,7 @@ sub update_match_event()
             end if
         'SIDE THROW IN -----------------------------------------------------------------
         case throw_in_lside_t0, throw_in_rside_t0, throw_in_lside_t1, throw_in_rside_t1
+            Timing.status = 0
             reset_gk_net_position (0,25)
             reset_gk_net_position (11,25)
             if Match_event_delay then
@@ -2362,6 +2361,8 @@ sub update_match_event()
         throw_in_tr_side_t0, throw_in_tr_side_t1, _
         throw_in_bl_side_t0, throw_in_bl_side_t1, _
         throw_in_br_side_t0, throw_in_br_side_t1
+        
+        Timing.status = 0
         
         if Match_event = throw_in_tl_side_t0 _
         or Match_event = throw_in_tr_side_t0 _
@@ -2420,6 +2421,8 @@ sub update_match_event()
         corner_bl_side_t0, corner_bl_side_t1, _
         corner_br_side_t0, corner_br_side_t1
 
+    Timing.status = 1
+    
     reset_gk_net_position (0,15)
     reset_gk_net_position (11,15)
     
@@ -2463,6 +2466,8 @@ sub update_match_event()
         end if
     end if
 case gk_t0_owner, gk_t1_owner
+	Timing.status = 0
+
     select case Match_event
         case gk_t0_owner
             p = 0
@@ -2481,6 +2486,9 @@ case gk_t0_owner, gk_t1_owner
 case ball_on_centre_t0 
 case ball_on_centre_t1
 case foul_t0, foul_t1
+
+	Timing.status = 0
+	
     reset_gk_net_position (0,15)
     reset_gk_net_position (11,15)
     
@@ -2512,15 +2520,9 @@ case foul_t0, foul_t1
     end if
     
 case presentation
-case happy_t0
-    if Match_event_delay then
-        update_ball_on_goal()
-    else    
-        put_ball_on_centre()
-        reset_players_positions()
-        Match_event = ball_in_game
-    end if
-case happy_t1
+case happy_t0, happy_t1
+	Timing.status = 0
+
     if Match_event_delay then
         update_ball_on_goal()
     else    

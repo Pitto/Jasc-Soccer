@@ -114,6 +114,7 @@ Type Match_timing_proto
 	seconds_elapsed as single
 	secs_to_play as single
 	injury_time as single
+	status as integer '0/1
 End Type
 
 Type proto_Joystick
