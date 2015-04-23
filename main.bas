@@ -48,13 +48,6 @@ load_behavior()
 load_tact()
 'load player sprites, pitch... and so on...
 load_bitmap()
-'debug stuff
-'if (Debug) then
-	'check if the correct loading of the tactic file
-	'dbg_display_tct_file_check()
-	'check if the bitmaps have been correctly loaded
-	'check_bitmap()
-'end if
 'loads the teams
 load_teams_list()
 load_pitch_data()

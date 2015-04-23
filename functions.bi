@@ -520,8 +520,8 @@ function is_goal (c as integer) as integer
 end function
 
 function is_in_pl_fieldview (c as Integer, pl_to_pass as integer) as Integer
-    if  abs(cos(pl(c).rds) - cos(_abtp(pl(c).x,pl(c).y,pl(pl_to_pass).x,pl(pl_to_pass).y))) < 0.25 and _
-        abs(sin(pl(c).rds) - sin(_abtp(pl(c).x,pl(c).y,pl(pl_to_pass).x,pl(pl_to_pass).y))) < 0.25 then
+    if  abs(cos(pl(c).rds) - cos(_abtp(pl(c).x,pl(c).y,pl(pl_to_pass).x,pl(pl_to_pass).y))) < PL_FIELD_VIEW_HALF and _
+        abs(sin(pl(c).rds) - sin(_abtp(pl(c).x,pl(c).y,pl(pl_to_pass).x,pl(pl_to_pass).y))) < PL_FIELD_VIEW_HALF then
         return 1
     else
         return 0

@@ -1,6 +1,6 @@
 '#DEFINE################################################################
 #define GAME_NAME "JASC SOCCER"
-#define GAME_VERSION "0.24.6"
+#define GAME_VERSION "0.24.7"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 7
@@ -87,6 +87,9 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 #define PL_MIN_SLIDE_DIST 16
 'minimum distance from opponent pl to allow pl owner of the ball to run to the net
 #define PL_RUN_SPACE 30
+'field view of the player
+#define PL_FIELD_VIEW 0.70
+#define PL_FIELD_VIEW_HALF PL_FIELD_VIEW/2
 'maximum distance to allow the human pl to pass to another player
 #define MAX_DIST_PASS 400
 'total number of the player sprites
@@ -102,6 +105,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 
 'lenght in ms of the sleep statement
 #define SLEEP_TIME 20
+#define TIME_PAUSE_EVENT 5
 
 'colors
 #define C_BLACK &h000000

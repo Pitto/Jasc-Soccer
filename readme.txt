@@ -48,14 +48,20 @@ Acknowledgements:
 · Public
 · change other #define with consts
 · Sound effects
-· Players have to go outside the penaldy area when there are some freekicks
+· Players have to go outside the penalty area when there are some freekicks
 · direction of the player going to the ball has to be corrected
 · Fix paint_kits routine
 · Timing on/off when game is inactive
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
-  
+· change paint_kit SUB
+sa  
 DEV LOG -------------------------------------
+0.24.7
+· It is possibile to control the Debug level
+· Timing on/off when game is inactive
+· Half Time switch field - to be improved
+
 0.24.5
 · Tactic editor merged into the main program
 · a dedicated sub routine to draw pitch lines

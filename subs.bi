@@ -65,6 +65,8 @@ DECLARE SUB draw_pitch()
 DECLARE SUB update_ball()
 'draw the grid
 DECLARE SUB draw_grid()
+'draws a custom line giving x, y, radiants, lenght and color
+DECLARE SUB draw_custom_line(x as single, y as single, rds as single, a_l as single, cl as Uinteger)
 DECLARE SUB draw_pl_tile(tile as integer, tile_color as uinteger)
 'draws the players
 DECLARE SUB draw_players()
@@ -162,6 +164,10 @@ sub draw_arrow(x as single, y as single, rds as single, a_l as single, cl as Uin
     line (x, y)-(x + a_l * cos(rds), y + a_l *  -sin(rds)),cl
     line (x + a_l * cos(rds), y + a_l *  -sin(rds))-(x + a_l/2 * cos(rds-0.5), y + a_l/2 *  -sin(rds-0.5)),cl
     line (x + a_l * cos(rds), y + a_l *  -sin(rds))-(x + a_l/2 * cos(rds+0.5), y + a_l/2 *  -sin(rds+0.5)),cl
+end sub
+
+sub draw_custom_line(x as single, y as single, rds as single, a_l as single, cl as Uinteger)
+    line (x, y)-(x + a_l * cos(rds), y + a_l *  -sin(rds)),cl
 end sub
 
 SUB check_ball_limits()
@@ -488,17 +494,15 @@ END SUB
 SUB display_match()
 	
 	dim e As EVENT
-
+	static mins as integer = 0
+	static reverse_pitch as integer = 0
+	
 	DO
 		If (ScreenEvent(@e)) Then
 			Select Case e.type
 			Case EVENT_KEY_RELEASE
-				If (e.scancode = SC_Escape) Then
-					Game_section = credits
+				If (e.scancode = SC_ESCAPE) Then
 					Exit_flag = 1
-				End If
-				If (e.scancode = SC_D) Then
-					Debug = 1 - Debug
 				End If
 			End Select
 		End If
@@ -509,7 +513,6 @@ SUB display_match()
 		update_ball()
 		get_user_input()
 		update_camera_position()
-		
 		
 		Timing.time_current = Timer
 		Dt = Timing.time_current - Timing.time_last
@@ -539,7 +542,7 @@ SUB display_match()
                             Pitch_data(Main_menu_pitch_type_selected).gkw,_
                             Pitch_data(Main_menu_pitch_type_selected).gkh,_
                             C_WHITE, c_x_o, c_y_o)
-			draw_debug()
+			if (Debug) then draw_debug()
 			draw_top_net()
 			draw_players()
 			draw_bottom_net()
@@ -555,8 +558,20 @@ SUB display_match()
 		else
 			Timing.fps +=1
 		end if
-		if int(90/Timing.secs_to_play*Timing.seconds_elapsed)>90 + Timing.injury_time then Exit_flag = 1
+		
+		mins = 90/Timing.secs_to_play*Timing.seconds_elapsed
+		
+		'half time reverse attack direction of the team
+		if (reverse_pitch = 0 and mins > 45) then
+			reverse_pitch = 1 - reverse_pitch
+			swap Team(0).att_dir, Team(1).att_dir
+			Timing.time_diff = Timer
+			match_event = interval
+		end if
+		
+		if (90/Timing.secs_to_play*Timing.seconds_elapsed)>90 then Exit_flag = 1
 		Timing.time_last = Timing.time_current
+	
 	LOOP UNTIL Exit_flag = 1
 	game_section = main_menu
 END SUB
@@ -699,8 +714,7 @@ SUB draw_bottom_info()
     for d = 0 to int (SCREEN_W / 32) +1 
         PUT (32*d, SCREEN_H-32), shadowed_sprite, trans
     next
-    
-    
+
     if Match_event_delay then
         for d = 8 to int (SCREEN_W / 32) +1 
             PUT (32*d, SCREEN_H\2 - 6), shadowed_sprite, trans
@@ -711,8 +725,7 @@ SUB draw_bottom_info()
     end if
     draw string (SCREEN_W - 50,SCREEN_H - 20), str(Timing.actual_fps) + " Fps", C_WHITE
     
-    PrintFont SCREEN_W - 70, 20, "Mins " + str(int(90/Timing.secs_to_play*Timing.seconds_elapsed)), UniFont, 1, 1
-    
+    PrintFont SCREEN_W - 100, 20, "Mins " + str(int(90/Timing.secs_to_play*Timing.seconds_elapsed)), UniFont, 1, 1
     
 END SUB
 
@@ -726,14 +739,11 @@ SUB draw_debug()
     dim as integer c
     static frame as integer
     'if clausole IMPORTANT!
-    if PL_ball_owner_id > -1 then
-        'Draw String 
-        PrintFont 20, 20, pl(PL_ball_owner_id).label, UniFont, 1, 1
-        PrintFont 20, 38, SHELL_Message, SmallFont, 1, 1
-    end if
-
-    if (DEBUG) then
-        draw_grid()
+    
+    PrintFont 30, SCREEN_H - 25, "DEBUG LEVEL: " + str(Debug), Unifont, 1, 1
+        
+    if debug > 1 then draw_grid()
+    if debug > 2 then
         'draw woods hit area
         circle (PITCH_NET_L_WOOD -c_x_o, PITCH_NET_TOP_Y - c_y_o), PITCH_NET_WOOD_RADIUS, C_DARK_RED,,,,F
         circle (PITCH_NET_R_WOOD -c_x_o, PITCH_NET_TOP_Y - c_y_o), PITCH_NET_WOOD_RADIUS, C_DARK_RED,,,,F
@@ -751,7 +761,8 @@ SUB draw_debug()
             (PITCH_NET_R_WOOD + PITCH_NET_WOOD_RADIUS - c_x_o, PITCH_NET_BOTTOM_Y - PITCH_NET_H + PITCH_NET_WOOD_RADIUS - c_y_o),C_DARK_RED, BF
         line (PITCH_NET_L_WOOD - PITCH_NET_WOOD_RADIUS - c_x_o, PITCH_NET_TOP_Y - PITCH_NET_H - PITCH_NET_WOOD_RADIUS- c_y_o)- _
             (PITCH_NET_R_WOOD + PITCH_NET_WOOD_RADIUS - c_x_o, PITCH_NET_TOP_Y - PITCH_NET_H + PITCH_NET_WOOD_RADIUS - c_y_o),C_DARK_RED, BF
-        
+    end if
+	if debug > 3 then
         if get_pl_to_pass(Pl_ball_owner_id) then
             line (pl(get_nrst_pl_ball(0)).x-c_x_o, pl(get_nrst_pl_ball(0)).y-c_y_o)-_
             (pl(get_pl_to_pass(Pl_ball_owner_id)).x-c_x_o,pl(get_pl_to_pass(Pl_ball_owner_id)).y-c_y_o), RGB(255,255,0)
@@ -759,7 +770,7 @@ SUB draw_debug()
         
         circle (Match_event_old_ball_x - C_x_o, Match_event_old_ball_y - C_y_o), 20, C_WHITE
 
-        for c = 0 to PL_N_TOT * 2 - 1
+        for c = 0 to Ubound(pl)-1
             if pl(c).team = PL_team_owner_id then
                 circle (pl(c).x - C_x_o, pl(c).y - c_y_o),12, C_ORANGE,,,,F
             end if
@@ -781,7 +792,8 @@ SUB draw_debug()
             draw_arrow  (pl(pl_ball_owner_id).x - c_x_o, pl(pl_ball_owner_id).y - c_y_o, _
                         find_shoot_angle(pl_ball_owner_id), 50, C_WHITE)
         end if
-    
+    end if
+    if debug > 4 then
         for c = 0 to Ubound(pl)-1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+12, "ID: " + str(pl(c).id), SmallFont, 1, 1
             PrintFont pl(c).x-c_x_o+DBG_TXT_OFFSET, pl(c).y-c_y_o+24, "ACT: " + str(print_pl_action(pl(c).action)), SmallFont, 1, 1
@@ -799,30 +811,29 @@ SUB draw_debug()
             end if        
         next c
         draw_arrow (20,206, (PI * Team(0).att_dir - PI_2), 10, Team(0).c_1)
-        PrintFont 30, 200, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
-        PrintFont 30, 206, Team(0).label, SmallFont, 1, 1
-       
-        draw_arrow (20,246, (PI * Team(1).att_dir - PI_2), 10, Team(1).c_1)
-        PrintFont 30, 240, "Team(1).att_dir: " + str(Team(1).att_dir), SmallFont, 1, 1
-        PrintFont 30, 246, Team(1).label, SmallFont, 1, 1
-        
-        PrintFont DBG_TXT_OFFSET, 50, "PL_Team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 56, "Ball Spin: " + str(Ball.spin), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 74, "Match_event_delay: " + str(Match_event_delay), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 80, "Match Event: " + str(print_match_event(Match_Event)), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 86, "Match_event_last_tile: " + str(Match_event_last_tile), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 92, "Dt: " + str(Dt), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 98, "PL_ball_owner_delay: " + str(PL_ball_owner_delay), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 104, "PL_target_id: " + str(PL_target_id), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 110, "PL_ball_owner_id: " + str(PL_ball_owner_id), SmallFont, 1, 1
-        PrintFont DBG_TXT_OFFSET, 116, "PL_team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
-        'display ball traectory
-        frame +=1
+    end if
+    if debug > 5 then
+		if PL_ball_owner_id > -1 then
+			'Draw String 
+			PrintFont 20, 20, pl(PL_ball_owner_id).label, UniFont, 1, 1
+			PrintFont 20, 38, SHELL_Message, SmallFont, 1, 1
+			'draws the fieldview of the selected player
+			draw_custom_line(pl(PL_ball_owner_id).x - c_x_o, pl(PL_ball_owner_id).y - c_y_o,_
+							pl(PL_ball_owner_id).rds - PL_FIELD_VIEW_HALF, 200, C_BLUE)
+			draw_custom_line(pl(PL_ball_owner_id).x - c_x_o, pl(PL_ball_owner_id).y - c_y_o,_
+							pl(PL_ball_owner_id).rds + PL_FIELD_VIEW_HALF, 200, C_BLUE)
+		end if
+	end if
+	if debug > 6 then
+	    'DISPLAY BALL TRAJECTORIES
+	    frame +=1
         for frame = 0 to BALL_FRAMES_RECORD - 1
-            pset (Ball_record(frame).x -c_x_o, Ball_record(frame).y - c_y_o)
+        pset (Ball_record(frame).x -c_x_o, Ball_record(frame).y - c_y_o)
         next frame
         if frame > BALL_FRAMES_RECORD - 1 then frame = 0
-        'input key debug -------------------------------------
+	end if
+	if debug > 7 then
+	        'input key debug -------------------------------------
         if MULTIKEY(SC_UP) then
             line (40, 400)-(60,380), C_WHITE, BF
         end if
@@ -844,9 +855,27 @@ SUB draw_debug()
         line (40, 400)-(60,420), C_BLACK, B
         line (60, 400)-(80,420), C_BLACK, B
         line (100, 400)-(140,420), C_BLACK, B
+	end if
+
+        PrintFont 30, 200, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
+        PrintFont 30, 206, Team(0).label, SmallFont, 1, 1
+      
+        draw_arrow (20,246, (PI * Team(1).att_dir - PI_2), 10, Team(1).c_1)
+        PrintFont 30, 240, "Team(1).att_dir: " + str(Team(1).att_dir), SmallFont, 1, 1
+        PrintFont 30, 246, Team(1).label, SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 50, "PL_Team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 56, "Ball Spin: " + str(Ball.spin), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 74, "Match_event_delay: " + str(Match_event_delay), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 80, "Match Event: " + str(print_match_event(Match_Event)), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 86, "Match_event_last_tile: " + str(Match_event_last_tile), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 92, "Dt: " + str(Dt), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 98, "PL_ball_owner_delay: " + str(PL_ball_owner_delay), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 104, "PL_target_id: " + str(PL_target_id), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 110, "PL_ball_owner_id: " + str(PL_ball_owner_id), SmallFont, 1, 1
+        PrintFont DBG_TXT_OFFSET, 116, "PL_team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
+
+
         '-----------------------------------------------------
-         
-    end if
 end SUB
 
 SUB draw_grid()
@@ -925,8 +954,7 @@ end sub
 
 
 Sub Draw_main_menu()
-    Dim a As Integer
-    dim i as integer
+    Dim As Integer a, i
     dim btn_w as integer = 160 'width of the button
     dim btn_h as integer = 20 'width of the button
     dim btn_v_space as integer = 10 'vertical spacing of each button
@@ -1432,22 +1460,18 @@ SUB get_user_input()
     If (ScreenEvent(@e)) Then
         Select Case e.type
         Case EVENT_KEY_RELEASE
-            If (e.scancode = SC_D) Then
-                DEBUG = DEBUG xor 1
-            End If
+        	If (e.scancode = SC_D) Then
+				Debug = Debug + 1
+				if Debug > 10 then Debug = 0
+			End If
             'reverse attack direction of the teams
             If DEBUG and (e.scancode = SC_R) Then
                 Team(0).att_dir = 1 - Team(0).att_dir 
                 Team(1).att_dir = 1 - Team(1).att_dir 
             End if
-            If (e.scancode = SC_P) Then
-                'pause
-                SLEEP
-            End If
         End Select
     End If
-    'in Watch match and Debug mode the user may move the ball
-    'or use some custom keys to check the correct behaviour of
+    'in Debug mode use some custom keys to check the correct behaviour of
     'the Match_event
     if DEBUG then
         if Multikey(SC_0) then Match_event = ball_in_game : Match_event_delay = MATCH_EVENT_DEFAULT_DELAY
@@ -1572,12 +1596,9 @@ SUB init_gfx()
 	SCREENSET 1, 0
 	CLS
 	WindowTitle GAME_NAME + " " + Str(GAME_VERSION) + " by " + str(GAME_AUTHOR)
-	'MAIN------------------------------------------------------------------------------------
 	'hides the mouse
     SetMouse 320, 240, 0
     load_fonts()
-
-
 END SUB
 
 SUB init_team_data()
@@ -2258,7 +2279,7 @@ sub update_match_event()
     'p is the id of the player selected to perform actions... and the other just watch!
     static p as Integer
     static match_flag as integer ' useful to not perform twice a match_Event
-    dim rnd_pl as Integer
+    dim as integer rnd_pl, c
     
     record_ball_position()
     
@@ -2276,6 +2297,19 @@ sub update_match_event()
     end if
     
     select case match_event
+		'when there is the interval all the players have to go outside the pitch
+		case interval
+			Timing.status = 0
+			put_ball_on_centre()
+			for c = 0 to Ubound(pl)
+				pl(c).rds = _abtp (pl(c).x,pl(c).y, PITCH_X - 100, PITCH_MIDDLE_H)
+				pl(c).speed = pl(c).speed_default
+				move_player(c)
+			next c
+			'after some seconds of pause the game restarts
+			if Timer - Timing.time_diff > TIME_PAUSE_EVENT then
+				Match_event = ball_in_game
+			end if
         case ball_in_game
 			Timing.status = 1
             store_ball_position() 'store the ball position for free kicks

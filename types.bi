@@ -111,6 +111,7 @@ Type Match_timing_proto
 	time_start as double
 	time_last as single
 	time_current as single
+	time_diff as single
 	seconds_elapsed as single
 	secs_to_play as single
 	injury_time as single

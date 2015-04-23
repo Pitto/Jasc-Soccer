@@ -1,7 +1,7 @@
 DIM SHARED SmallFont AS FontType
 DIM SHARED UniFont AS FontType
 dim SHARED Dt as single ' Delta Timing
-DIM SHARED Debug as Integer = 1
+DIM SHARED Debug as Integer = 0
 'exit flag
 DIM shared Exit_flag as Integer = 0
 
