@@ -740,7 +740,7 @@ SUB draw_debug()
     static frame as integer
     'if clausole IMPORTANT!
     
-    PrintFont 30, SCREEN_H - 25, "DEBUG LEVEL: " + str(Debug), Unifont, 1, 1
+    PrintFont 30, SCREEN_H - 60, "DEBUG LEVEL: " + str(Debug), Unifont, 1, 1
         
     if debug > 1 then draw_grid()
     if debug > 2 then
@@ -2568,12 +2568,10 @@ end select
 end sub
 
 SUB update_players()
-    dim c as Integer
-    Dim d as Integer
+    dim as Integer c, d
     dim decision as Integer = 0
     dim pl_to_pass as Integer = 0
-    dim trg_x as single
-    dim trg_y as single
+    dim as single trg_x, trg_y
     
     'the following is a very bad try to give a decent AI to the players
     for c = 0 to Ubound(pl)
@@ -2628,7 +2626,7 @@ SUB update_players()
                     'else keep position
                     reset_gk_net_position (c,25)
                 end if
-    else
+		else
         'routine for other players (defenders, midfielders, attackers)#########
         'if the pl(c) is the nearest to the ball 
         'run to the ball and restore original speed of the player
@@ -2641,8 +2639,16 @@ SUB update_players()
                 if is_pl_input_rds() then
                     pl(c).speed = pl(c).speed_default
                     pl(c).rds = get_pl_input_rds()
-                else
-                    pl(c).speed = 0
+                    'if the player doesn't own the ball and is running
+                    'to get it - the PC helps himself to get the ball
+                    'correcting the angle of the player
+                    if 	PL_ball_owner_id <> c and _
+						abs(cos(pl(c).rds) - cos(_abtp(pl(c).x,pl(c).y,Ball.x, Ball.y))) < PL_FIELD_VIEW_HALF and _
+						abs(sin(pl(c).rds) - sin(_abtp(pl(c).x,pl(c).y,Ball.x, Ball.y))) < PL_FIELD_VIEW_HALF then
+						pl(c).rds = _abtp(pl(c).x, pl(c).y, Ball.x, Ball.y)
+                    end if
+                else    
+                   pl(c).speed = 0
                 end if
                 if is_ball_controllable_by_human(c) then
                     reset_ball_z()
@@ -2651,7 +2657,6 @@ SUB update_players()
                         ball.y = pl(c).y
                         ball.x +=  5 *cos(pl(c).rds)'*pl(c).speed*Dt
                         ball.y +=  5 *-sin(pl(c).rds)'*pl(c).speed*Dt
-                        'if (rnd * 10 > 8) then ball.speed += 10 
                     end if
                     PL_ball_owner_id = c
                     PL_team_owner_id = pl(c).team
