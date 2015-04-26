@@ -439,6 +439,10 @@ END SUB
 
 SUB delete_bitmap()
 	dim count as integer
+	For count = 0 To PL_SPRITES_TOT_N - 1
+		If pl_sprite_0(count) Then ImageDestroy pl_sprite_0(count)
+        If pl_sprite_1(count) Then ImageDestroy pl_sprite_1(count)
+    Next
     For count = 0 To 14
         If ball_sprite(count) Then ImageDestroy ball_sprite(count)
     Next
@@ -450,14 +454,6 @@ SUB delete_bitmap()
     If Wallpaper(0) Then ImageDestroy Wallpaper(0)
     If Wallpaper(1) Then ImageDestroy Wallpaper(1)
     If Wallpaper(2) Then ImageDestroy Wallpaper(2)
-END SUB
-
-SUB delete_players_sprites()
-    dim count as Integer
-    For count = 0 To PL_SPRITES_TOT_N - 1
-        If pl_sprite_0(count) Then ImageDestroy pl_sprite_0(count)
-        If pl_sprite_1(count) Then ImageDestroy pl_sprite_1(count)
-    Next
 END SUB
 
 SUB display_menu()
