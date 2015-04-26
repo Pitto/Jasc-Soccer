@@ -48,6 +48,7 @@ load_behavior()
 load_tact()
 'load player sprites, pitch... and so on...
 load_bitmap()
+load_player_sprites()
 'loads the teams
 load_teams_list()
 load_pitch_data()
@@ -64,6 +65,7 @@ DO
 			display_tactic_editor()
 		'GAME
 		case game
+			
 			'initalize the teams selected
 			init_team_data()
 			'initialize pitch dimensions
@@ -85,7 +87,6 @@ DO
 		case exit_game
 			exit do
 	end select
-	'If InKey = Chr(255,107) Then Exit Do
 LOOP
 'remove bitmap data from memory
 delete_bitmap()

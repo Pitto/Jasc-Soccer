@@ -3,7 +3,7 @@
 #define GAME_VERSION "0.24.8"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
-#define GAME_N_TOT_TEAMS 8
+#define GAME_N_TOT_TEAMS 7
 
 'USEFUL CONSTS###########################################################################
 const FIXED_TIME_STEP as double = 1/60.0 'useful for Delta Timing

@@ -47,7 +47,7 @@ DECLARE SUB load_bitmap()
 'paints the kits of the teams with a custom color - and also the color of the skin of
 'the players
 DECLARE SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer, _
-C_shirt_1 as Integer, C_pants_1 as Integer, C_socks_1 as Integer)
+    C_shirt_1 as Integer, C_pants_1 as Integer, C_socks_1 as Integer)
 'delete the sprites
 DECLARE SUB delete_bitmap()
 'cheks if the sprites have been rightly loaded
@@ -156,9 +156,6 @@ declare sub tct_ed_save_data(slot_to_save as integer)
 declare sub init_pitch_dimensions(x as integer, y as integer,_
                         w as integer, h as integer, slot as integer)
 declare sub display_tactic_editor()
-
-
-
 
 sub draw_arrow(x as single, y as single, rds as single, a_l as single, cl as Uinteger)
     line (x, y)-(x + a_l * cos(rds), y + a_l *  -sin(rds)),cl
@@ -316,22 +313,6 @@ SUB check_bitmap()
     flip
     screenunlock ' Unlock the page to display what has been drawn on the screen
     sleep 2000
-'    
-'    for count = 0 to PL_SPRITES_TOT_N - 1
-'        if (count > 0) and (count MOD 21 = 0) then
-'            img_x = 0
-'            img_y += 20
-'        end if
-'        PUT (img_x,img_y), gk_sprite(count),trans
-'        draw string (img_x,img_y), str(count)
-'        img_x += 28
-'    next count
-'    workpage xor = 1 ' Swap work pages.
-'    flip
-'    screenunlock ' Unlock the page to display what has been drawn on the screen
-'    sleep 1000
-    
-    
 END SUB
 
 SUB check_pl_collisions()
@@ -457,11 +438,7 @@ SUB check_throw_in_corner_kick()
 END SUB
 
 SUB delete_bitmap()
-    dim count as Integer
-    For count = 0 To PL_SPRITES_TOT_N - 1
-        If pl_sprite_0(count) Then ImageDestroy pl_sprite_0(count)
-        If pl_sprite_1(count) Then ImageDestroy pl_sprite_1(count)
-    Next
+	dim count as integer
     For count = 0 To 14
         If ball_sprite(count) Then ImageDestroy ball_sprite(count)
     Next
@@ -473,6 +450,14 @@ SUB delete_bitmap()
     If Wallpaper(0) Then ImageDestroy Wallpaper(0)
     If Wallpaper(1) Then ImageDestroy Wallpaper(1)
     If Wallpaper(2) Then ImageDestroy Wallpaper(2)
+END SUB
+
+SUB delete_players_sprites()
+    dim count as Integer
+    For count = 0 To PL_SPRITES_TOT_N - 1
+        If pl_sprite_0(count) Then ImageDestroy pl_sprite_0(count)
+        If pl_sprite_1(count) Then ImageDestroy pl_sprite_1(count)
+    Next
 END SUB
 
 SUB display_menu()
@@ -684,8 +669,7 @@ SUB draw_aknowledgements()
 END SUB
 
 SUB draw_ball()
-    dim offset_frame as Integer
-    dim x as Integer
+    dim as integer offset_frame
     
     if (ball.z > 25) then
         if ball.z < 60 then
@@ -1055,31 +1039,11 @@ Sub Draw_main_menu()
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         End Select
     Next a
-    
-    'If a = Main_menu_Item_selected Then
-             '   if Main_menu_Team_0_selected > lbound(Main_Menu_List_Teams) then
-             '           Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-             '   end if
-             '   if Main_menu_Team_0_selected < ubound(Main_Menu_List_Teams)-1 then
-             '           Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-             '   end if
-            'end if
-        'Case 1
-        '    PrintFont SCREEN_W\2 - len(Main_Menu_List_Teams(Main_menu_Team_1_selected).label)*4,_
-        '    a*30 + top_margin, str(Main_Menu_List_Teams(Main_menu_Team_1_selected).label) , UniFont, 1,1
-        '    If a = Main_menu_Item_selected Then
-        '        if Main_menu_Team_1_selected > lbound(Main_Menu_List_Teams) then
-        '                Draw String (SCREEN_W\2 - 100, a*30 + top_margin), "<"
-        '        end if
-        '        if Main_menu_Team_1_selected < ubound(Main_Menu_List_Teams)-1 then
-        '                Draw String (SCREEN_W\2 + 92, a*30 + top_margin), ">"
-        '        end if
-        '    end if
+   
 End Sub
 
 SUB draw_pitch()
-    dim as Integer pitch_rows, pitch_cols
-    dim as Integer a, b
+    dim as Integer pitch_rows, pitch_cols, a, b
     dim banner_message as string*32
     pitch_rows = PITCH_H \ 32 + 4
     pitch_cols = PITCH_W \ 32 + 4
@@ -1613,9 +1577,8 @@ SUB init_team_data()
 END SUB
 
 SUB init_players_proprietes()
-    dim t as integer
+    dim as integer t, c
     dim id as integer = 0
-    dim c as integer 
     Dim ff As Ubyte
     ff = Freefile
     'read data from text file and store into array
@@ -1666,7 +1629,6 @@ END SUB
 
 SUB load_bitmap()
     dim as integer img_x, img_w, img_y, img_h, count, action, offset, c
-    
     'loading players sprites------------------------------------------------------------
     img_w = 21
     img_h = 25
@@ -1676,25 +1638,19 @@ SUB load_bitmap()
     'one array for each team… then with paint_kits sub
     'the color of the kits of the sprites will be changed
     BLOAD "img\pl_sprites.bmp", 0
-    'it loads three time the same sprite because so after it will be painted
-    'with custom skin colors (see player_proto type for details)
-    'decomment check_bitmap SUB if you want to check the result
     for count = 0 to PL_SPRITES_TOT_N -1
         if (count > 0) and (count MOD 17 = 0) then
             img_x = 0
             img_y += img_h
         end if
-        pl_sprite_0(count) = IMAGECREATE (img_w, img_h)
-        pl_sprite_1(count) = IMAGECREATE (img_w, img_h)
+        Pl_sprite_0(count) = IMAGECREATE (img_w, img_h)
+        Pl_sprite_1(count) = IMAGECREATE (img_w, img_h)
         gk_sprite(count) = IMAGECREATE (img_w, img_h)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), pl_sprite_0(count)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), pl_sprite_1(count)
+        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_0(count)
+        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_1(count)
         GET (img_x, img_y)-(img_x + 20, img_y + 24), gk_sprite(count)
         img_x += img_w
     next count
-    
-    '-----------------------------------------------------------------------------------
-    
     'loading ball sprites
     BLOAD "img\ball_sprites.bmp", 0
     img_x = 0
@@ -1745,6 +1701,10 @@ SUB load_bitmap()
     
     
 END SUB
+
+SUB load_player_sprites()
+
+end sub
 
 SUB load_behavior()
 'BEHAVIOR DATA
@@ -1875,18 +1835,11 @@ END SUB
 SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer, _
     C_shirt_1 as Integer, C_pants_1 as Integer, C_socks_1 as Integer)
     
-    Dim pitch As Integer
+    Dim as integer count, pitch, c
     Dim pixels As Any Ptr
-    Dim count as Integer
     dim as Integer img_w = 0
     dim as Integer img_h = 0
-    
-    if C_shirt_0 = C_shirt_1 then
-		C_shirt_1 = C_shirt_1 xor &hFFFFFF
-		C_pants_1 = C_pants_1 xor &hFFFFFF
-		C_socks_1 = C_socks_1 xor &hFFFFFF
-	end if
-     
+
     for count = 0 to PL_SPRITES_TOT_N - 1
         If 0 <> ImageInfo( pl_sprite_0(count),img_w ,img_h,, pitch, pixels ) Then
             Print "unable to retrieve image information."
@@ -1896,22 +1849,11 @@ SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer,
         'Paint the sprite white the selected color image by directly manipulating pixel memory.
         For y As Integer = 0 To img_h
             Dim row As Integer Ptr = pixels + y * pitch
-            
-            For x As Integer = 0 To img_w
-                if row[x] = C_KIT_SHIRT then
-                    row[x] = C_SHIRT_0
-                end if
-                if row[x] = C_KIT_PANTS then
-                    row[x] = C_PANTS_0
-                end if
-                if row[x]= C_KIT_LINE then
-                    row[x] = C_PANTS_0
-                end if
-                if row[x] = C_KIT_SOCKS then
-                    row[x] = C_SOCKS_0
-                end if
-            Next x
-            
+			For x As Integer = 0 To img_w
+				if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_0
+				if row[x] = C_KIT_PANTS then row[x] = C_PANTS_0
+				if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_0
+			Next x
         Next y
         If 0 <> ImageInfo( pl_sprite_1(count),img_w ,img_h,, pitch, pixels ) Then
             Print "unable to retrieve image information."
@@ -1920,23 +1862,13 @@ SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer,
         End If
         'Paint the sprite white the selected color image by directly manipulating pixel memory.
         For y As Integer = 0 To img_h
-            Dim row As Integer Ptr = pixels + y * pitch
-            
-            For x As Integer = 0 To img_w
-                if row[x] = C_KIT_SHIRT then
-                    row[x] = C_SHIRT_1
-                end if
-                if row[x] = C_KIT_PANTS then
-                    row[x] = C_PANTS_1
-                end if
-                if row[x]= C_KIT_LINE then
-                    row[x] = C_PANTS_1
-                end if
-                if row[x] = C_KIT_SOCKS then
-                    row[x] = C_SOCKS_1
-                end if
-            Next x
-        Next y
+			Dim row As Integer Ptr = pixels + y * pitch
+			For x As Integer = 0 To img_w
+				if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_1
+				if row[x] = C_KIT_PANTS then row[x] = C_PANTS_1
+				if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_1
+			Next x
+		Next y
     next count
     
 END SUB
