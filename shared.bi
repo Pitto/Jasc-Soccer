@@ -78,7 +78,7 @@ Dim Shared Main_Menu_control_selected as integer = 0
 
 'MATCH EVENTS ---------------------------------------------------------------------------
 dim shared Match_event as proto_match_event 'indicates the actual match event
-Match_event = ball_in_game 'default... I'll change this value soon
+Match_event = resetting_start_position 'default... I'll change this value soon
 dim shared Match_event_delay as Integer = 0 'delay between every state change
 dim shared Match_event_last_tile as Integer = 0 'stores the tile where the ball
 'was before going off the pitch

@@ -56,6 +56,7 @@ enum proto_match_event
     foul_t1
     team_presentation
     presentation
+    resetting_start_position
     interval
     happy_t0
     happy_t1

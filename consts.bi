@@ -12,8 +12,8 @@ const M_PIXEL as single = 9.5 '9.5 pixel = 1m
 const PITCH_X as Integer = 50
 const PITCH_Y as Integer = 50
 'pitch dimensions
-const PITCH_W as Integer = 832'832'use a 32 multiplier… the pitch texture may fit better!
-const PITCH_H as Integer = 992'992 'idem
+const PITCH_W as Integer = 832 '832'use a 32 multiplier… the pitch texture may fit better!
+const PITCH_H as Integer = 992 '992 'idem
 
 const PITCH_PENALTY_AREA as Single = PITCH_W*0.30 'see update players sub for details
 'net dimensions
@@ -134,7 +134,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 
 #define MATCH_EVENT_DEFAULT_DELAY 100
 #define DBG_TXT_OFFSET 10
-#define BALL_FRAMES_RECORD 100
+#define BALL_FRAMES_RECORD 1000
 
 '----- TACTIC EDITOR CONSTS
 const tct_ed_PITCH_W as integer = 388

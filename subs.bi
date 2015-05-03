@@ -129,6 +129,8 @@ DECLARE SUB record_ball_position()
 DECLARE SUB check_ball_limits()
 'restore the original value of the players
 DECLARE SUB restore_players_speed()
+'reset the players to the start position in their middle half of the pitch after a goal or at beginning of a game
+DECLARE SUB reset_player_start_positions(c as integer)
 'shoot the ball in a defined place, with a defined speed & angle
 DECLARE SUB shoot_ball(pl_id as integer, pl_trg_id as integer, x_trg as single, y_trg as single, alfa as single, spin as single)
 'store the old ball position
@@ -214,7 +216,7 @@ SUB check_ball_goals()
             Team(0).goal += 1
             match_event = happy_t0
         end if
-
+		Timing.time_diff = Timer
         match_event_delay = MATCH_EVENT_DEFAULT_DELAY*2
         camera.speed = 0
         PL_ball_owner_id = -1
@@ -475,19 +477,45 @@ END SUB
 SUB display_match()
 	
 	dim e As EVENT
+	dim c as integer
 	static mins as integer = 0
 	static reverse_pitch as integer = 0
+	static selecting_tactic as integer = 0 
 	
 	DO
 		If (ScreenEvent(@e)) Then
 			Select Case e.type
 			Case EVENT_KEY_RELEASE
+				'show/hide tactic selection
+				If (e.scancode = SC_T) Then
+					selecting_tactic = 1 - selecting_tactic
+				End If
+				'change on the fly the tactic of the team 0 with +/- keys
+				If 	selecting_tactic and (e.scancode = SC_PLUS) and _
+					Team(0).tact_module < 9 then
+					Team(0).tact_module +=1
+				end if
+				If 	selecting_tactic and (e.scancode = SC_MINUS) and _
+					Team(0).tact_module > 0 then
+					Team(0).tact_module -=1
+				end if
+				
 				If (e.scancode = SC_ESCAPE) Then
 					Exit_flag = 1
 				End If
+				'activate vaious level of debug messages
+				If (e.scancode = SC_D) Then
+					Debug = Debug + 1
+					if Debug > 10 then Debug = 0
+				End If
+				'reverse attack direction of the teams
+				If DEBUG and (e.scancode = SC_R) Then
+					Team(0).att_dir = 1 - Team(0).att_dir 
+					Team(1).att_dir = 1 - Team(1).att_dir 
+				End if
 			End Select
 		End If
-	
+
 		update_match_event()
 		check_ball_woods()
 		check_ball_limits()
@@ -528,6 +556,22 @@ SUB display_match()
 			draw_players()
 			draw_bottom_net()
 			draw_bottom_info()
+			'display the selecting tactic menu
+			if (selecting_tactic) then
+				draw_button (50, 72, 180,_
+							20, "TACTIC of " + Team(0).label,_
+							C_WHITE, C_DARK_RED, 0, C_GRAY)
+				
+				for c = 0 to Ubound (tct_tile_label)-1
+					draw_button (50, 100 + c * 22, 32 + 12 * is_equal(Team(0).tact_module, c),_
+							20, tct_tile_label(c),_
+							C_WHITE,_
+							C_BLUE,_
+							is_equal(Team(0).tact_module, c),_
+							C_GRAY)
+				next c
+			end if
+			
 			workpage xor = 1 ' Swap work pages.
 			screenunlock ' Unlock the page to display what has been drawn on the screen
 		end if
@@ -706,6 +750,9 @@ SUB draw_bottom_info()
     draw string (SCREEN_W - 50,SCREEN_H - 20), str(Timing.actual_fps) + " Fps", C_WHITE
     
     PrintFont SCREEN_W - 100, 20, "Mins " + str(int(90/Timing.secs_to_play*Timing.seconds_elapsed)), UniFont, 1, 1
+    if (pl_ball_owner_id <> -1) then
+		PrintFont 10, 20, str(pl(pl_ball_owner_id).label), UniFont, 1, 1
+    end if
     
 END SUB
 
@@ -839,7 +886,6 @@ SUB draw_debug()
 
         PrintFont 30, 200, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
         PrintFont 30, 206, Team(0).label, SmallFont, 1, 1
-      
         draw_arrow (20,246, (PI * Team(1).att_dir - PI_2), 10, Team(1).c_1)
         PrintFont 30, 240, "Team(1).att_dir: " + str(Team(1).att_dir), SmallFont, 1, 1
         PrintFont 30, 246, Team(1).label, SmallFont, 1, 1
@@ -853,9 +899,6 @@ SUB draw_debug()
         PrintFont DBG_TXT_OFFSET, 104, "PL_target_id: " + str(PL_target_id), SmallFont, 1, 1
         PrintFont DBG_TXT_OFFSET, 110, "PL_ball_owner_id: " + str(PL_ball_owner_id), SmallFont, 1, 1
         PrintFont DBG_TXT_OFFSET, 116, "PL_team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
-
-
-        '-----------------------------------------------------
 end SUB
 
 SUB draw_grid()
@@ -936,7 +979,7 @@ end sub
 Sub Draw_main_menu()
     Dim As Integer a, i
     dim btn_w as integer = 160 'width of the button
-    dim btn_h as integer = 20 'width of the button
+    dim btn_h as integer = 16 'height of the button
     dim btn_v_space as integer = 10 'vertical spacing of each button
     Dim top_margin as integer = 80
     'graphic statements
@@ -1416,21 +1459,7 @@ SUB get_pl_behavior(pl_id as Integer)
 END SUB
 
 SUB get_user_input()
-    dim e As EVENT
-    If (ScreenEvent(@e)) Then
-        Select Case e.type
-        Case EVENT_KEY_RELEASE
-        	If (e.scancode = SC_D) Then
-				Debug = Debug + 1
-				if Debug > 10 then Debug = 0
-			End If
-            'reverse attack direction of the teams
-            If DEBUG and (e.scancode = SC_R) Then
-                Team(0).att_dir = 1 - Team(0).att_dir 
-                Team(1).att_dir = 1 - Team(1).att_dir 
-            End if
-        End Select
-    End If
+
     'in Debug mode use some custom keys to check the correct behaviour of
     'the Match_event
     if DEBUG then
@@ -1603,7 +1632,9 @@ SUB init_players_proprietes()
             pl(c).y = PITCH_Y + (PITCH_H\4) + ((PITCH_H\2)*(t xor 1))
             'assign id
             pl(c).id = c
-            pl(c).x = pl(c).number * 60 + PITCH_X
+            pl(c).in_place = 0
+            pl(c).x = PITCH_X - 100
+            pl(c).y = PITCH_H\2 + PITCH_Y
             
         next c
     Close #ff
@@ -1905,8 +1936,8 @@ SUB reset_gk_net_position (c as integer, distance_from_net as Integer)
     else
         pl(c).speed = 0
         pl(c).x = PITCH_MIDDLE_W
-        pl(c).y = PITCH_Y + PITCH_H * (pl(c).team xor 1)_
-                + distance_from_net - distance_from_net * 2 * (Team(pl(c).team).att_dir)
+        pl(c).y = 	PITCH_Y + PITCH_H * (Team(pl(c).team).att_dir)_
+					+ distance_from_net - distance_from_net * 2 * (Team(pl(c).team).att_dir)
         'when stay in the net always watch the ball
         pl(c).rds = _abtp(pl(c).x,pl(c).y, ball.x, ball.y)
     end if
@@ -1926,6 +1957,38 @@ SUB reset_players_positions()
                 pl(c).x = c * ((PITCH_W-10)\PL_N_TOT*2) + 10 + PITCH_X
         next c
     next t
+END SUB
+
+SUB reset_player_start_positions(c as integer)
+	dim as single x_trg, y_trg
+	dim as integer tile_row, tile_col, tile
+	tile =  tct_tile    (Team(pl(c).team).tact_module, _
+                            pl(c).tct_id, _
+                            32)
+	'reversing coords if attack way is different from bottom-up
+	if (team(pl(c).team).att_dir) then
+'		tile = TILES_PL_N - tile
+	end if
+	'get the row and the column
+	tile_row = tile MOD 16
+	tile_col = 16-int(tile\16)
+	'convert in xy coords
+	x_trg = (tile_row * PITCH_W\16) + PITCH_X + PITCH_W\32
+	if (team(pl(c).team).att_dir) then
+		y_trg = PITCH_Y + PITCH_H\2 + (tile_col * PITCH_H\32)
+	else
+		y_trg = PITCH_Y + PITCH_H\2 - (tile_col * PITCH_H\32)
+	end if
+	'returns the right rds to the tile
+	pl(c).rds = _abtp (pl(c).x,pl(c).y,x_trg,y_trg)
+	'if the distance is less than 5 then the pl has reached the position
+	if d_b_t_p(pl(c).x,pl(c).y,x_trg,y_trg) < 5 then
+		pl(c).speed = 0
+		pl(c).in_place = 1
+	else
+		pl(c).in_place = 0
+		pl(c).speed = pl(c).speed_default
+	end if
 END SUB
 
 SUB restore_players_speed()
@@ -1972,7 +2035,7 @@ END SUB
 
 SUB run_tactic_all_players(c as integer)
     dim d as Integer = 0
-    for d = 0 to PL_N_TOT * 2 - 1
+    for d = 0 to Ubound(pl)-1
         if pl(d).role = "G" then continue for 'the gk doesnt' must follow tactic
         if d = c then continue for
         run_tactic(d)
@@ -2184,6 +2247,8 @@ Sub Update_main_menu()
             end if
             Training_mode = 0
             Exit_flag = 1
+            Match_event = resetting_start_position
+            Timing.time_diff = Timer
             Game_section = game
         End If
 	Case 7
@@ -2482,6 +2547,20 @@ case foul_t0, foul_t1
     end if
     
 case presentation
+case resetting_start_position
+	if Timer - Timing.time_diff > TIME_PAUSE_EVENT*2 then
+		Match_event = ball_in_game
+	end if
+	for c = 0 to Ubound(pl) - 1
+		if pl(c).role<>"G" then
+			reset_player_start_positions(c)
+		else
+			reset_gk_net_position (0,15)
+			reset_gk_net_position (11,15)
+		end if
+	next c
+	move_all_players()
+	
 case happy_t0, happy_t1
 	Timing.status = 0
 
@@ -2489,8 +2568,7 @@ case happy_t0, happy_t1
         update_ball_on_goal()
     else    
         put_ball_on_centre()
-        reset_players_positions()
-        Match_event = ball_in_game
+        Match_event = resetting_start_position
     end if
 end select
 end sub

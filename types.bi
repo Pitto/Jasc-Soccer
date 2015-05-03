@@ -60,6 +60,7 @@ TYPE player_proto
     pwr_tackle as single
 	pwr_gk as single
 	precision as single
+	in_place as integer ' return 1 if the player has get his place before free kicks
 END TYPE
 
 TYPE ball_proto
