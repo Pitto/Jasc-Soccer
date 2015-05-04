@@ -481,6 +481,10 @@ SUB display_match()
 	static mins as integer = 0
 	static reverse_pitch as integer = 0
 	static selecting_tactic as integer = 0 
+	static change_formation as integer = 0
+	static pl_selected as integer = 1
+	static pl_sel_0 as integer = -1
+	static pl_sel_1 as integer = -1
 	
 	DO
 		If (ScreenEvent(@e)) Then
@@ -489,6 +493,7 @@ SUB display_match()
 				'show/hide tactic selection
 				If (e.scancode = SC_T) Then
 					selecting_tactic = 1 - selecting_tactic
+					change_formation = 0
 				End If
 				'change on the fly the tactic of the team 0 with +/- keys
 				If 	selecting_tactic and (e.scancode = SC_PLUS) and _
@@ -499,6 +504,33 @@ SUB display_match()
 					Team(0).tact_module > 0 then
 					Team(0).tact_module -=1
 				end if
+				'allow to select a the player
+				If 	change_formation and (e.scancode = SC_ENTER) and _
+					pl_sel_0 <> -1 then
+					pl_sel_1 = pl_selected
+					swap pl(pl_sel_0).tct_id, pl(pl_sel_1).tct_id
+					swap pl(pl_sel_0), pl(pl_sel_1)
+					pl_sel_0 = -1
+					pl_sel_1 = -1
+					exit select
+				end if
+				If 	change_formation and (e.scancode = SC_PLUS) and _
+					pl_selected < 10 then
+					pl_selected +=1
+				end if
+				If 	change_formation and (e.scancode = SC_MINUS) and _
+					pl_selected > 1 then
+					pl_selected -=1
+				end if
+				If 	change_formation and (e.scancode = SC_ENTER) and _
+					pl_sel_0 = -1 then
+					pl_sel_0 = pl_selected
+				end if
+				'show/hide formation
+				If (e.scancode = SC_F) Then
+					change_formation = 1 - change_formation
+					selecting_tactic = 0
+				End If
 				
 				If (e.scancode = SC_ESCAPE) Then
 					Exit_flag = 1
@@ -569,6 +601,22 @@ SUB display_match()
 							C_BLUE,_
 							is_equal(Team(0).tact_module, c),_
 							C_GRAY)
+				next c
+			end if
+			
+			if (change_formation) then
+				draw_button (50, 72, 200,_
+							20, "Formation of " + Team(0).label,_
+							C_WHITE, C_DARK_RED, 0, C_GRAY)
+				for c = 1 to 10
+					draw_button (50, 100 + c * 22, 35, 20, str(pl(c).number),_
+							C_WHITE, C_BLUE, is_equal(pl_selected, c), C_GRAY)
+					draw_button (90, 100 + c * 22, 180, 20, pl(c).label,_
+							C_WHITE, C_BLUE, is_equal(pl_selected, c), C_GRAY)
+					if pl_sel_0 = c then
+						draw_button (90, 100 + c * 22, 180, 20, pl(c).label,_
+							C_BLACK, C_DARK_RED, 0, C_GRAY)
+					end if
 				next c
 			end if
 			
