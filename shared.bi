@@ -22,6 +22,7 @@ DIM SHARED Gk_sprite(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a m
 DIM SHARED Ball_sprite(15) AS ANY PTR '  A pointer that points to a memory buffer (for ball sprites)
 DIM SHARED Net_sprite(2) AS ANY PTR '  A pointer that points to a memory buffer (for net sprites)
 DIM SHARED Pitch_sprite(12) AS Uinteger PTR '  A pointer that points to a memory buffer (for pitch sprites)
+DIM SHARED Back_net AS Uinteger PTR '  A pointer that points to a memory buffer (for back net sprite)
 DIM SHARED Banner_sprite AS ANY PTR 'idem for banner
 DIM SHARED Shadowed_sprite AS ANY PTR 'idem for shadowed sprite
 DIM SHARED Wallpaper(3) as any ptr 'wallpaper bitmaps

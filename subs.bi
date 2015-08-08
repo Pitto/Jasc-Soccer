@@ -584,9 +584,11 @@ SUB display_match()
                             Pitch_data(Main_menu_pitch_type_selected).gkh,_
                             C_WHITE, c_x_o, c_y_o)
 			if (Debug) then draw_debug()
+			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y - 120 - c_y_o ), back_net, trans
 			draw_top_net()
 			draw_players()
 			draw_bottom_net()
+			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y + PITCH_H + 10 - c_y_o ), back_net, trans
 			draw_bottom_info()
 			'display the selecting tactic menu
 			if (selecting_tactic) then
@@ -1726,6 +1728,12 @@ SUB load_bitmap()
         GET (img_x, img_y)-(img_x + 20, img_y + 24), gk_sprite(count)
         img_x += img_w
     next count
+    'loading back net
+    BLOAD "img\back_net.bmp", 0
+    Back_net = IMAGECREATE(292,100)
+    get (0,0)-(291,99), Back_net
+    
+    
     'loading ball sprites
     BLOAD "img\ball_sprites.bmp", 0
     img_x = 0
