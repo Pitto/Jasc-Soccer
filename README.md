@@ -10,5 +10,6 @@ It is possible to play against the PC.
 Official Forum thread on www.freebasic.net:
 http://www.freebasic.net/forum/viewtopic.php?f=15&t=20637 thread, thank you for your feedbacks
 
-Video of the gameplay explaining some further features:
+Video of the gameplay:
 https://www.youtube.com/watch?v=14ruEBfzDqM
+in the video there are subtitles that explain some further features:
