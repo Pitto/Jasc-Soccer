@@ -12,4 +12,5 @@ http://www.freebasic.net/forum/viewtopic.php?f=15&t=20637 thread, thank you for 
 
 Video of the gameplay:
 https://www.youtube.com/watch?v=14ruEBfzDqM
-in the video there are subtitles that explain some further features:
+
+In the video there are subtitles that explain some further features.
