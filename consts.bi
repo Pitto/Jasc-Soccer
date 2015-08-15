@@ -1,6 +1,6 @@
 '#DEFINE################################################################
 #define GAME_NAME "JASC SOCCER"
-#define GAME_VERSION "0.24.8"
+#define GAME_VERSION "0.24.9"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 8
@@ -69,7 +69,8 @@ const SQR_2 as single = 1.4142135f
 const SCREEN_W as Integer = 640 
 const SCREEN_H as Integer = 480
 'useful to don't allow the camera to move everywere, this sets a limit
-const CAMERA_PADDING as Integer = 45
+const CAMERA_Y_PADDING as Integer = 200
+const CAMERA_X_PADDING as Integer = 45
 'ratio of the xy movements of the camera having the ball as reference point
 const CAMERA_EASING_RATIO as Single = 0.40f
 const PL_DEFAULT_SPEED as single = 15.5 * M_Pixel

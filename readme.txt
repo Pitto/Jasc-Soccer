@@ -27,11 +27,13 @@ Acknowledgements:
 · The creators of http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra13, very useful for the ball trajectory calc
 · Original font printing routine was created by Chis Chadwick and it came as a part of his Pixel Plus 256 package. Additional code (font loading subs, font formats, font files, changes, …) by Dean Janjic.
 · Some fonts used are based on GNU Unifont - Project page http://unifoundry.com/unifont.html
+· YSOCCER DEVELOPERS: The stadim bitmap is a mockup based on their sprites - http://ysoccer.sourceforge.net/
 
 'TODO LIST (in order of importance)-------------------------------------
 · matchtime and half-time field switch
     fix check_throw_in_corner_kick()
 · IMPROVE AI (sooo much!)
+· A Much more cool menu
 · AFTERTOUCH Wow! :)
 · Human vs Human
 · cleanup code (heavy work!) :(
@@ -41,7 +43,6 @@ Acknowledgements:
 · get_short_side_pl_to_pass
 · get_short_endline_pl_to_pass
 · New sprite set
-· Use of custom font
 · Game menu :) - maybe fantastic!
 · 3 kind of skin for the player
 · Replais
@@ -50,15 +51,13 @@ Acknowledgements:
 · Sound effects
 · Players have to go outside the penalty area when there are some freekicks
 · direction of the player going to the ball has to be corrected
-· Fix paint_kits routine
-· Timing on/off when game is inactive
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
-· change paint_kit SUB
-sa  
+
 DEV LOG -------------------------------------
 0.24.9
 · Fixed a bug in team kit painting
+· Stadium bitmaps - Thanks to Ysoccer developers
 
 0.24.8
 · It is possible to change on the fly the tactic

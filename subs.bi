@@ -73,7 +73,7 @@ DECLARE SUB draw_custom_line(x as single, y as single, rds as single, a_l as sin
 DECLARE SUB draw_pl_tile(tile as integer, tile_color as uinteger)
 'draws the players
 DECLARE SUB draw_players()
-'resets the position of the players (0's ids on the left side, 1's ids on the right side)
+'resets the position of the players
 DECLARE SUB reset_players_positions()
 'puts the ball into the centre of the pitch
 DECLARE SUB put_ball_on_centre()
@@ -176,23 +176,23 @@ SUB check_ball_limits()
     'border pitch limit check
     dim as integer is_ball_out = 0
     
-    if (ball.x > PITCH_X+PITCH_W+CAMERA_PADDING) THEN
-        ball.x = PITCH_X+PITCH_W+CAMERA_PADDING-5
+    if (ball.x > PITCH_X+PITCH_W+CAMERA_X_PADDING) THEN
+        ball.x = PITCH_X+PITCH_W+CAMERA_X_PADDING-5
         ball.rds = PI - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.x < PITCH_X - CAMERA_PADDING) THEN
-        ball.x = PITCH_X - CAMERA_PADDING + 5
+    if (ball.x < PITCH_X - CAMERA_X_PADDING) THEN
+        ball.x = PITCH_X - CAMERA_X_PADDING + 5
         ball.rds = PI - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.y > PITCH_Y + PITCH_H + CAMERA_PADDING) THEN
-        ball.y = PITCH_Y + PITCH_H + CAMERA_PADDING - 5
+    if (ball.y > PITCH_Y + PITCH_H + CAMERA_Y_PADDING) THEN
+        ball.y = PITCH_Y + PITCH_H + CAMERA_Y_PADDING - 5
         ball.rds = PI_DOUBLE - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.y <  PITCH_Y - CAMERA_PADDING ) THEN
-        ball.y = PITCH_Y - CAMERA_PADDING + 5
+    if (ball.y <  PITCH_Y - CAMERA_X_PADDING ) THEN
+        ball.y = PITCH_Y - CAMERA_X_PADDING + 5
         ball.rds = PI_DOUBLE - ball.rds
         ball.speed *= 0.3
         ball.z_speed *= 0.5
@@ -591,11 +591,23 @@ SUB display_match()
                             Pitch_data(Main_menu_pitch_type_selected).gkh,_
                             C_WHITE, c_x_o, c_y_o)
 			if (Debug) then draw_debug()
-			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y - 120 - c_y_o ), back_net, trans
+			'draw the top stadium: 305 is the witch in pixel of the stadium tile
+			for c = 0 to int(PITCH_W / 305) + 1
+				PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y - 220 - c_y_o), Stadium_bitmap(0), pset
+				PrintFont PITCH_X - 150 - c_x_o + c * 305, PITCH_Y - 70 - c_y_o, "Many Thanks to YSoccer Developers http://ysoccer.sourceforge.net/", SmallFont, 1, 1
+			next c
+			'... the upper back net
+			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y - 140 - c_y_o ), back_net, trans
 			draw_top_net()
 			draw_players()
 			draw_bottom_net()
+			'...the lower back net
 			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y + PITCH_H + 10 - c_y_o ), back_net, trans
+			'draw the bottom stadium: 305 is the witch in pixel of the stadium tile
+			for c = 0 to int(PITCH_W / 305) + 1
+				PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y + PITCH_H + 30 - c_y_o), Stadium_bitmap(1), pset
+			next c
+			
 			draw_bottom_info()
 			'display the selecting tactic menu
 			if (selecting_tactic) then
@@ -1719,6 +1731,15 @@ SUB load_bitmap()
     img_h = 25
     img_x = 0
     img_y = 0
+    
+    'loading stadium
+    BLOAD "img\stadium_top.bmp", 0
+    Stadium_bitmap(0) = IMAGECREATE(305, 192)
+    get (0,0)-(304,191), Stadium_bitmap(0)
+	BLOAD "img\stadium_bottom.bmp", 0
+    Stadium_bitmap(1) = IMAGECREATE(305, 192)
+    get (0,0)-(304,191), Stadium_bitmap(1)
+
 
     'loading back net
     BLOAD "img\back_net.bmp", 0
@@ -2209,17 +2230,17 @@ SUB update_camera_position()
     camera.y += -sin(_abtp(camera.x, camera.y, ball.x, ball.y))*camera.speed * Dt
     
     'padding & border limit check
-    if (camera.x < PITCH_X + camera.w/2 - CAMERA_PADDING) then
-        camera.x = PITCH_X + camera.w/2 - CAMERA_PADDING
+    if (camera.x < PITCH_X + camera.w/2 - CAMERA_X_PADDING) then
+        camera.x = PITCH_X + camera.w/2 - CAMERA_X_PADDING
     end if
-    if (camera.x > PITCH_X + PITCH_W - camera.w/2 + CAMERA_PADDING) then
-        camera.x = PITCH_X + PITCH_W - camera.w/2 + CAMERA_PADDING
+    if (camera.x > PITCH_X + PITCH_W - camera.w/2 + CAMERA_X_PADDING) then
+        camera.x = PITCH_X + PITCH_W - camera.w/2 + CAMERA_X_PADDING
     end if
-    if (camera.y > PITCH_Y + PITCH_H - camera.h/2 + CAMERA_PADDING) then
-        camera.y = PITCH_Y + PITCH_H - camera.h/2 + CAMERA_PADDING
+    if (camera.y > PITCH_Y + PITCH_H - camera.h/2 + CAMERA_Y_PADDING) then
+        camera.y = PITCH_Y + PITCH_H - camera.h/2 + CAMERA_Y_PADDING
     end if
-    if (camera.y < PITCH_Y + camera.h/2 - CAMERA_PADDING) then
-        camera.y = PITCH_Y + camera.h/2 - CAMERA_PADDING
+    if (camera.y < PITCH_Y + camera.h/2 - CAMERA_Y_PADDING) then
+        camera.y = PITCH_Y + camera.h/2 - CAMERA_Y_PADDING
     end if
     'update global variables
     c_x_o = camera.x - camera.w/2

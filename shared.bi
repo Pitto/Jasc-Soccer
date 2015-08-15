@@ -19,6 +19,7 @@ dim shared bhv_tile(0 to 35, 0 to 9) as Integer 'behavior array
 DIM SHARED Pl_sprite_0(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Pl_sprite_1(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Gk_sprite(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
+DIM SHARED Stadium_bitmap(2) AS Uinteger PTR 'Stadium bitmap
 DIM SHARED Ball_sprite(15) AS ANY PTR '  A pointer that points to a memory buffer (for ball sprites)
 DIM SHARED Net_sprite(2) AS ANY PTR '  A pointer that points to a memory buffer (for net sprites)
 DIM SHARED Pitch_sprite(12) AS Uinteger PTR '  A pointer that points to a memory buffer (for pitch sprites)
