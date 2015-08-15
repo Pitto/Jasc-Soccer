@@ -57,6 +57,9 @@ Acknowledgements:
 · change paint_kit SUB
 sa  
 DEV LOG -------------------------------------
+0.24.9
+· Fixed a bug in team kit painting
+
 0.24.8
 · It is possible to change on the fly the tactic
   of the team 0 - Press "T" key to activate menu and +/- keys to change

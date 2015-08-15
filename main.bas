@@ -65,7 +65,7 @@ DO
 			display_tactic_editor()
 		'GAME
 		case game
-			
+			load_player_sprites()
 			'initalize the teams selected
 			init_team_data()
 			'initialize pitch dimensions

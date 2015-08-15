@@ -30,6 +30,7 @@ Declare Sub Load_teams_list()
 Declare Sub Update_main_menu()
 'draw on screen the main menu
 Declare Sub Draw_main_menu()
+Declare Sub delete_player_sprites()
 'draw and update the main menu
 DECLARE SUB display_menu()
 'load fontsd
@@ -42,8 +43,10 @@ DECLARE SUB load_tact()
 DECLARE SUB load_behavior()
 'get user input to control the direction of the player 
 'DECLARE SUB get_user_input_ways(c as integer)
-'load sprites
+'load bitmaps
 DECLARE SUB load_bitmap()
+'load player_sprites
+DECLARE SUB load_player_sprites()
 'paints the kits of the teams with a custom color - and also the color of the skin of
 'the players
 DECLARE SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer, _
@@ -441,10 +444,6 @@ END SUB
 
 SUB delete_bitmap()
 	dim count as integer
-	For count = 0 To PL_SPRITES_TOT_N - 1
-		If pl_sprite_0(count) Then ImageDestroy pl_sprite_0(count)
-        If pl_sprite_1(count) Then ImageDestroy pl_sprite_1(count)
-    Next
     For count = 0 To 14
         If ball_sprite(count) Then ImageDestroy ball_sprite(count)
     Next
@@ -457,6 +456,14 @@ SUB delete_bitmap()
     If Wallpaper(1) Then ImageDestroy Wallpaper(1)
     If Wallpaper(2) Then ImageDestroy Wallpaper(2)
 END SUB
+
+SUB delete_player_sprites()
+	dim count as integer
+	For count = 0 To PL_SPRITES_TOT_N - 1
+		If pl_sprite_0(count) Then ImageDestroy pl_sprite_0(count)
+		If pl_sprite_1(count) Then ImageDestroy pl_sprite_1(count)
+	Next
+End sub
 
 SUB display_menu()
 	DO
@@ -648,6 +655,7 @@ SUB display_match()
 		Timing.time_last = Timing.time_current
 	
 	LOOP UNTIL Exit_flag = 1
+	delete_player_sprites()
 	game_section = main_menu
 END SUB
 
@@ -1711,28 +1719,11 @@ SUB load_bitmap()
     img_h = 25
     img_x = 0
     img_y = 0
-    'load and stores the sprites into two array
-    'one array for each team… then with paint_kits sub
-    'the color of the kits of the sprites will be changed
-    BLOAD "img\pl_sprites.bmp", 0
-    for count = 0 to PL_SPRITES_TOT_N -1
-        if (count > 0) and (count MOD 17 = 0) then
-            img_x = 0
-            img_y += img_h
-        end if
-        Pl_sprite_0(count) = IMAGECREATE (img_w, img_h)
-        Pl_sprite_1(count) = IMAGECREATE (img_w, img_h)
-        gk_sprite(count) = IMAGECREATE (img_w, img_h)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_0(count)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_1(count)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), gk_sprite(count)
-        img_x += img_w
-    next count
+
     'loading back net
     BLOAD "img\back_net.bmp", 0
     Back_net = IMAGECREATE(292,100)
     get (0,0)-(291,99), Back_net
-    
     
     'loading ball sprites
     BLOAD "img\ball_sprites.bmp", 0
@@ -1786,7 +1777,30 @@ SUB load_bitmap()
 END SUB
 
 SUB load_player_sprites()
-
+    dim as integer img_x, img_w, img_y, img_h, count
+    
+    'loading players sprites-------------------------
+    img_w = 21
+    img_h = 25
+    img_x = 0
+    img_y = 0
+    'load and stores the sprites into two array
+    'one array for each team… then with paint_kits sub
+    'the color of the kits of the sprites will be changed
+    BLOAD "img\pl_sprites.bmp", 0
+    for count = 0 to PL_SPRITES_TOT_N -1
+        if (count > 0) and (count MOD 17 = 0) then
+            img_x = 0
+            img_y += img_h
+        end if
+        Pl_sprite_0(count) = IMAGECREATE (img_w, img_h)
+        Pl_sprite_1(count) = IMAGECREATE (img_w, img_h)
+        gk_sprite(count) = IMAGECREATE (img_w, img_h)
+        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_0(count)
+        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_1(count)
+        GET (img_x, img_y)-(img_x + 20, img_y + 24), gk_sprite(count)
+        img_x += img_w
+    next count
 end sub
 
 SUB load_behavior()
