@@ -144,6 +144,9 @@ declare sub draw_arrow(x as single, y as single, rds as single, a_l as single, c
 declare sub check_ball_woods()
 'update the ball into the goal
 declare sub update_ball_on_goal()
+'display the pre-match teams
+declare sub display_teams()
+
 'TACTIC EDITOR SUBS
 declare sub tct_ed_key_input_listener() 'checks if some input key are pressed
 declare sub tct_ed_pos_copy()'copy on clipboard the pl positions 
@@ -447,14 +450,16 @@ SUB delete_bitmap()
     For count = 0 To 14
         If ball_sprite(count) Then ImageDestroy ball_sprite(count)
     Next
-    If net_sprite(0)   Then ImageDestroy net_sprite(0)
-    If net_sprite(1)   Then ImageDestroy net_sprite(1)
-    If pitch_sprite(0) Then ImageDestroy pitch_sprite(0)
-    If pitch_sprite(1) Then ImageDestroy pitch_sprite(1)
-    If banner_sprite   Then ImageDestroy banner_sprite
-    If Wallpaper(0) Then ImageDestroy Wallpaper(0)
-    If Wallpaper(1) Then ImageDestroy Wallpaper(1)
-    If Wallpaper(2) Then ImageDestroy Wallpaper(2)
+    If net_sprite(0)		Then ImageDestroy net_sprite(0)
+    If net_sprite(1)		Then ImageDestroy net_sprite(1)
+    If Stadium_bitmap(0)	Then ImageDestroy Stadium_bitmap(0)
+    If Stadium_bitmap(1)	Then ImageDestroy Stadium_bitmap(1)
+    If pitch_sprite(0)		Then ImageDestroy pitch_sprite(0)
+    If pitch_sprite(1)		Then ImageDestroy pitch_sprite(1)
+    If banner_sprite		Then ImageDestroy banner_sprite
+    If Wallpaper(0)			Then ImageDestroy Wallpaper(0)
+    If Wallpaper(1) 		Then ImageDestroy Wallpaper(1)
+    If Wallpaper(2) 		Then ImageDestroy Wallpaper(2)
 END SUB
 
 SUB delete_player_sprites()
@@ -671,6 +676,54 @@ SUB display_match()
 	game_section = main_menu
 END SUB
 
+SUB display_teams()
+	dim as integer c, x, y
+	dim as integer h_padding = 16
+	dim as integer v_padding = 20
+	dim e As EVENT
+	DO
+		If (ScreenEvent(@e)) Then
+			Select Case e.type
+			Case EVENT_KEY_RELEASE
+				If (e.scancode = SC_Escape) Then
+					Exit do
+				End If
+			End Select
+		End If
+	
+		screenlock ' Lock the screen
+		screenset workpage, workpage xor 1 ' Swap work pages.
+		cls
+		PUT (0, 0), Wallpaper(0),pset
+		y = 50
+		x = 50
+		for c = 0 to Ubound(Pl)-1
+			draw_button (x + h_padding, y, len(pl(0).label) * 5, 16,_
+						pl(c).label, C_WHITE, C_BLUE, 0,0)
+			draw_button (x, y, 16, 16,_
+						str(pl(c).number), C_WHITE, C_BLUE, 0,0)
+		
+			if (c < 11) then
+				put (x - h_padding * 2, y), pl_sprite_0(102), trans
+			else
+				put (x - h_padding * 2, y), pl_sprite_1(102), trans
+			end if
+			y += v_padding
+			if (c = 10) then
+				y = 50
+				x = SCREEN_W -  len(pl(0).label) * 6
+			end if
+		next c
+		if (int(Timer) mod 2) then
+			draw string (SCREEN_W - 128, SCREEN_H - 20), _
+						"press ESC"
+		end if
+		workpage xor = 1 ' Swap work pages.
+		screenunlock
+		sleep 50,1
+	LOOP
+END SUB
+
 SUB display_tactic_editor()
 
 	dim e As EVENT
@@ -680,7 +733,6 @@ SUB display_tactic_editor()
 			Select Case e.type
 			Case EVENT_KEY_RELEASE
 				If (e.scancode = SC_Escape) Then
-					Game_section = credits
 					Exit_flag = 1
 				End If
 			End Select

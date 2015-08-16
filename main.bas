@@ -73,6 +73,7 @@ DO
 						Main_menu_pitch_type_selected)
 			'initialize the player proprietes for the match seleceted
 			init_players_proprietes()
+			display_teams()
 			put_ball_on_centre()
 			'initialize the Timer
 			init_timing()
