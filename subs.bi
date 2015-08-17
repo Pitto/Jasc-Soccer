@@ -784,7 +784,7 @@ SUB display_tactic_editor()
 end sub
 
 SUB draw_aknowledgements()
-	#define AKN_MAX_LINES 50
+	#define AKN_MAX_LINES 55
 	dim txt(AKN_MAX_LINES) as string
 	dim c as integer = 0
 	Dim ff As Ubyte
@@ -804,6 +804,8 @@ SUB draw_aknowledgements()
 		Cls
 		workpage xor = 1 ' Swap work pages.
 		PUT (0, 0), Wallpaper(2),pset
+		PUT (SCREEN_W\2 - 128, txt_y - 150), Amiga_1200_bitmap, trans
+		
 			if (int(Timer) mod 2) then
 				draw string (SCREEN_W - 128, SCREEN_H - 20), _
 							"press J to exit"
@@ -868,14 +870,14 @@ SUB draw_bottom_info()
             PUT (32*d, SCREEN_H\2 - 6), shadowed_sprite, trans
         next
         PrintFont SCREEN_W \ 2, SCREEN_H \ 2, str(Team(0).label) + " " + str(Team(0).goal) + _
-        " : " + str(Team(1).goal) + " " + str(Team(1).label), UniFont, 1, 1
+        " : " + str(Team(1).goal) + " " + str(Team(1).label), CoolFont, 1, 1
         PrintFont SCREEN_W \ 2, SCREEN_H \ 2 + 36, "Match_Event " + print_match_event(Match_event), SmallFont, 1, 1
     end if
     draw string (SCREEN_W - 50,SCREEN_H - 20), str(Timing.actual_fps) + " Fps", C_WHITE
     
-    PrintFont SCREEN_W - 100, 20, "Mins " + str(int(90/Timing.secs_to_play*Timing.seconds_elapsed)), UniFont, 1, 1
+    PrintFont SCREEN_W - 100, 20, "Mins " + str(int(90/Timing.secs_to_play*Timing.seconds_elapsed)), CoolFont, 1, 1
     if (pl_ball_owner_id <> -1) then
-		PrintFont 10, 20, str(pl(pl_ball_owner_id).label), UniFont, 1, 1
+		PrintFont 10, 20, str(pl(pl_ball_owner_id).label), CoolFont, 1, 1
     end if
     
 END SUB
@@ -966,7 +968,7 @@ SUB draw_debug()
     if debug > 5 then
 		if PL_ball_owner_id > -1 then
 			'Draw String 
-			PrintFont 20, 20, pl(PL_ball_owner_id).label, UniFont, 1, 1
+			PrintFont 20, 20, pl(PL_ball_owner_id).label, CoolFont, 1, 1
 			PrintFont 20, 38, SHELL_Message, SmallFont, 1, 1
 			'draws the fieldview of the selected player
 			draw_custom_line(pl(PL_ball_owner_id).x - c_x_o, pl(PL_ball_owner_id).y - c_y_o,_
@@ -1118,7 +1120,8 @@ Sub Draw_main_menu()
     draw_button 	(SCREEN_W\2 - 300, SCREEN_H - 30, 600, 20, _
 					str("This software is released under the Terms of the GNU GPL license v. 2.0"),_
 					C_WHITE, C_GRAY,0,0)
-    For a = 0 To 7
+	
+	For a = 0 To 7
         Select Case a
         Case 0
 			for i = lbound(Main_Menu_List_Teams) to ubound (Main_Menu_List_Teams) - 1
@@ -1796,6 +1799,11 @@ SUB load_bitmap()
 	BLOAD "img\stadium_bottom.bmp", 0
     Stadium_bitmap(1) = IMAGECREATE(305, 192)
     get (0,0)-(304,191), Stadium_bitmap(1)
+	
+	'loading my old Amiga 1200
+	BLOAD "img\amiga_1200.bmp", 0
+    Amiga_1200_bitmap = IMAGECREATE(256, 131)
+    get (0,0)-(255,130), Amiga_1200_bitmap
 
 
     'loading back net

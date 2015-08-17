@@ -28,6 +28,7 @@ DIM SHARED Back_net AS Uinteger PTR '  A pointer that points to a memory buffer 
 DIM SHARED Banner_sprite AS ANY PTR 'idem for banner
 DIM SHARED Shadowed_sprite AS ANY PTR 'idem for shadowed sprite
 DIM SHARED Wallpaper(3) as any ptr 'wallpaper bitmaps
+DIM SHARED Amiga_1200_bitmap as Uinteger ptr 'My Old Amiga 1200!
 
 DIM SHARED Workpage AS INTEGER ' buffer holding the player sprites
 DIM SHARED Addframe as Integer = 0 'to be soon removed

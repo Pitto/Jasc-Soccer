@@ -1,3 +1,8 @@
+This game is dedicated to the memory of my
+A M I G A   1 2 0 0
+I've lost this computer almost 20 years ago - SIGH!
+
+
 *** J A S C * S O C C E R ***
 Just Another Sensi Clone
 
@@ -41,3 +46,5 @@ created by CHIS CHADWICK
 and it came as a part of his Pixel Plus 256 package.
 Additional code (font loading subs, font formats,
 font files, changes...) by DEAN JANJIC
+
+The YSoccer's developers
