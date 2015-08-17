@@ -678,8 +678,8 @@ END SUB
 
 SUB display_teams()
 	dim as integer c, x, y
-	dim as integer h_padding = 16
-	dim as integer v_padding = 20
+	dim as integer h_padding = 24
+	dim as integer v_padding = 24
 	dim e As EVENT
 	DO
 		If (ScreenEvent(@e)) Then
@@ -695,23 +695,25 @@ SUB display_teams()
 		screenset workpage, workpage xor 1 ' Swap work pages.
 		cls
 		PUT (0, 0), Wallpaper(0),pset
-		y = 50
-		x = 50
+		y = 100
+		x = 100
+		
+		PrintFont 100, 25, team(0).label, CoolFont, 1, 1
+		PrintFont SCREEN_W -  len(pl(0).label) * 7, 25, team(1).label, CoolFont, 1, 1
+		
 		for c = 0 to Ubound(Pl)-1
-			draw_button (x + h_padding, y, len(pl(0).label) * 5, 16,_
-						pl(c).label, C_WHITE, C_BLUE, 0,0)
-			draw_button (x, y, 16, 16,_
-						str(pl(c).number), C_WHITE, C_BLUE, 0,0)
+			PrintFont x - h_padding, y + 3, str(pl(c).number), SmallFont, 1, 1
+			PrintFont x, y, pl(c).label, CoolFont, 1, 1
 		
 			if (c < 11) then
-				put (x - h_padding * 2, y), pl_sprite_0(102), trans
+				put (x - h_padding * 2, y - 8), pl_sprite_0(102), trans
 			else
-				put (x - h_padding * 2, y), pl_sprite_1(102), trans
+				put (x - h_padding * 2, y - 8), pl_sprite_1(102), trans
 			end if
 			y += v_padding
 			if (c = 10) then
-				y = 50
-				x = SCREEN_W -  len(pl(0).label) * 6
+				y = 100
+				x = SCREEN_W -  len(pl(0).label) * 7
 			end if
 		next c
 		if (int(Timer) mod 2) then
@@ -1089,9 +1091,12 @@ sub draw_button (x as integer, y as integer, w as integer,_
 		Line 	(x - offset_line,y - offset_line)-_
 				(x+w + offset_line,_
 				y+h + offset_line),stroke_color_selected,B
+		
 		draw string 	(x + (w \ 2) - len(label)*4 + offset_shadow,_
 						y + 5 + offset_shadow), label, C_BLACK		
 	end if
+	
+	'PrintFont x + w\2 - len(label)*4, y+5, label, CoolFont, 1, 1
 	
 	draw string (x + (w \ 2) - len(label)*4, y + 5), label		
 	
@@ -1100,10 +1105,10 @@ end sub
 
 Sub Draw_main_menu()
     Dim As Integer a, i
-    dim btn_w as integer = 160 'width of the button
-    dim btn_h as integer = 16 'height of the button
-    dim btn_v_space as integer = 10 'vertical spacing of each button
-    Dim top_margin as integer = 80
+    dim btn_w as integer = 220 'width of the button
+    dim btn_h as integer = 20 'height of the button
+    dim btn_v_space as integer = 15 'vertical spacing of each button
+    Dim top_margin as integer = 100
     'graphic statements
     'wallpaper
     PUT (0, 0), Wallpaper(1),pset
@@ -1914,6 +1919,7 @@ END SUB
 SUB load_fonts()
     LoadFont "Fonts\SmallFont.bmp", SmallFont, 1
     LoadFont "Fonts\UniFont.bmp", UniFont, 1
+    LoadFont "Fonts\CoolFont.bmp", CoolFont, 1
 END SUB
 
 SUB load_pitch_data()

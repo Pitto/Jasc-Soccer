@@ -1,5 +1,6 @@
 DIM SHARED SmallFont AS FontType
 DIM SHARED UniFont AS FontType
+DIM SHARED CoolFont AS FontType
 dim SHARED Dt as single ' Delta Timing
 DIM SHARED Debug as Integer = 0
 'exit flag
