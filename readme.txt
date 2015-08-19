@@ -33,7 +33,7 @@ Acknowledgements:
 · matchtime and half-time field switch
     fix check_throw_in_corner_kick()
 · IMPROVE AI (sooo much!)
-· A Much more cool menu
+· A better menu
 · AFTERTOUCH Wow! :)
 · Human vs Human
 · cleanup code (heavy work!) :(
@@ -43,7 +43,6 @@ Acknowledgements:
 · get_short_side_pl_to_pass
 · get_short_endline_pl_to_pass
 · New sprite set
-· Game menu :) - maybe fantastic!
 · 3 kind of skin for the player
 · Replais
 · Public
