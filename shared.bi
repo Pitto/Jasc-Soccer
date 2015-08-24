@@ -21,6 +21,7 @@ DIM SHARED Pl_sprite_0(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a
 DIM SHARED Pl_sprite_1(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Gk_sprite(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Stadium_bitmap(2) AS Uinteger PTR 'Stadium bitmap
+DIM SHARED Bench_bitmap as Uinteger ptr 'Bench bitmap
 DIM SHARED Ball_sprite(15) AS ANY PTR '  A pointer that points to a memory buffer (for ball sprites)
 DIM SHARED Net_sprite(2) AS ANY PTR '  A pointer that points to a memory buffer (for net sprites)
 DIM SHARED Pitch_sprite(12) AS Uinteger PTR '  A pointer that points to a memory buffer (for pitch sprites)
@@ -29,6 +30,7 @@ DIM SHARED Banner_sprite AS ANY PTR 'idem for banner
 DIM SHARED Shadowed_sprite AS ANY PTR 'idem for shadowed sprite
 DIM SHARED Wallpaper(3) as any ptr 'wallpaper bitmaps
 DIM SHARED Amiga_1200_bitmap as Uinteger ptr 'My Old Amiga 1200!
+
 
 DIM SHARED Workpage AS INTEGER ' buffer holding the player sprites
 DIM SHARED Addframe as Integer = 0 'to be soon removed

@@ -776,7 +776,6 @@ SUB display_tactic_editor()
 		tct_ed_print_tact_data()
 
 		workpage xor = 1 ' Swap work pages.
-		'locate 10,10 : print str(get_ball_tile())
 		screenunlock
 		sleep 50,1
 	LOOP UNTIL Exit_flag = 1
@@ -1214,12 +1213,12 @@ End Sub
 SUB draw_pitch()
     dim as Integer pitch_rows, pitch_cols, a, b
     dim banner_message as string*32
-    pitch_rows = PITCH_H \ 32 + 4
-    pitch_cols = PITCH_W \ 32 + 4
+    pitch_rows = PITCH_H \ 32 + 8
+    pitch_cols = PITCH_W \ 32 + 8
     
     'drawing the grass
-    for a = 0 to pitch_rows -1
-        for b = 0 to pitch_cols -1
+    for a = -2 to pitch_rows -1
+        for b = -2 to pitch_cols -1
             if is_in_camera_crop (PITCH_X + b*32, PITCH_Y + a*32, 128) then
                 if a mod 2 = 0 then
                     PUT (PITCH_X - 64 + (b*32)- c_x_o, PITCH_Y - 64 +(a*32) - c_y_o),_
@@ -1240,6 +1239,11 @@ SUB draw_pitch()
     PUT (PITCH_X + PITCH_W - 266 - c_x_o, PITCH_Y - 27 - c_y_o), banner_sprite, trans
     banner_message = GAME_AUTHOR_SITE
     draw string (PITCH_X + PITCH_W - 256 - c_x_o,  PITCH_Y - 20 - c_y_o), banner_message, RGB(50,50,50)
+    
+    'bench
+    PUT (PITCH_X - 90 - c_x_o, PITCH_MIDDLE_H - c_y_o - 200), Bench_bitmap, trans
+    PUT (PITCH_X - 90 - c_x_o, PITCH_MIDDLE_H - c_y_o + 20), Bench_bitmap, trans
+    
     
 END SUB
 
@@ -1799,12 +1803,16 @@ SUB load_bitmap()
 	BLOAD "img\stadium_bottom.bmp", 0
     Stadium_bitmap(1) = IMAGECREATE(305, 192)
     get (0,0)-(304,191), Stadium_bitmap(1)
-	
+    
+    'loading bench
+    BLOAD "img\bench.bmp", 0
+    Bench_bitmap = IMAGECREATE(80, 150)
+    get (0,0)-(79,149), Bench_bitmap
+    
 	'loading my old Amiga 1200
 	BLOAD "img\amiga_1200.bmp", 0
     Amiga_1200_bitmap = IMAGECREATE(256, 131)
     get (0,0)-(255,130), Amiga_1200_bitmap
-
 
     'loading back net
     BLOAD "img\back_net.bmp", 0
@@ -1858,13 +1866,10 @@ SUB load_bitmap()
     Wallpaper(2)= IMAGECREATE(640,480)
     GET (0,0)-(639,479), Wallpaper(2)
     
-    
-    
 END SUB
 
 SUB load_player_sprites()
     dim as integer img_x, img_w, img_y, img_h, count
-    
     'loading players sprites-------------------------
     img_w = 21
     img_h = 25
