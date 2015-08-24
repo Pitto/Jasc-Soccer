@@ -446,14 +446,18 @@ SUB check_throw_in_corner_kick()
 END SUB
 
 SUB delete_bitmap()
-	dim count as integer
-    For count = 0 To 14
-        If ball_sprite(count) Then ImageDestroy ball_sprite(count)
+	dim c as integer
+    For c = 0 To 14
+        If ball_sprite(c) Then ImageDestroy ball_sprite(c)
+    Next
+    For c = 0 To 7
+        If Cameraman_sprite(c) Then ImageDestroy Cameraman_sprite(c)
     Next
     If net_sprite(0)		Then ImageDestroy net_sprite(0)
     If net_sprite(1)		Then ImageDestroy net_sprite(1)
     If Stadium_bitmap(0)	Then ImageDestroy Stadium_bitmap(0)
     If Stadium_bitmap(1)	Then ImageDestroy Stadium_bitmap(1)
+    If Bench_bitmap			Then ImageDestroy Bench_bitmap
     If pitch_sprite(0)		Then ImageDestroy pitch_sprite(0)
     If pitch_sprite(1)		Then ImageDestroy pitch_sprite(1)
     If banner_sprite		Then ImageDestroy banner_sprite
@@ -1211,7 +1215,7 @@ Sub Draw_main_menu()
 End Sub
 
 SUB draw_pitch()
-    dim as Integer pitch_rows, pitch_cols, a, b
+    dim as Integer pitch_rows, pitch_cols, a, b, c
     dim banner_message as string*32
     pitch_rows = PITCH_H \ 32 + 8
     pitch_cols = PITCH_W \ 32 + 8
@@ -1244,6 +1248,13 @@ SUB draw_pitch()
     PUT (PITCH_X - 90 - c_x_o, PITCH_MIDDLE_H - c_y_o - 200), Bench_bitmap, trans
     PUT (PITCH_X - 90 - c_x_o, PITCH_MIDDLE_H - c_y_o + 20), Bench_bitmap, trans
     
+    'cameraman
+    for c = 0 to 7
+		Cameraman(c).rds = _abtp(cameraman(c).x,cameraman(c).y, Ball.x, Ball.y)
+		PUT (cameraman(c).x - c_x_o, cameraman(c).y - c_y_o),_
+		Cameraman_sprite(start_frame_static(Cameraman(c).rds)),_
+		trans
+    next c
     
 END SUB
 
@@ -1829,6 +1840,17 @@ SUB load_bitmap()
         img_x += 16
     next count
     
+    'loading cameraman sprites
+    BLOAD "img\cameraman.bmp", 0
+    img_x = 0
+    img_y = 0
+    for count = 0 to 7
+        Cameraman_sprite(count) = IMAGECREATE (16, 25)
+        GET (img_x, img_y)-(img_x + 15, img_y + 24), Cameraman_sprite(count)
+        img_x = 0
+        img_y += 25
+    next count
+    
     'loading net sprites
     BLOAD "img\net_0.bmp",0
     net_sprite(0) = IMAGECREATE(106,38)
@@ -1964,6 +1986,16 @@ Sub init_pitch_dimensions(x as integer, y as integer,_
     Pitch_data(slot).gkw = Pitch_data(slot).paw \ 2 'half goalkeeper area width
     Pitch_data(slot).gkh = Pitch_data(slot).pah \ 3 'goalkeeper area height
     Pitch_data(slot).cdw = 2 'corner dish diameter
+    
+    Cameraman(0).x = x - 30		:	Cameraman(0).y = y - 10
+    Cameraman(1).x = x + w + 10	:	Cameraman(1).y = y - 10
+    Cameraman(2).x = x - 30		:	Cameraman(2).y = y + h\2 + 10
+    Cameraman(3).x = x + w + 10	:	Cameraman(3).y = y + h\2 + 10
+    Cameraman(4).x = x - 30		:	Cameraman(4).y = y + h - 10
+    Cameraman(5).x = x + w + 10	:	Cameraman(5).y = y + h - 10
+    Cameraman(6).x = x + w - w\2 - 150:	Cameraman(6).y = y + h + 10
+    Cameraman(7).x = x + w - w\2 - 150:	Cameraman(7).y = y - 20
+    
 end sub
 
 SUB load_tact()

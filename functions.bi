@@ -9,6 +9,8 @@ declare function d_t_r (degree as integer) as single
 declare function d_b_t_p (x1 as single, y1 as single, x2 as single, y2 as single) as single
 ' calculates the starting frame for the player sprite from the angle in radiants
 declare function start_frame (radiants as single) as integer
+'sam as above but for static sprites
+declare function start_frame_static (radiants as single) as integer
 ' return the right angle where to shoot the ball to score a goal
 declare function find_shoot_angle (pl_id as Integer) as single
 ' returns in wich ball tile is the ball
@@ -112,6 +114,35 @@ function start_frame (radiants as single) as integer
 			return 0
     end select
 end function
+
+function start_frame_static (radiants as single) as integer
+    dim degree as Short
+    'convert radiants to 360° degree
+    degree = (180-int(radiants*180/PI))
+    select case degree
+		case 0 to 22
+			return 4
+		case 23 to 67
+			return 3'tr
+		case 68 to 112
+			return 2
+		case 113 to 157
+			return 1
+		case 158 to 202
+			return 0
+		case 203 to 247
+			return 7'bL
+		case 248 to 292
+			return 6
+		case 292 to 337
+			return 5
+		case 337 to 360
+			return 4
+		case else
+			return 0
+    end select
+end function
+
 
 function find_shoot_angle (pl_id as Integer) as single
     dim as single alfa_1, alfa_2, dist_1, dist_2, dist_to_gk, shoot_angle

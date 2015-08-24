@@ -20,6 +20,7 @@ dim shared bhv_tile(0 to 35, 0 to 9) as Integer 'behavior array
 DIM SHARED Pl_sprite_0(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Pl_sprite_1(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Gk_sprite(PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
+DIM SHARED Cameraman_sprite(8) AS Uinteger ptr ' Cameraman sprites
 DIM SHARED Stadium_bitmap(2) AS Uinteger PTR 'Stadium bitmap
 DIM SHARED Bench_bitmap as Uinteger ptr 'Bench bitmap
 DIM SHARED Ball_sprite(15) AS ANY PTR '  A pointer that points to a memory buffer (for ball sprites)
@@ -40,6 +41,8 @@ DIM shared C_y_o as single = 0 'camera y offset
 
 dim shared Camera as camera_proto 'camera type
 dim shared Pl(PL_N_TOT*2) as player_proto 'player type
+dim shared Cameraman(8) as player_proto 'player type
+
 dim shared Ball as ball_proto 'ball type
 dim shared Ball_record(BALL_FRAMES_RECORD) as ball_proto 'ball type
 dim shared Team(2) as Team_proto 'team
