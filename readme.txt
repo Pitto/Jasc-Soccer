@@ -52,6 +52,8 @@ Acknowledgements:
 · direction of the player going to the ball has to be corrected
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
+· When player is near the ball the code could help him to get
+  the correct angle to the ball
 
 DEV LOG -------------------------------------
 0.24.9
@@ -59,6 +61,9 @@ DEV LOG -------------------------------------
 · Stadium bitmaps - Heavy inspired to Ysoccer stadium
 · Pre-match teams presentation
 · Added a custom bitmap font (CoolFont)
+· Added cameraman sprites
+· Added bench bitmap
+· Code cleanup
 
 0.24.8
 · It is possible to change on the fly the tactic

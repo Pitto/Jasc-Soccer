@@ -602,8 +602,7 @@ SUB display_match()
 			if (Debug) then draw_debug()
 			'draw the top stadium: 305 is the witch in pixel of the stadium tile
 			for c = 0 to int(PITCH_W / 305) + 1
-				PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y - 220 - c_y_o), Stadium_bitmap(0), pset
-				PrintFont PITCH_X - 150 - c_x_o + c * 305, PITCH_Y - 70 - c_y_o, "Many Thanks to YSoccer Developers http://ysoccer.sourceforge.net/", SmallFont, 1, 1
+				PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y - 220 - c_y_o), Stadium_bitmap(0), trans
 			next c
 			'... the upper back net
 			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y - 140 - c_y_o ), back_net, trans
