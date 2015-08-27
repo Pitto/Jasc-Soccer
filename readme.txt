@@ -29,6 +29,7 @@ Acknowledgements:
 · Some fonts used are based on GNU Unifont - Project page http://unifoundry.com/unifont.html
 · YSOCCER DEVELOPERS: The stadim bitmap is inspired to their sprites - http://ysoccer.sourceforge.net/
 · Sensible Soccer's developers - They made a beautiful game
+· Unifont developers: http://savannah.gnu.org/projects/unifont
 
 'TODO LIST -------------------------------------
 · matchtime and half-time field switch

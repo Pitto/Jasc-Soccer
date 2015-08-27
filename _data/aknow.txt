@@ -29,10 +29,6 @@ www.geany.org
 *EBBEN FEAGAN AND RICHARD CLARK*
 for their useful book 'A Beginner's Guide to FreeBasic'
 
-*YSOCCER DEVELOPERS*
-The stadim bitmap is based on their sprites
-http://ysoccer.sourceforge.net/
-
 *ALL THE FOLLOWERS of the*
 www.freebasic.net/forum/viewtopic.php?f=15&t=20637
 thread... thank you for your feedbacks!
@@ -46,5 +42,10 @@ created by CHIS CHADWICK
 and it came as a part of his Pixel Plus 256 package.
 Additional code (font loading subs, font formats,
 font files, changes...) by DEAN JANJIC
+
+Sensible Soccer's developers - They made a beautiful game
+
+Unifont developers:
+http://savannah.gnu.org/projects/unifont
 
 The YSoccer's developers

@@ -785,7 +785,7 @@ SUB display_tactic_editor()
 end sub
 
 SUB draw_aknowledgements()
-	#define AKN_MAX_LINES 55
+	#define AKN_MAX_LINES 100
 	dim txt(AKN_MAX_LINES) as string
 	dim c as integer = 0
 	Dim ff As Ubyte
@@ -861,26 +861,27 @@ END SUB
 
 SUB draw_bottom_info()
     dim d as Integer
-    
-    for d = 0 to int (SCREEN_W / 32) +1 
-        PUT (32*d, SCREEN_H-32), shadowed_sprite, trans
-    next
-
-    if Match_event_delay then
-        for d = 8 to int (SCREEN_W / 32) +1 
-            PUT (32*d, SCREEN_H\2 - 6), shadowed_sprite, trans
-        next
-        PrintFont SCREEN_W \ 2, SCREEN_H \ 2, str(Team(0).label) + " " + str(Team(0).goal) + _
-        " : " + str(Team(1).goal) + " " + str(Team(1).label), CoolFont, 1, 1
-        PrintFont SCREEN_W \ 2, SCREEN_H \ 2 + 36, "Match_Event " + print_match_event(Match_event), SmallFont, 1, 1
-    end if
-    draw string (SCREEN_W - 50,SCREEN_H - 20), str(Timing.actual_fps) + " Fps", C_WHITE
-    
+    'show mins on the upper right corner of the monitor
     PrintFont SCREEN_W - 100, 20, "Mins " + str(int(90/Timing.secs_to_play*Timing.seconds_elapsed)), CoolFont, 1, 1
+	'shows the name of the player owner of the ball
     if (pl_ball_owner_id <> -1) then
 		PrintFont 10, 20, str(pl(pl_ball_owner_id).label), CoolFont, 1, 1
     end if
+	'show scoring info when there is a pause in the game
+    if Match_event_delay then
+        for d = 0 to int (SCREEN_W / 32) +1 
+            PUT (32*d, SCREEN_H\2 - 6), shadowed_sprite, trans
+        next
+        PrintFont 32, SCREEN_H \ 2, str(Team(0).label) + " " + str(Team(0).goal) + _
+        " : " + str(Team(1).goal) + " " + str(Team(1).label), CoolFont, 1, 1
+        PrintFont 32, SCREEN_H \ 2 + 36, "Match_Event " + print_match_event(Match_event), SmallFont, 1, 1
+    end if
+    'bottom shadow
+    for d = 0 to int (SCREEN_W / 32) +1 
+        PUT (32*d, SCREEN_H-32), shadowed_sprite, trans
+    next
     
+    PrintFont SCREEN_W - 50, SCREEN_H - 20, str(Timing.actual_fps) + " Fps", SmallFont, 1, 1
 END SUB
 
 SUB draw_bottom_net()
@@ -1512,43 +1513,43 @@ SUB get_pl_behavior(pl_id as Integer)
             SHELL_message =  str(decision) + " TILE " + str(tile) + " PASS to nearest"
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
-                        pl(get_nrst_pl_pass(pl_id)).y, 0.1, rnd * 1.0-0.5)
+                        pl(get_nrst_pl_pass(pl_id)).y, 0.1, 0)
             exit sub
         case bhv_tile(tile, 0)+1 to bhv_tile(tile, 1)	'1: pass_to_2nd_nearest
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS 2nd nearest"
             pl_to_pass = rnd*2 + 1
             shoot_ball  (pl_id, get_nrst2_pl_pass(pl_id, pl_to_pass),_
                         pl(get_nrst2_pl_pass(pl_id, pl_to_pass)).x,_
-                        pl(get_nrst2_pl_pass(pl_id, pl_to_pass)).y, 0.1, rnd * 1.0-0.5)
+                        pl(get_nrst2_pl_pass(pl_id, pl_to_pass)).y, 0.1, 0)
             exit sub
         case bhv_tile(tile, 1)+1 to bhv_tile(tile, 2)	'2: pass_short_side
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Short Side"
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
-                        pl(get_nrst_pl_pass(pl_id)).y, 0.2, rnd * 1.0-0.5)
+                        pl(get_nrst_pl_pass(pl_id)).y, 0.2, 0)
             exit sub
         case bhv_tile(tile, 2)+1 to bhv_tile(tile, 3)	'3: pass_long_side
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Long Side"
             shoot_ball  (pl_id, get_longside_pl_to_pass(pl_id),_
                         pl(get_longside_pl_to_pass(pl_id)).x,_
-                        pl(get_longside_pl_to_pass(pl_id)).y, 0.3,rnd * 1.0-0.5)
+                        pl(get_longside_pl_to_pass(pl_id)).y, 0.3,0)
             exit sub
         case bhv_tile(tile, 3)+1 to bhv_tile(tile, 4)	'4: pass_endline
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Endline"
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
-                        pl(get_nrst_pl_pass(pl_id)).y, 0.5,rnd * 1.0-0.5)
+                        pl(get_nrst_pl_pass(pl_id)).y, 0.5,0)
             exit sub
         case bhv_tile(tile, 4)+1 to bhv_tile(tile, 5)'5: pass_center 
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS center"
             shoot_ball  (pl_id, get_centerest_pl_to_pass(pl_id),_
                         pl(get_centerest_pl_to_pass(pl_id)).x,_
-                        pl(get_centerest_pl_to_pass(pl_id)).y, 0.2, rnd * 1.0-0.5)
+                        pl(get_centerest_pl_to_pass(pl_id)).y, 0.2, 0)
             exit sub
         case bhv_tile(tile, 5)+1 to bhv_tile(tile, 6)	'6: run_to_centre
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " R U N centre"
             ball.speed += ((rnd*5 + 5) * M_Pixel)
-            ball.rds = _abtp (pl(pl_id).x, pl(pl_id).y, pl(pl_id).x, PITCH_MIDDLE_H) + rnd * .5 -.25
+            ball.rds = _abtp (pl(pl_id).x, pl(pl_id).y, pl(pl_id).x, PITCH_MIDDLE_H) + rnd * .25 -.125
             PL_target_id = -1 ' The pl is not passing to anyone
             
             exit sub
@@ -1558,7 +1559,7 @@ SUB get_pl_behavior(pl_id as Integer)
             reset_ball_z()
 
             ball.rds = _abtp (pl(pl_id).x, pl(pl_id).y,_
-            PITCH_MIDDLE_W , (PITCH_Y + PITCH_H * (1 - Team(pl(pl_id).team).att_dir))) + rnd * .5 -.25
+            PITCH_MIDDLE_W , (PITCH_Y + PITCH_H * (1 - Team(pl(pl_id).team).att_dir))) + rnd * .25 -.125
             ball.speed += ((rnd*5 + 5) * M_Pixel)
             PL_target_id = -1 ' The pl is not passing to anyone
             
@@ -1568,7 +1569,7 @@ SUB get_pl_behavior(pl_id as Integer)
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " R U N to endline"
             
             ball.rds = _abtp (pl(pl_id).x, pl(pl_id).y,_
-            PITCH_X + (PITCH_W * (1 - Team(pl(pl_id).team).att_dir)), pl(pl_id).y+1) + rnd * .5 -.25
+            PITCH_X + (PITCH_W * (1 - Team(pl(pl_id).team).att_dir)), pl(pl_id).y+1) + rnd * .25 -.125
             ball.speed += ((rnd*5 + 5) * M_Pixel)
             PL_target_id = -1 ' The pl is not passing to anyone
             
@@ -1579,7 +1580,7 @@ SUB get_pl_behavior(pl_id as Integer)
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " SHOOT in TARGET"
             
             ball.rds = find_shoot_angle(pl_id)
-            ball.spin = 1.0 * rnd - 0.5
+            ball.spin = 0.5 * rnd - 0.25
             
             if decision mod 2 = 0 then 
                 reset_ball_z()

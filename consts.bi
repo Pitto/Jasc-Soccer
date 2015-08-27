@@ -90,7 +90,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 'minimum distance between two sliders - see check_pl_collisions sub for details
 #define PL_MIN_SLIDE_DIST 16
 'minimum distance from opponent pl to allow pl owner of the ball to run to the net
-#define PL_RUN_SPACE 30
+#define PL_RUN_SPACE 20
 'field view of the player
 #define PL_FIELD_VIEW 0.70
 #define PL_FIELD_VIEW_HALF PL_FIELD_VIEW/2
@@ -101,7 +101,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 'possibility % a slide contact become a foul
 #define RND_SLIDE_FOUL 15
 'possibility % a contact become falling
-#define RND_CONTACT_FALL 2
+#define RND_CONTACT_FALL 0
 
 'moltiplicator of speed for some actions
 #define SPEED_RATIO_SLIDING 2.8
