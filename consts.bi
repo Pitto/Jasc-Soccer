@@ -71,6 +71,9 @@ const SCREEN_H as Integer = 480
 'useful to don't allow the camera to move everywere, this sets a limit
 const CAMERA_Y_PADDING as Integer = 200
 const CAMERA_X_PADDING as Integer = 100
+const CAMERA_Y_PADDING_HALF as Integer = CAMERA_Y_PADDING \ 2 
+const CAMERA_X_PADDING_HALF as Integer = CAMERA_X_PADDING \ 2
+
 'ratio of the xy movements of the camera having the ball as reference point
 const CAMERA_EASING_RATIO as Single = 0.40f
 const PL_DEFAULT_SPEED as single = 15.5 * M_Pixel

@@ -179,23 +179,23 @@ SUB check_ball_limits()
     'border pitch limit check
     dim as integer is_ball_out = 0
     
-    if (ball.x > PITCH_X+PITCH_W+CAMERA_X_PADDING) THEN
-        ball.x = PITCH_X+PITCH_W+CAMERA_X_PADDING-5
+    if (ball.x > PITCH_X+PITCH_W+CAMERA_X_PADDING_HALF) THEN
+        ball.x = PITCH_X+PITCH_W+CAMERA_X_PADDING_HALF -5
         ball.rds = PI - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.x < PITCH_X - CAMERA_X_PADDING) THEN
-        ball.x = PITCH_X - CAMERA_X_PADDING + 5
+    if (ball.x < PITCH_X - CAMERA_X_PADDING_HALF) THEN
+        ball.x = PITCH_X - CAMERA_X_PADDING_HALF + 5
         ball.rds = PI - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.y > PITCH_Y + PITCH_H + CAMERA_Y_PADDING) THEN
-        ball.y = PITCH_Y + PITCH_H + CAMERA_Y_PADDING - 5
+    if (ball.y > PITCH_Y + PITCH_H + CAMERA_Y_PADDING_HALF) THEN
+        ball.y = PITCH_Y + PITCH_H + CAMERA_Y_PADDING_HALF - 5
         ball.rds = PI_DOUBLE - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.y <  PITCH_Y - CAMERA_X_PADDING ) THEN
-        ball.y = PITCH_Y - CAMERA_X_PADDING + 5
+    if (ball.y <  PITCH_Y - CAMERA_Y_PADDING_HALF ) THEN
+        ball.y = PITCH_Y - CAMERA_Y_PADDING_HALF + 5
         ball.rds = PI_DOUBLE - ball.rds
         ball.speed *= 0.3
         ball.z_speed *= 0.5
@@ -771,7 +771,6 @@ SUB display_tactic_editor()
 		tct_ed_draw_ball_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
 		tct_ed_update_pl_on_tact_tile()
 		tct_ed_draw_players()
-		
 		
 		line (tct_ed_mouse.x-5, tct_ed_mouse.y)-(tct_ed_mouse.x+5, tct_ed_mouse.y)
 		line (tct_ed_mouse.x, tct_ed_mouse.y-5)-(tct_ed_mouse.x, tct_ed_mouse.y+5)
@@ -1986,14 +1985,14 @@ Sub init_pitch_dimensions(x as integer, y as integer,_
     Pitch_data(slot).gkh = Pitch_data(slot).pah \ 3 'goalkeeper area height
     Pitch_data(slot).cdw = 2 'corner dish diameter
     
-    Cameraman(0).x = x - 30		:	Cameraman(0).y = y - 10
-    Cameraman(1).x = x + w + 10	:	Cameraman(1).y = y - 10
+    Cameraman(0).x = x - 30		:	Cameraman(0).y = y - 25
+    Cameraman(1).x = x + w + 10	:	Cameraman(1).y = y - 25
     Cameraman(2).x = x - 30		:	Cameraman(2).y = y + h\2 + 10
     Cameraman(3).x = x + w + 10	:	Cameraman(3).y = y + h\2 + 10
     Cameraman(4).x = x - 30		:	Cameraman(4).y = y + h - 10
     Cameraman(5).x = x + w + 10	:	Cameraman(5).y = y + h - 10
     Cameraman(6).x = x + w - w\2 - 150:	Cameraman(6).y = y + h + 10
-    Cameraman(7).x = x + w - w\2 - 150:	Cameraman(7).y = y - 20
+    Cameraman(7).x = x + w - w\2 - 150:	Cameraman(7).y = y - 40
     
 end sub
 
@@ -2794,7 +2793,7 @@ SUB update_players()
             'goalkeepers routine
             if pl(c).role = "G" then
 '                ' if the ball is into the area then the GK runs to the ball
-                if is_ball_into_penalty_area (1 - Team(pl(c).team).att_dir) and _
+                if is_ball_into_penalty_area (Team(pl(c).team).att_dir) and _
                 pl(c).delay = 0 and PL_team_owner_id <> pl(c).team then
                     pl(c).rds = _abtp(pl(c).x,pl(c).y, ball.x,ball.y)
                     pl(c).speed = pl(c).speed_default
@@ -2940,7 +2939,11 @@ case sliding
             pl(d).delay = PL_DELAY_FALLING
             pl(c).action = running
             'maybe the REFEREE WHISTLES A FOUL
-            if int(rnd*100) < RND_SLIDE_FOUL and pl(c).team <> pl(d).team then
+            
+            if 	int(get_diff_angle(pl(c).rds,pl(d).rds)*100) > RND_SLIDE_FOUL and _
+				pl(c).team <> pl(d).team then
+            
+            'if int(rnd*100) < RND_SLIDE_FOUL and pl(c).team <> pl(d).team then
                 if pl(c).team = 0 then
                     'if is into penalty area the referee whistles a penalty kick
                    if is_pl_into_opponent_penalty_area (d) then

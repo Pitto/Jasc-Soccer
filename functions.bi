@@ -7,6 +7,8 @@ declare function r_t_d (degree as integer) as integer
 declare function d_t_r (degree as integer) as single
 ' calculates the distance between two points
 declare function d_b_t_p (x1 as single, y1 as single, x2 as single, y2 as single) as single
+'gives values in the range -1...1
+declare function get_diff_angle(alfa as single, beta as single) as single
 ' calculates the starting frame for the player sprite from the angle in radiants
 declare function start_frame (radiants as single) as integer
 'sam as above but for static sprites
@@ -182,6 +184,14 @@ function find_shoot_angle (pl_id as Integer) as single
     
     return shoot_angle
 
+end function
+
+function get_diff_angle(alfa as single, beta as single) as single
+    if alfa <> beta  then
+        return sin(alfa-beta+PI_2)
+    else
+        return 0
+    end if
 end function
 
 function get_dist_from_tile(tile as Integer, pl_x as single, pl_y as single) as single
@@ -480,15 +490,17 @@ function is_ball_slidable (c as integer) as Integer
     'if the pl slider is not receiving the ball and if
     'the ball distance is into a specified range (in this case >30 <50)
     '(...) and also important: the ball.z must be less than a fixed value
+    
     if (PL_ball_owner_id <> c) and (PL_target_id <> c)_
     and (d_b_t_p(pl(c).x, pl(c).y,ball.x, ball.y)) > 10 _
     and (d_b_t_p(pl(c).x, pl(c).y,ball.x, ball.y)) < 60 _
     and ball.z < 5 _
-    and pl(c).action = running and Match_Event = Ball_in_game then
-    return 1
-else
-    return 0
-end if
+    and pl(c).action = running and Match_Event = Ball_in_game _
+    and get_diff_angle(pl(c).rds,ball.rds) < 0 then
+		return 1
+	else
+		return 0
+	end if
 end function
 
 function is_ball_headkickable (c as integer) as Integer
