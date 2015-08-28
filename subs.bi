@@ -882,6 +882,7 @@ SUB draw_bottom_info()
     next
     
     PrintFont SCREEN_W - 50, SCREEN_H - 20, str(Timing.actual_fps) + " Fps", SmallFont, 1, 1
+    PrintFont 50, SCREEN_H - 20, SHELL_message, Unifont, 1, 1
 END SUB
 
 SUB draw_bottom_net()
@@ -2202,26 +2203,46 @@ SUB run_tactic(c as Integer)
 		tile =  tct_tile    (Team(pl(c).team).tact_module, _
                             pl(c).tct_id, _
                             get_ball_tile(team(pl(c).team).att_dir))
-        
-       if (team(pl(c).team).att_dir) then
+
+		'offset of the tactic tile when the ball is of the goalkeeeper
+		'or when there is a penalty kick or a throw in
+		'(in this case all players have to go outside penalty area)		
+		select case match_event
+			case gk_t0_owner, gk_t1_owner, penalty_t0, penalty_t1, _	
+			throw_in_tl_side_t0, throw_in_tl_side_t1, _
+			throw_in_tr_side_t0, throw_in_tr_side_t1, _
+			throw_in_bl_side_t0, throw_in_bl_side_t1, _
+			throw_in_br_side_t0, throw_in_br_side_t1
+			'if (team(pl(c).team).att_dir = 0) then
+				if tile > 2 and tile < 14 then tile +=48
+				if tile > 17 and tile < 30 then tile +=32
+				if tile > 33 and tile < 46 then tile +=16
+			'else
+				if tile > 209 and tile < 222 then tile -=16
+				if tile > 225 and tile < 238 then tile -=32
+				if tile > 241 and tile < 254 then tile -=48
+			'end if
+		end select
+		
+		if (team(pl(c).team).att_dir) then
 			tile = TILES_PL_N - tile
 		end if
 		
-		'get the row and the column
+		'get row and column
 		tile_row = tile MOD 16
 		tile_col = 16-int(tile\16)
 		'convert in xy coords
 		x_trg = (tile_row * PITCH_W\16) + PITCH_X + PITCH_W\32
 		y_trg = PITCH_H - (tile_col * PITCH_H\16) + PITCH_H\16
 		
-		'returns te right rds to the tile
+		'returns right rds to tile
 		pl(c).rds = _abtp (pl(c).x,pl(c).y,x_trg,y_trg)
 		'if the distance is less than 5 then the pl has reached the position
 		if d_b_t_p(pl(c).x,pl(c).y,x_trg,y_trg) < 5 then
 			pl(c).speed = 0
 		else
-			pl(c).speed = pl(c).speed_default
 			'update the pl position moving him
+			pl(c).speed = pl(c).speed_default
 		end if
 	end if
 END SUB

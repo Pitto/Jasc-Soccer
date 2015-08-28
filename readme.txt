@@ -54,8 +54,7 @@ Acknowledgements:
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
 · change ball bound limits
-· When player is near the ball the code could help him to get
-  the correct angle to the ball
+· when the gk catch the ball all the players have to go outside the penalty area
 
 DEV LOG -------------------------------------
 0.24.9
@@ -67,6 +66,8 @@ DEV LOG -------------------------------------
 · Added bench bitmap
 · Improved Goalkeeper AI
 · Changed sliding decision policy
+· Players go outside penalty area on throw in, penalty kick or when the
+  goalkeeper has the ball
 · Code cleanup
 
 0.24.8
