@@ -1531,9 +1531,12 @@ SUB get_pl_behavior(pl_id as Integer)
             exit sub
         case bhv_tile(tile, 2)+1 to bhv_tile(tile, 3)	'3: pass_long_side
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Long Side"
-            shoot_ball  (pl_id, get_longside_pl_to_pass(pl_id),_
-                        pl(get_longside_pl_to_pass(pl_id)).x,_
-                        pl(get_longside_pl_to_pass(pl_id)).y, 0.3,0)
+            'shoot_ball  (pl_id, get_longside_pl_to_pass(pl_id),_
+                        'pl(get_longside_pl_to_pass(pl_id)).x,_
+                        'pl(get_longside_pl_to_pass(pl_id)).y, 0.3,0)
+            shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
+                        pl(get_nrst_pl_pass(pl_id)).x,_
+                        pl(get_nrst_pl_pass(pl_id)).y, 0.3, 0)
             exit sub
         case bhv_tile(tile, 3)+1 to bhv_tile(tile, 4)	'4: pass_endline
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Endline"
@@ -2875,8 +2878,15 @@ SUB update_players()
                     if PL_ball_owner_id = c then
                         ball.x = pl(c).x
                         ball.y = pl(c).y
-                        ball.x +=  5 *cos(pl(c).rds)'*pl(c).speed*Dt
-                        ball.y +=  5 *-sin(pl(c).rds)'*pl(c).speed*Dt
+                        ball.x +=  5 *cos(pl(c).rds) '*pl(c).speed*Dt
+                        ball.y +=  5 *-sin(pl(c).rds) '*pl(c).speed*Dt
+                        ball.rds = pl(c).rds
+						ball.speed = pl(c).speed
+						'if ((int(Timer*1000) MOD 20) = 0) and pl(c).speed > 0 then
+							'ball.x +=  10 *cos(pl(c).rds) '*pl(c).speed*Dt
+							'ball.y +=  10 *-sin(pl(c).rds) '*pl(c).speed*Dt
+							'ball.speed += 10
+						'end if
                     end if
                     PL_ball_owner_id = c
                     PL_team_owner_id = pl(c).team

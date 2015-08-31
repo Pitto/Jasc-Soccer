@@ -529,7 +529,7 @@ function is_ball_into_penalty_area (c as integer) as Integer
 end function
 
 function is_ball_controllable_by_human (c as Integer) as Integer
-    if d_b_t_p(pl(c).x,pl(c).y, ball.x,ball.y) < 13 and ball.z < 6 then
+    if d_b_t_p(pl(c).x,pl(c).y, ball.x,ball.y) < 12 and ball.z < 6 then
         'in this way the pl can't touch twice the ball
         'because after his touch for passing or kicking the delay is set
         'see get_user_input_action SUB for details
