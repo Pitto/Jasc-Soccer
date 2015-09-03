@@ -30,6 +30,12 @@ Declare Sub Load_teams_list()
 Declare Sub Update_main_menu()
 'draw on screen the main menu
 Declare Sub Draw_main_menu()
+
+declare Sub display_team_editor()
+declare Sub update_team_editor()
+Declare sub draw_team_editor()
+declare sub load_team_data_for_team_editor(n_team as string)
+
 Declare Sub delete_player_sprites()
 'draw and update the main menu
 DECLARE SUB display_menu()
@@ -179,23 +185,23 @@ SUB check_ball_limits()
     'border pitch limit check
     dim as integer is_ball_out = 0
     
-    if (ball.x > PITCH_X+PITCH_W+CAMERA_X_PADDING_HALF) THEN
-        ball.x = PITCH_X+PITCH_W+CAMERA_X_PADDING_HALF -5
+    if (ball.x > PITCH_X+PITCH_W+BALL_X_BOUND) THEN
+        ball.x = PITCH_X+PITCH_W+BALL_X_BOUND -5
         ball.rds = PI - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.x < PITCH_X - CAMERA_X_PADDING_HALF) THEN
-        ball.x = PITCH_X - CAMERA_X_PADDING_HALF + 5
+    if (ball.x < PITCH_X - BALL_X_BOUND) THEN
+        ball.x = PITCH_X - BALL_X_BOUND + 5
         ball.rds = PI - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.y > PITCH_Y + PITCH_H + CAMERA_Y_PADDING_HALF) THEN
-        ball.y = PITCH_Y + PITCH_H + CAMERA_Y_PADDING_HALF - 5
+    if (ball.y > PITCH_Y + PITCH_H + BALL_Y_BOUND) THEN
+        ball.y = PITCH_Y + PITCH_H + BALL_Y_BOUND - 5
         ball.rds = PI_DOUBLE - ball.rds
         ball.speed *= 0.3:ball.z_speed *= 0.5
     END IF
-    if (ball.y <  PITCH_Y - CAMERA_Y_PADDING_HALF ) THEN
-        ball.y = PITCH_Y - CAMERA_Y_PADDING_HALF + 5
+    if (ball.y <  PITCH_Y - BALL_Y_BOUND ) THEN
+        ball.y = PITCH_Y - BALL_Y_BOUND + 5
         ball.rds = PI_DOUBLE - ball.rds
         ball.speed *= 0.3
         ball.z_speed *= 0.5
@@ -729,6 +735,22 @@ SUB display_teams()
 	LOOP
 END SUB
 
+Sub display_team_editor()
+	DO	
+		update_team_editor()
+		Screensync
+		Screenlock ' Lock the screen
+		Screenset workpage, workpage xor 1 ' Swap work pages.
+		Cls
+		draw_team_editor()
+		workpage xor = 1 ' Swap work pages.
+		Screenunlock
+		SLEEP SLEEP_TIME, 1
+	LOOP UNTIL Exit_flag = 1
+	game_section = main_menu
+	Exit_flag = 0
+end sub
+
 SUB display_tactic_editor()
 
 	dim e As EVENT
@@ -1124,7 +1146,7 @@ Sub Draw_main_menu()
 					str("This software is released under the Terms of the GNU GPL license v. 2.0"),_
 					C_WHITE, C_GRAY,0,0)
 	
-	For a = 0 To 7
+	For a = 0 To Main_menu_Items_total
         Select Case a
         Case 0
 			for i = lbound(Main_Menu_List_Teams) to ubound (Main_Menu_List_Teams) - 1
@@ -1209,6 +1231,11 @@ Sub Draw_main_menu()
 			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 			"Edit TACTICS",_
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
+		Case 8
+			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			"Edit Team - " + Main_Menu_List_Teams(Main_menu_Team_0_selected).label,_
+			C_WHITE, C_GRAY,is_equal(a,Main_menu_Item_selected),C_WHITE)
         End Select
     Next a
    
@@ -1461,6 +1488,81 @@ SUB draw_players()
         end if
     next c
 END SUB
+
+Sub draw_team_editor()
+	
+	dim as integer col, row, x, y, w, h, x_padding, y_padding, mask_color
+	dim labels(11) As String*8 = {"NUM","ROL","NAM","SKN","SPD", "STM", _
+                       "PKK", "PHD", "PTK", "PGK", "PRC"}
+	dim label as string = ""
+	x = 20
+	y = 50
+	w = 25
+	h = 16
+	x_padding = 6
+	y_padding = 4
+	mask_color = C_WHITE
+	PrintFont x, 20, "TEAM EDITOR " + _
+	Main_Menu_List_Teams(Main_menu_Team_0_selected).label, CoolFont, 1, 1
+	'pl(c).number,pl(c).role,pl(c).label,pl(c).skin,_
+'				   pl(c).speed_default,pl(c).stamina,pl(c).pwr_kick,_
+'				   pl(c).pwr_head,pl(c).pwr_tackle,pl(c).pwr_gk,_
+'				   pl(c).precision
+	for row = 0 to TE_ROWS-1
+	
+		for col = 0 to TE_COLS-1
+			select case col
+				case 0
+					label = str(pl(row).number)
+				case 1
+					label = str(pl(row).role)
+				case 2
+					label = pl(row).label
+				case 3
+					label = str(pl(row).skin)
+				case 4
+					label = str(pl(row).speed_default)
+				case 5
+					label = str(pl(row).stamina)
+				case 6
+					label = str(pl(row).pwr_kick)
+				case 7
+					label = str(pl(row).pwr_head)
+				case 8
+					label = str(pl(row).pwr_tackle)
+				case 9
+					label = str(pl(row).pwr_gk)
+				case 10
+					label = str(pl(row).precision)
+			end select
+			if col = 2 then
+				w = 150
+			else
+				w = 25
+			end if
+			if col <> 3 then
+				if col = TE_col_sel and row = TE_row_sel then
+					mask_color = C_BLACK
+				else
+					mask_color = C_GRAY
+				end if
+				if col = TE_col_sel and row = TE_row_sel and TE_select then
+					draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, TE_select, C_WHITE)
+				else
+					draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, 0, 0)
+				end if
+				
+			end if
+			if (row = 0) then
+				PrintFont x, y - 6, labels(col), SmallFont, 1, 1
+			end if
+			x += w + x_padding
+		next col
+		x = 20
+		y += h + y_padding
+	next row
+	draw string  (5 , 5), "TE_Select " + str(TE_select)
+End sub
 
 SUB draw_top_net()
     PUT (PITCH_MIDDLE_W - 53 - c_x_o, PITCH_Y - 38 - c_y_o ), net_sprite(0), trans
@@ -1783,7 +1885,6 @@ SUB init_players_proprietes()
             pl(c).in_place = 0
             pl(c).x = PITCH_X - 100
             pl(c).y = PITCH_H\2 + PITCH_Y
-            
         next c
     Close #ff
     next t
@@ -2018,6 +2119,22 @@ SUB load_tact()
         next c
         Close #ff
     next slot
+END SUB
+
+SUB load_team_data_for_team_editor(n_team as string)
+	dim as integer t, c
+    Dim ff As Ubyte
+    ff = Freefile
+    'read data from text file
+    Open "_data/" + n_team + ".team.csv" For input As #ff
+	for c = 0 to TE_TOT_PLAYERS-1
+		'assign values from file
+		Input #ff,  pl(c).number,pl(c).role,pl(c).label,pl(c).skin,_
+				   pl(c).speed_default,pl(c).stamina,pl(c).pwr_kick,_
+				   pl(c).pwr_head,pl(c).pwr_tackle,pl(c).pwr_gk,_
+				   pl(c).precision
+	next c
+    Close #ff
 END SUB
 
 Sub Load_teams_list()
@@ -2308,6 +2425,33 @@ SUB store_ball_position()
     
 END SUB
 
+Sub update_team_editor()
+	dim e As EVENT
+	If (ScreenEvent(@e)) Then
+		Select Case e.type
+		Case EVENT_KEY_RELEASE
+			If (e.scancode = SC_Escape) Then
+				Exit_flag = 1
+			End If
+			If (e.scancode = SC_Enter) Then
+				TE_select = 1 - TE_select
+			End If
+			if TE_select = 0 then
+				If (e.scancode = SC_UP) 	Then TE_row_sel -=1
+				If (e.scancode = SC_DOWN) 	Then TE_row_sel +=1
+				If (e.scancode = SC_RIGHT) 	Then TE_col_sel +=1
+				If (e.scancode = SC_LEFT) 	Then TE_col_sel -=1
+			end if
+		End Select
+	End If
+	'limits of selection
+	if TE_row_sel > TE_ROWS - 1 then TE_row_sel = TE_ROWS
+	if TE_row_sel < 0 then TE_row_sel = 0
+	if TE_col_sel > TE_COLS - 1 then TE_col_sel = TE_COLS
+	if TE_col_sel < 0 then TE_row_sel = 0
+End sub
+
+
 SUB update_ball()
     
     ball.old_x = ball.x
@@ -2399,7 +2543,8 @@ Sub Update_main_menu()
         End Select
     End If
 
-    If Main_menu_Item_selected > 7 Then Main_menu_Item_selected = 7
+    If Main_menu_Item_selected > Main_menu_Items_total _
+		Then Main_menu_Item_selected = Main_menu_Items_total
     If Main_menu_Item_selected < 0 Then Main_menu_Item_selected = 0
     
     Select Case Main_menu_Item_selected
@@ -2479,6 +2624,11 @@ Sub Update_main_menu()
 			
 			Exit_flag = 1
 			Game_section = Tactic_editor
+        End If
+    Case 8
+        If Multikey(SC_ENTER) Then
+			Exit_flag = 1
+			Game_section = Team_Editor
         End If
     End Select
     'important! resets to 0 the horizontal scroll of the selected item

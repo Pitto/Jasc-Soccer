@@ -1,6 +1,6 @@
 '#DEFINE################################################################
 #define GAME_NAME "JASC SOCCER"
-#define GAME_VERSION "0.24.9"
+#define GAME_VERSION "0.25"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 8
@@ -54,7 +54,6 @@ const BALL_MIN_SPEED as Single = 0.2 * M_PIXEL
 'spin
 const BALL_SPIN_RATIO as Single = 30.0
 
-
 'TRIGONOMETRIC CONSTS--------------------------------------------------------------------
 const PI as single = 3.14159265f
 const PI_DOUBLE as single = PI*2
@@ -74,6 +73,10 @@ const CAMERA_X_PADDING as Integer = 100
 const CAMERA_Y_PADDING_HALF as Integer = CAMERA_Y_PADDING \ 2 
 const CAMERA_X_PADDING_HALF as Integer = CAMERA_X_PADDING \ 2
 
+'ball limits outside pitch
+const BALL_X_BOUND = 100
+const BALL_Y_BOUND = 25
+
 'ratio of the xy movements of the camera having the ball as reference point
 const CAMERA_EASING_RATIO as Single = 0.40f
 const PL_DEFAULT_SPEED as single = 15.5 * M_Pixel
@@ -81,6 +84,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 'PLAYERS CONSTS--------------------------------------------------------------------------
 
 #define PL_N_TOT 11
+
 'delay of the player before executing another action
 #define PL_DELAY_TIME 150
 #define PL_DELAY_FALLING 10
@@ -148,3 +152,8 @@ const tct_ed_PITCH_Y as integer = 20
 const tct_ed_PITCH_PENALTY_AREA as integer = tct_ed_PITCH_W\3
 const tct_ed_TILES as integer = 36
 const tct_ed_PL_TILES as integer = 256
+
+'----- TEAM EDITOR CONSTS
+const TE_TOT_PLAYERS as integer = 16
+const TE_COLS as integer = 11
+const TE_ROWS as integer = TE_TOT_PLAYERS

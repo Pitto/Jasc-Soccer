@@ -70,7 +70,7 @@ dim shared Training_mode as integer = 0
 
 'MAIN MENU ITEMS-------------------------------------------------------------------------
 Dim Shared Main_menu_Item_selected As Integer = 0
-Dim Shared Main_menu_Items_total As Integer = 5
+Dim Shared Main_menu_Items_total As Integer = 8
 Dim Shared Main_menu_Team_0_selected As Integer = 5
 Dim Shared Main_menu_Team_1_selected As Integer = 6
 Dim Shared Main_menu_mins_selected As Integer = 0
@@ -119,6 +119,10 @@ dim shared tct_ed_Has_saved as Ubyte = 0
 dim shared tct_ed_Has_saved_display_time as Double
 Dim shared tct_ed_mouse as mouse
 Dim shared tct_ed_pl(10) as player_proto
+
+Dim shared TE_col_sel as integer = 0
+Dim shared TE_row_sel as integer = 0
+Dim shared TE_select as integer = 1
 
 
 Dim shared Game_section as proto_game_section

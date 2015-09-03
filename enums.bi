@@ -17,10 +17,11 @@ end enum
 
 enum proto_game_section
 	main_menu = 0
-	tactic_editor = 1
-	game = 2
-	credits = 3
-	exit_game = 4
+	tactic_editor 
+	team_editor
+	game 
+	credits
+	exit_game
 end enum
 
 enum proto_match_event

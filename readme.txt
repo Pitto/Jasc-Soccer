@@ -70,6 +70,15 @@ DEV LOG -------------------------------------
   goalkeeper has the ball
 · Code cleanup
 
+0.25
+· Team editor
+
+0.24.9
+· Improved AI
+· Stadium bitmaps
+· Bench bitmaps
+· Pre-match team presentation
+
 0.24.8
 · It is possible to change on the fly the tactic
   of the team 0 - Press "T" key to activate menu and +/- keys to change

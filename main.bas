@@ -59,6 +59,10 @@ DO
 		case main_menu
 			'display main menu
 			display_menu()
+		'team editor
+		case team_editor
+			load_team_data_for_team_editor(Main_Menu_List_Teams(Main_menu_Team_0_selected).id)
+			display_team_editor()
 		'TACTIC EDITOR
 		case tactic_editor
 			init_pitch_dimensions(10, 10, 320, 320, 0)
