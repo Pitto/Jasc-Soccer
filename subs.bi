@@ -1491,26 +1491,30 @@ END SUB
 
 Sub draw_team_editor()
 	
-	dim as integer col, row, x, y, w, h, x_padding, y_padding, mask_color
-	dim labels(11) As String*8 = {"NUM","ROL","NAM","SKN","SPD", "STM", _
-                       "PKK", "PHD", "PTK", "PGK", "PRC"}
+	dim as integer col, row, x, y, w, h, x_padding, y_padding, mask_color, label_w
+	dim labels(12) As String*10 = {"NUM","ROLE","NAME","SKIN","SPEED", "STAMINA", _
+                       "PW_KICK", "PW_HEAD", "PW_TACKLE", "PW_GK", "PRECISION", "AVERAGE"}
 	dim label as string = ""
 	x = 20
 	y = 50
 	w = 25
 	h = 16
-	x_padding = 6
-	y_padding = 4
+	label_w = 80
+	x_padding = 8
+	y_padding = 5
 	mask_color = C_WHITE
 	PrintFont x, 20, "TEAM EDITOR " + _
 	Main_Menu_List_Teams(Main_menu_Team_0_selected).label, CoolFont, 1, 1
+	
+	PrintFont x, SCREEN_H - 16, "PRESS CTRL + S to SAVE & CLOSE Editor", Unifont, 1, 1
+	
 	'pl(c).number,pl(c).role,pl(c).label,pl(c).skin,_
 '				   pl(c).speed_default,pl(c).stamina,pl(c).pwr_kick,_
 '				   pl(c).pwr_head,pl(c).pwr_tackle,pl(c).pwr_gk,_
 '				   pl(c).precision
 	for row = 0 to TE_ROWS-1
 	
-		for col = 0 to TE_COLS-1
+		for col = 0 to TE_COLS
 			select case col
 				case 0
 					label = str(pl(row).number)
@@ -1534,6 +1538,11 @@ Sub draw_team_editor()
 					label = str(pl(row).pwr_gk)
 				case 10
 					label = str(pl(row).precision)
+				case 11
+					label = str	(int((pl(row).speed_default + pl(row).stamina + _
+								pl(row).pwr_kick + pl(row).pwr_head + _
+								pl(row).pwr_tackle + pl(row).pwr_gk + _
+								pl(row).precision)/7))
 			end select
 			if col = 2 then
 				w = 150
@@ -1548,10 +1557,10 @@ Sub draw_team_editor()
 				end if
 				if col = TE_col_sel and row = TE_row_sel and TE_select then
 					draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, TE_select, C_WHITE)
+					draw_button (x - label_w\2, y-h-y_padding, label_w, h, labels(col),	C_WHITE, C_BLUE, 0, 0)
 				else
 					draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, 0, 0)
 				end if
-				
 			end if
 			if (row = 0) then
 				PrintFont x, y - 6, labels(col), SmallFont, 1, 1
@@ -2427,6 +2436,15 @@ END SUB
 
 Sub update_team_editor()
 	dim e As EVENT
+	dim Save_team as integer = 0
+	dim as integer t, c
+    Dim ff As Ubyte
+    ff = Freefile
+
+	If MULTIKEY(SC_S) and MULTIKEY(SC_CONTROL) Then
+		Save_team = 1
+	End If
+	
 	If (ScreenEvent(@e)) Then
 		Select Case e.type
 		Case EVENT_KEY_RELEASE
@@ -2442,6 +2460,67 @@ Sub update_team_editor()
 				If (e.scancode = SC_RIGHT) 	Then TE_col_sel +=1
 				If (e.scancode = SC_LEFT) 	Then TE_col_sel -=1
 			end if
+			if TE_select then
+				select case TE_col_sel
+					'case 0
+						'label = str(pl(row).number)
+					'case 1
+						'label = str(pl(row).role)
+					'case 2
+						'label = pl(row).label
+					'case 3
+						'label = str(pl(row).skin)
+					case 4
+						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).speed_default +=10
+						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).speed_default -=10
+						If (e.scancode = SC_RIGHT) 	Then pl(TE_row_sel).speed_default +=1
+						If (e.scancode = SC_LEFT) 	Then pl(TE_row_sel).speed_default -=1
+						if pl(TE_row_sel).speed_default > 100 	then pl(TE_row_sel).speed_default = 100
+						if pl(TE_row_sel).speed_default < 0 	then pl(TE_row_sel).speed_default = 0
+					case 5
+						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).stamina +=10
+						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).stamina -=10
+						If (e.scancode = SC_RIGHT) 	Then pl(TE_row_sel).stamina +=1
+						If (e.scancode = SC_LEFT) 	Then pl(TE_row_sel).stamina -=1
+						if pl(TE_row_sel).stamina > 100 	then pl(TE_row_sel).stamina = 100
+						if pl(TE_row_sel).stamina < 0 		then pl(TE_row_sel).stamina = 0
+					case 6
+						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).pwr_kick +=10
+						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).pwr_kick -=10
+						If (e.scancode = SC_RIGHT) 	Then pl(TE_row_sel).pwr_kick +=1
+						If (e.scancode = SC_LEFT) 	Then pl(TE_row_sel).pwr_kick -=1
+						if pl(TE_row_sel).pwr_kick > 100 	then pl(TE_row_sel).pwr_kick = 100
+						if pl(TE_row_sel).pwr_kick < 0 		then pl(TE_row_sel).pwr_kick = 0
+					case 7
+						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).pwr_head +=10
+						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).pwr_head -=10
+						If (e.scancode = SC_RIGHT) 	Then pl(TE_row_sel).pwr_head +=1
+						If (e.scancode = SC_LEFT) 	Then pl(TE_row_sel).pwr_head -=1
+						if pl(TE_row_sel).pwr_head > 100 	then pl(TE_row_sel).pwr_head = 100
+						if pl(TE_row_sel).pwr_head < 0 		then pl(TE_row_sel).pwr_head = 0
+					case 8
+						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).pwr_tackle +=10
+						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).pwr_tackle -=10
+						If (e.scancode = SC_RIGHT) 	Then pl(TE_row_sel).pwr_tackle +=1
+						If (e.scancode = SC_LEFT) 	Then pl(TE_row_sel).pwr_tackle -=1
+						if pl(TE_row_sel).pwr_tackle > 100 	then pl(TE_row_sel).pwr_tackle = 100
+						if pl(TE_row_sel).pwr_tackle < 0 		then pl(TE_row_sel).pwr_tackle = 0
+					case 9
+						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).pwr_gk +=10
+						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).pwr_gk -=10
+						If (e.scancode = SC_RIGHT) 	Then pl(TE_row_sel).pwr_gk +=1
+						If (e.scancode = SC_LEFT) 	Then pl(TE_row_sel).pwr_gk -=1
+						if pl(TE_row_sel).pwr_gk > 100 	then pl(TE_row_sel).pwr_gk = 100
+						if pl(TE_row_sel).pwr_gk < 0 		then pl(TE_row_sel).pwr_gk = 0
+					case 10
+						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).precision +=10
+						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).precision -=10
+						If (e.scancode = SC_RIGHT) 	Then pl(TE_row_sel).precision +=1
+						If (e.scancode = SC_LEFT) 	Then pl(TE_row_sel).precision -=1
+						if pl(TE_row_sel).precision > 100 	then pl(TE_row_sel).precision = 100
+						if pl(TE_row_sel).precision < 0 		then pl(TE_row_sel).precision = 0
+				end select
+			end if
 		End Select
 	End If
 	'limits of selection
@@ -2449,6 +2528,21 @@ Sub update_team_editor()
 	if TE_row_sel < 0 then TE_row_sel = 0
 	if TE_col_sel > TE_COLS - 1 then TE_col_sel = TE_COLS
 	if TE_col_sel < 0 then TE_row_sel = 0
+	
+	'save the file
+	if (Save_team) then
+		Open "_data/" + Main_Menu_List_Teams(Main_menu_Team_0_selected).id + ".team.csv" For Output As #ff
+		for c = 0 to TE_TOT_PLAYERS-1
+			'assign values
+			Write #ff,  pl(c).number,pl(c).role,pl(c).label,pl(c).skin,_
+				   pl(c).speed_default,pl(c).stamina,pl(c).pwr_kick,_
+				   pl(c).pwr_head,pl(c).pwr_tackle,pl(c).pwr_gk,_
+				   pl(c).precision
+		next c
+		Close #ff
+		Save_team = 0
+		Exit_flag = 1
+	end if
 End sub
 
 
