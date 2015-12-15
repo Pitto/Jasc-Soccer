@@ -49,14 +49,17 @@ Acknowledgements:
 · Replais
 · change other #define with consts
 · Sound effects
-· Players have to go outside the penalty area when there are some freekicks
 · direction of the player going to the ball has to be corrected
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
 · change ball bound limits
 · when the gk catch the ball all the players have to go outside the penalty area
+· update delete bitmap routine
 
 DEV LOG -------------------------------------
+0.25
+· Team editor
+
 0.24.9
 · Fixed a bug in team kit painting
 · Stadium bitmaps - freely inspired to Ysoccer stadium
@@ -69,11 +72,6 @@ DEV LOG -------------------------------------
 · Players go outside penalty area on throw in, penalty kick or when the
   goalkeeper has the ball
 · Code cleanup
-
-0.25
-· Team editor
-
-0.24.9
 · Improved AI
 · Stadium bitmaps
 · Bench bitmaps

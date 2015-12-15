@@ -470,6 +470,7 @@ SUB delete_bitmap()
     If Wallpaper(0)			Then ImageDestroy Wallpaper(0)
     If Wallpaper(1) 		Then ImageDestroy Wallpaper(1)
     If Wallpaper(2) 		Then ImageDestroy Wallpaper(2)
+    If Wallpaper(3) 		Then ImageDestroy Wallpaper(3)
 END SUB
 
 SUB delete_player_sprites()
@@ -1500,18 +1501,17 @@ Sub draw_team_editor()
 	w = 25
 	h = 16
 	label_w = 80
-	x_padding = 8
-	y_padding = 5
+	x_padding = 4
+	y_padding = 4
 	mask_color = C_WHITE
+	
+	
+	PUT (0, 0), Wallpaper(3),pset
 	PrintFont x, 20, "TEAM EDITOR " + _
 	Main_Menu_List_Teams(Main_menu_Team_0_selected).label, CoolFont, 1, 1
 	
 	PrintFont x, SCREEN_H - 16, "PRESS CTRL + S to SAVE & CLOSE Editor", Unifont, 1, 1
-	
-	'pl(c).number,pl(c).role,pl(c).label,pl(c).skin,_
-'				   pl(c).speed_default,pl(c).stamina,pl(c).pwr_kick,_
-'				   pl(c).pwr_head,pl(c).pwr_tackle,pl(c).pwr_gk,_
-'				   pl(c).precision
+
 	for row = 0 to TE_ROWS-1
 	
 		for col = 0 to TE_COLS
@@ -1523,7 +1523,7 @@ Sub draw_team_editor()
 				case 2
 					label = pl(row).label
 				case 3
-					label = str(pl(row).skin)
+					label = "" 'str(pl(row).skin)
 				case 4
 					label = str(pl(row).speed_default)
 				case 5
@@ -1546,21 +1546,30 @@ Sub draw_team_editor()
 			end select
 			if col = 2 then
 				w = 150
+			elseif col = 3 then
+				w = 14
 			else
 				w = 25
 			end if
-			if col <> 3 then
-				if col = TE_col_sel and row = TE_row_sel then
-					mask_color = C_BLACK
-				else
-					mask_color = C_GRAY
-				end if
-				if col = TE_col_sel and row = TE_row_sel and TE_select then
-					draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, TE_select, C_WHITE)
-					draw_button (x - label_w\2, y-h-y_padding, label_w, h, labels(col),	C_WHITE, C_BLUE, 0, 0)
-				else
-					draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, 0, 0)
-				end if
+			if col = TE_col_sel and row = TE_row_sel then
+				mask_color = C_BLACK
+			else
+				mask_color = C_GRAY
+			end if
+			
+			if col = TE_col_sel and row = TE_row_sel and TE_select then
+				draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, TE_select, C_WHITE)
+				draw_button (x - 30, y-30, label_w, h, labels(col),	C_WHITE, C_BLUE, 0, 0)
+			elseif (col = TE_COLS) then
+				draw_button (x, y, w, h, label,	C_GRAY xor mask_color, C_GRAY xor mask_color, 0, 0)
+			else
+				draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, 0, 0)
+			end if
+			if col = 11 then
+				put (x + w + x_padding,y), Star_sprite(9-int(ValInt(label))/10), trans'int(ValInt(label))/10), trans
+			end if
+			if col = 3 then
+				put (x + 2,y + 2), Head_sprite(pl(row).skin), trans
 			end if
 			if (row = 0) then
 				PrintFont x, y - 6, labels(col), SmallFont, 1, 1
@@ -1570,7 +1579,27 @@ Sub draw_team_editor()
 		x = 20
 		y += h + y_padding
 	next row
-	draw string  (5 , 5), "TE_Select " + str(TE_select)
+	'put the slider instructions for changing values
+	x = 20
+	y = 50
+	for row = 0 to TE_ROWS-1
+		for col = 0 to TE_COLS
+			if col = 2 then
+				w = 150
+			elseif col = 3 then
+				w = 14
+			else
+				w = 25
+			end if
+			if col = TE_col_sel and row = TE_row_sel and TE_select and col > 3 then
+				put (x-33, y-20), Slider_sprite, trans
+			end if
+			x += w + x_padding
+		next col
+		x = 20
+		y += h + y_padding
+	next row
+	'-------------------------------------------------------
 End sub
 
 SUB draw_top_net()
@@ -1964,6 +1993,24 @@ SUB load_bitmap()
         img_y += 25
     next count
     
+    'loading head sprites
+    BLOAD "img\heads.bmp", 0
+    for c = 0 to 2
+        Head_sprite(c) = IMAGECREATE (10, 12)
+        GET (c*10, 0)-(c*10+9, 11), Head_sprite(c)
+    next c
+    
+    'loading stars sprites
+    BLOAD "img\stars.bmp", 0
+    for c = 0 to 9
+        Star_sprite(c) = IMAGECREATE (160, 16)
+        GET (0, c*16)-(159, c*16+15), Star_sprite(c)
+    next c
+    
+    BLOAD "img\slider.bmp",0
+    Slider_sprite = IMAGECREATE(92,59)
+    get (0,0)-(91,58), Slider_sprite
+    
     'loading net sprites
     BLOAD "img\net_0.bmp",0
     net_sprite(0) = IMAGECREATE(106,38)
@@ -2000,6 +2047,10 @@ SUB load_bitmap()
     BLOAD "img\wallp_2.bmp",0
     Wallpaper(2)= IMAGECREATE(640,480)
     GET (0,0)-(639,479), Wallpaper(2)
+    
+    BLOAD "img\wallp_3.bmp",0
+    Wallpaper(3)= IMAGECREATE(640,480)
+    GET (0,0)-(639,479), Wallpaper(3)
     
 END SUB
 
@@ -2468,8 +2519,10 @@ Sub update_team_editor()
 						'label = str(pl(row).role)
 					'case 2
 						'label = pl(row).label
-					'case 3
+					case 3
 						'label = str(pl(row).skin)
+						If (e.scancode = SC_UP and pl(TE_row_sel).skin < 2) Then pl(TE_row_sel).skin +=1
+						If (e.scancode = SC_DOWN and pl(TE_row_sel).skin > 0) 	Then pl(TE_row_sel).skin -=1
 					case 4
 						If (e.scancode = SC_UP) 	Then pl(TE_row_sel).speed_default +=10
 						If (e.scancode = SC_DOWN) 	Then pl(TE_row_sel).speed_default -=10
@@ -2524,9 +2577,9 @@ Sub update_team_editor()
 		End Select
 	End If
 	'limits of selection
-	if TE_row_sel > TE_ROWS - 1 then TE_row_sel = TE_ROWS
+	if TE_row_sel > TE_ROWS - 2 then TE_row_sel = TE_ROWS -1
 	if TE_row_sel < 0 then TE_row_sel = 0
-	if TE_col_sel > TE_COLS - 1 then TE_col_sel = TE_COLS
+	if TE_col_sel > TE_COLS - 2 then TE_col_sel = TE_COLS - 1
 	if TE_col_sel < 0 then TE_row_sel = 0
 	
 	'save the file
