@@ -2521,8 +2521,36 @@ Sub update_team_editor()
 						'label = str(pl(row).number)
 					'case 1
 						'label = str(pl(row).role)
-					'case 2
+					case 2
 						'label = pl(row).label
+						If (e.scancode = SC_SPACE) then  pl(TE_row_sel).label = pl(TE_row_sel).label+" "
+						If (e.scancode = SC_A) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"A"
+						If (e.scancode = SC_B) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"B"
+						If (e.scancode = SC_C) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"C"
+						If (e.scancode = SC_D) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"D"
+						If (e.scancode = SC_E) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"E"
+						If (e.scancode = SC_F) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"F"
+						If (e.scancode = SC_G) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"G"
+						If (e.scancode = SC_H) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"H"
+						If (e.scancode = SC_I) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"I"
+						If (e.scancode = SC_J) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"J"
+						If (e.scancode = SC_K) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"K"
+						If (e.scancode = SC_L) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"L"
+						If (e.scancode = SC_M) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"M"
+						If (e.scancode = SC_N) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"N"
+						If (e.scancode = SC_O) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"O"
+						If (e.scancode = SC_P) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"P"
+						If (e.scancode = SC_Q) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"Q"
+						If (e.scancode = SC_R) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"R"
+						If (e.scancode = SC_S) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"S"
+						If (e.scancode = SC_T) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"T"
+						If (e.scancode = SC_U) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"U"
+						If (e.scancode = SC_V) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"V"
+						If (e.scancode = SC_W) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"W"
+						If (e.scancode = SC_X) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"X"
+						If (e.scancode = SC_Y) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"Y"
+						If (e.scancode = SC_Z) then  pl(TE_row_sel).label = pl(TE_row_sel).label+"Z"
+						If (e.scancode = SC_BACKSPACE) then pl(TE_row_sel).label = ""
 					case 3
 						'label = str(pl(row).skin)
 						If (e.scancode = SC_UP and pl(TE_row_sel).skin < 2) Then pl(TE_row_sel).skin +=1
