@@ -74,6 +74,8 @@ declare function print_match_event(event as Integer) as String
 declare function get_nrst_pl_ball_free_kick(n_team as Integer) as Integer
 'returns the action the player is performing
 declare function print_pl_action(action as integer) as string
+'returns the value of player
+declare function player_money_value(average as integer) as string
 'TACTIC EDITOR FUNCTIONS
 declare function tct_ed_get_ball_tile() as integer
 
@@ -751,4 +753,18 @@ function is_equal(a as integer, b as integer) as integer
 		return 0
 	end if
 
+end function
+
+function player_money_value(average as integer) as string
+	dim value as single
+	
+	value = ((1-cos(-PI_2*(average/100))))*PL_MAX_MONEY_VALUE
+	
+	if value < 1000000 then
+		value = int(value/1000)
+		return str(value) + "K"
+	else
+		value = int (value/1000000)
+		return str(value) + "M"
+	end if
 end function

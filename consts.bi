@@ -104,6 +104,8 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 #define PL_SPRITES_TOT_N 136
 'possibility % a slide contact become a foul
 #define RND_SLIDE_FOUL 15
+'maximum money value of player
+#define PL_MAX_MONEY_VALUE 15000000
 'possibility % a contact become falling
 #define RND_CONTACT_FALL 0
 

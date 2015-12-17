@@ -1496,6 +1496,7 @@ Sub draw_team_editor()
 	dim labels(12) As String*10 = {"NUM","ROLE","NAME","SKIN","SPEED", "STAMINA", _
                        "PW_KICK", "PW_HEAD", "PW_TACKLE", "PW_GK", "PRECISION", "AVERAGE"}
 	dim label as string = ""
+	dim pl_avg_value as integer
 	x = 20
 	y = 50
 	w = 25
@@ -1513,7 +1514,11 @@ Sub draw_team_editor()
 	PrintFont x, SCREEN_H - 16, "PRESS CTRL + S to SAVE & CLOSE Editor", Unifont, 1, 1
 
 	for row = 0 to TE_ROWS-1
-	
+		pl_avg_value = (int((pl(row).speed_default + pl(row).stamina + _
+						pl(row).pwr_kick + pl(row).pwr_head + _
+						pl(row).pwr_tackle + pl(row).pwr_gk + _
+						pl(row).precision)/7))
+		
 		for col = 0 to TE_COLS
 			select case col
 				case 0
@@ -1539,15 +1544,14 @@ Sub draw_team_editor()
 				case 10
 					label = str(pl(row).precision)
 				case 11
-					label = str	(int((pl(row).speed_default + pl(row).stamina + _
-								pl(row).pwr_kick + pl(row).pwr_head + _
-								pl(row).pwr_tackle + pl(row).pwr_gk + _
-								pl(row).precision)/7))
+					label = player_money_value(pl_avg_value)
 			end select
 			if col = 2 then
 				w = 150
 			elseif col = 3 then
 				w = 14
+			elseif col = 11 then
+				w = 30
 			else
 				w = 25
 			end if
@@ -1566,7 +1570,7 @@ Sub draw_team_editor()
 				draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, 0, 0)
 			end if
 			if col = 11 then
-				put (x + w + x_padding,y), Star_sprite(9-int(ValInt(label))/10), trans'int(ValInt(label))/10), trans
+				put (x + w + x_padding,y), Star_sprite((int(pl_avg_value)/10)-1), trans'int(ValInt(label))/10), trans
 			end if
 			if col = 3 then
 				put (x + 2,y + 2), Head_sprite(pl(row).skin), trans
