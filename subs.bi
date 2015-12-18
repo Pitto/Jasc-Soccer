@@ -1502,8 +1502,8 @@ Sub draw_team_editor()
 	w = 25
 	h = 16
 	label_w = 80
-	x_padding = 4
-	y_padding = 4
+	x_padding = 5
+	y_padding = 5
 	mask_color = C_WHITE
 	
 	
@@ -1551,9 +1551,9 @@ Sub draw_team_editor()
 			elseif col = 3 then
 				w = 14
 			elseif col = 11 then
-				w = 30
+				w = 50
 			else
-				w = 25
+				w = 28
 			end if
 			if col = TE_col_sel and row = TE_row_sel then
 				mask_color = C_BLACK
@@ -1593,7 +1593,7 @@ Sub draw_team_editor()
 			elseif col = 3 then
 				w = 14
 			else
-				w = 25
+				w = 28
 			end if
 			if col = TE_col_sel and row = TE_row_sel and TE_select and col > 3 then
 				put (x-33, y-20), Slider_sprite, trans
@@ -2007,8 +2007,8 @@ SUB load_bitmap()
     'loading stars sprites
     BLOAD "img\stars.bmp", 0
     for c = 0 to 9
-        Star_sprite(c) = IMAGECREATE (160, 16)
-        GET (0, c*16)-(159, c*16+15), Star_sprite(c)
+        Star_sprite(c) = IMAGECREATE (80, 16)
+        GET (0, c*16)-(79, c*16+15), Star_sprite(c)
     next c
     
     BLOAD "img\slider.bmp",0

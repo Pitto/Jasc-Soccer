@@ -757,14 +757,16 @@ end function
 
 function player_money_value(average as integer) as string
 	dim value as single
-	
+	dim as integer million, fraction
+
 	value = ((1-cos(-PI_2*(average/100))))*PL_MAX_MONEY_VALUE
 	
 	if value < 1000000 then
 		value = int(value/1000)
-		return str(value) + "K"
+		return str(value) + " K"
 	else
-		value = int (value/1000000)
-		return str(value) + "M"
+		million = int (value/1000000)
+		fraction = int ((value mod 1000000)/100000)
+		return str(million) + "." + str(fraction) + " M"
 	end if
 end function
