@@ -1493,19 +1493,19 @@ END SUB
 Sub draw_team_editor()
 	
 	dim as integer col, row, x, y, w, h, x_padding, y_padding, mask_color, label_w
-	dim labels(12) As String*10 = {"NUM","ROLE","NAME","SKIN","SPEED", "STAMINA", _
-                       "PW_KICK", "PW_HEAD", "PW_TACKLE", "PW_GK", "PRECISION", "AVERAGE"}
+	dim labels(12) As String*16 = {"NUMBER","ROLE","NAME","SKIN","SPEED", "STAMINA", _
+                       "POWER KICK", "POWER HEAD", "POWER TACKLE", "POWER GK", "PRECISION", "AVERAGE"}
 	dim label as string = ""
-	dim pl_avg_value as integer
+	dim as integer pl_avg_value, star
+	
 	x = 20
 	y = 50
 	w = 25
 	h = 16
-	label_w = 80
+	label_w = 120
 	x_padding = 5
 	y_padding = 5
 	mask_color = C_WHITE
-	
 	
 	PUT (0, 0), Wallpaper(3),pset
 	PrintFont x, 20, "TEAM EDITOR " + _
@@ -1518,6 +1518,10 @@ Sub draw_team_editor()
 						pl(row).pwr_kick + pl(row).pwr_head + _
 						pl(row).pwr_tackle + pl(row).pwr_gk + _
 						pl(row).precision)/7))
+						
+		star = int(pl_avg_value/10)
+		if star < 0 then star = 0
+		if star > 9 then star = 9
 		
 		for col = 0 to TE_COLS
 			select case col
@@ -1560,50 +1564,46 @@ Sub draw_team_editor()
 			else
 				mask_color = C_GRAY
 			end if
-			
+			if col = TE_col_sel and row = TE_row_sel then
+				draw_button (x, y - h - y_padding, label_w, h, labels(col),	C_GRAY, C_DARK_RED, 0, 0)
+			end if
 			if col = TE_col_sel and row = TE_row_sel and TE_select then
 				draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, TE_select, C_WHITE)
-				draw_button (x - 30, y-30, label_w, h, labels(col),	C_WHITE, C_BLUE, 0, 0)
-			elseif (col = TE_COLS) then
-				draw_button (x, y, w, h, label,	C_GRAY xor mask_color, C_GRAY xor mask_color, 0, 0)
 			else
-				draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, 0, 0)
+				draw_button (x, y, w, h, label,	C_GRAY xor mask_color, C_BLUE xor mask_color, 0, C_WHITE)
 			end if
 			if col = 11 then
-				put (x + w + x_padding,y), Star_sprite((int(pl_avg_value)/10)-1), trans'int(ValInt(label))/10), trans
+				put (x + w + x_padding,y), Star_sprite(star), trans
 			end if
 			if col = 3 then
 				put (x + 2,y + 2), Head_sprite(pl(row).skin), trans
 			end if
-			if (row = 0) then
-				PrintFont x, y - 6, labels(col), SmallFont, 1, 1
-			end if
 			x += w + x_padding
 		next col
 		x = 20
 		y += h + y_padding
 	next row
-	'put the slider instructions for changing values
-	x = 20
-	y = 50
-	for row = 0 to TE_ROWS-1
-		for col = 0 to TE_COLS
-			if col = 2 then
-				w = 150
-			elseif col = 3 then
-				w = 14
-			else
-				w = 28
-			end if
-			if col = TE_col_sel and row = TE_row_sel and TE_select and col > 3 then
-				put (x-33, y-20), Slider_sprite, trans
-			end if
-			x += w + x_padding
-		next col
-		x = 20
-		y += h + y_padding
-	next row
-	'-------------------------------------------------------
+	''put the slider instructions for changing values
+	'x = 20
+	'y = 50
+	'for row = 0 to TE_ROWS-1
+		'for col = 0 to TE_COLS
+			'if col = 2 then
+				'w = 150
+			'elseif col = 3 then
+				'w = 14
+			'else
+				'w = 28
+			'end if
+			'if col = TE_col_sel and row = TE_row_sel and TE_select and col > 3 then
+				'put (x-33, y-20), Slider_sprite, trans
+			'end if
+			'x += w + x_padding
+		'next col
+		'x = 20
+		'y += h + y_padding
+	'next row
+	''-------------------------------------------------------
 End sub
 
 SUB draw_top_net()
@@ -2505,6 +2505,9 @@ Sub update_team_editor()
 		Case EVENT_KEY_RELEASE
 			If (e.scancode = SC_Escape) Then
 				Exit_flag = 1
+				TE_select = 0
+				TE_row_sel = 0
+				TE_col_sel = 0
 			End If
 			If (e.scancode = SC_Enter) Then
 				TE_select = 1 - TE_select

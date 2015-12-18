@@ -54,6 +54,7 @@ dim shared PL_target_id as Integer = -1 '-1: none; 0-etc. indicates the id of th
 dim shared PL_ball_owner_id as Integer = -1 '-1: none; 0-etc. indicates the id of the pl owning the ball
 dim shared PL_ball_owner_delay as Integer = PL_DELAY_TIME*2 'for how much time owning the ball after the touch
 dim shared PL_team_owner_id as Integer = -1 'indicates the id of the team owning the ball
+dim shared PL_role(4) as String*1 = {"G","D","M","A"}
 
 dim shared SHELL_message as string * 64 'this is useful for debug, to store and display shell-like messages
 

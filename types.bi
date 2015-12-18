@@ -50,8 +50,9 @@ TYPE player_proto
     delay as Integer ' how many cycles delays the player to perform  an action
     'to be loaded from txt file -----
     skin as Integer    'skin color: 0: white with black hair;
-                         '   1: brown with black hair;
-                            '2:white with yellow air;
+                         '1:white with yellow air;   
+                         '2: brown with black hair;
+                            
     role as string*1
     speed_default as single     'speed default of the player
     stamina as single
