@@ -307,22 +307,25 @@ SUB check_bitmap()
     dim as Integer img_x = 0
     dim as Integer img_y = 0
     dim as Integer count = 0 
+    dim as integer skin = 0
     
     screenlock ' Lock the screen
     screenset workpage, workpage xor 1 ' Swap work pages.
     img_x = 0
     img_y = 0
     cls
-    for count = 0 to PL_SPRITES_TOT_N - 1
-        if (count > 0) and (count MOD 21 = 0) then
-            img_x = 0
-            img_y += 20
-        end if
-        PUT (img_x,img_y), pl_sprite_0(count),trans
-        PUT (img_x,img_y), pl_sprite_1(count),trans
-        draw string (img_x,img_y), str(count)
-        img_x += 56
-    next count
+    for skin = 0 to 2
+		for count = 0 to PL_SPRITES_TOT_N - 1
+			if (count > 0) and (count MOD 21 = 0) then
+				img_x = 0
+				img_y += 20
+			end if
+			PUT (img_x,img_y), pl_sprite_0(skin, count),trans
+			PUT (img_x,img_y), pl_sprite_1(skin, count),trans
+			draw string (img_x,img_y), str(count)
+			img_x += 56
+		next count
+    next skin
     workpage xor = 1 ' Swap work pages.
     flip
     screenunlock ' Unlock the page to display what has been drawn on the screen
@@ -474,11 +477,13 @@ SUB delete_bitmap()
 END SUB
 
 SUB delete_player_sprites()
-	dim count as integer
-	For count = 0 To PL_SPRITES_TOT_N - 1
-		If pl_sprite_0(count) Then ImageDestroy pl_sprite_0(count)
-		If pl_sprite_1(count) Then ImageDestroy pl_sprite_1(count)
-	Next
+	dim as integer skin, count
+	for skin = 0 to 2
+		For count = 0 To PL_SPRITES_TOT_N - 1
+			If pl_sprite_0(skin, count) Then ImageDestroy pl_sprite_0(skin, count)
+			If pl_sprite_1(skin, count) Then ImageDestroy pl_sprite_1(skin, count)
+		Next
+	next skin
 End sub
 
 SUB display_menu()
@@ -716,9 +721,9 @@ SUB display_teams()
 			PrintFont x, y, pl(c).label, CoolFont, 1, 1
 		
 			if (c < 11) then
-				put (x - h_padding * 2, y - 8), pl_sprite_0(102), trans
+				put (x - h_padding * 2, y - 8), pl_sprite_0(pl(c).skin, 102), trans
 			else
-				put (x - h_padding * 2, y - 8), pl_sprite_1(102), trans
+				put (x - h_padding * 2, y - 8), pl_sprite_1(pl(c).skin, 102), trans
 			end if
 			y += v_padding
 			if (c = 10) then
@@ -1417,18 +1422,18 @@ SUB draw_players()
                 if pl(a(c,0)).team = 0 then
                     if pl(a(c,0)).role = "G" then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_0(start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
+                        pl_sprite_0(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
                     end if
                 else
                     if pl(a(c,0)).role = "G" then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_1(start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
+                        pl_sprite_1(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame), trans
                     end if
                 end if
             case jumping, sliding, falling, falled, throw_in, gk_falled_w_ball, free_kicker
@@ -1448,18 +1453,18 @@ SUB draw_players()
                 if pl(a(c,0)).team = 0 then
                     if pl(a(c,0)).id < 2 then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_0(start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        pl_sprite_0(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
                     end if
                 else
                     if pl(a(c,0)).id < 2 then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_1(start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        pl_sprite_1(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
                     end if
                 end if
             
@@ -1469,18 +1474,18 @@ SUB draw_players()
                 if pl(a(c,0)).team = 0 then
                     if pl(a(c,0)).role = "G" then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_0(start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
+                        pl_sprite_0(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
                     end if
                 else
                     if pl(a(c,0)).role = "G" then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_1(start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
+                        pl_sprite_1(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+int(pl(a(c,0)).frame_offset/2)+9), trans
                     end if
                 end if
 
@@ -2059,7 +2064,7 @@ SUB load_bitmap()
 END SUB
 
 SUB load_player_sprites()
-    dim as integer img_x, img_w, img_y, img_h, count
+    dim as integer img_x, img_w, img_y, img_h, count, c
     'loading players sprites-------------------------
     img_w = 21
     img_h = 25
@@ -2068,20 +2073,24 @@ SUB load_player_sprites()
     'load and stores the sprites into two array
     'one array for each team… then with paint_kits sub
     'the color of the kits of the sprites will be changed
-    BLOAD "img\pl_sprites.bmp", 0
-    for count = 0 to PL_SPRITES_TOT_N -1
-        if (count > 0) and (count MOD 17 = 0) then
-            img_x = 0
-            img_y += img_h
-        end if
-        Pl_sprite_0(count) = IMAGECREATE (img_w, img_h)
-        Pl_sprite_1(count) = IMAGECREATE (img_w, img_h)
-        gk_sprite(count) = IMAGECREATE (img_w, img_h)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_0(count)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_1(count)
-        GET (img_x, img_y)-(img_x + 20, img_y + 24), gk_sprite(count)
-        img_x += img_w
-    next count
+    for c = 0 to 2
+		img_x = 0
+		img_y = 0
+		BLOAD "img\pl_sprites_" + str(c)+ ".bmp", 0
+		for count = 0 to PL_SPRITES_TOT_N -1
+			if (count > 0) and (count MOD 17 = 0) then
+				img_x = 0
+				img_y += img_h
+			end if
+			Pl_sprite_0(c, count) = IMAGECREATE (img_w, img_h)
+			Pl_sprite_1(c, count) = IMAGECREATE (img_w, img_h)
+			gk_sprite(c, count) = IMAGECREATE (img_w, img_h)
+			GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_0(c, count)
+			GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_1(c, count)
+			GET (img_x, img_y)-(img_x + 20, img_y + 24), gk_sprite(c, count)
+			img_x += img_w
+		next count
+	next c
 end sub
 
 SUB load_behavior()
@@ -2240,41 +2249,42 @@ END SUB
 SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer, _
     C_shirt_1 as Integer, C_pants_1 as Integer, C_socks_1 as Integer)
     
-    Dim as integer count, pitch, c
+    Dim as integer count, pitch, c, skin
     Dim pixels As Any Ptr
     dim as Integer img_w = 0
     dim as Integer img_h = 0
-
-    for count = 0 to PL_SPRITES_TOT_N - 1
-        If 0 <> ImageInfo( pl_sprite_0(count),img_w ,img_h,, pitch, pixels ) Then
-            Print "unable to retrieve image information."
-            Sleep
-            End
-        End If
-        'Paint the sprite white the selected color image by directly manipulating pixel memory.
-        For y As Integer = 0 To img_h
-            Dim row As Integer Ptr = pixels + y * pitch
-			For x As Integer = 0 To img_w
-				if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_0
-				if row[x] = C_KIT_PANTS then row[x] = C_PANTS_0
-				if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_0
-			Next x
-        Next y
-        If 0 <> ImageInfo( pl_sprite_1(count),img_w ,img_h,, pitch, pixels ) Then
-            Print "unable to retrieve image information."
-            Sleep
-            End
-        End If
-        'Paint the sprite white the selected color image by directly manipulating pixel memory.
-        For y As Integer = 0 To img_h
-			Dim row As Integer Ptr = pixels + y * pitch
-			For x As Integer = 0 To img_w
-				if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_1
-				if row[x] = C_KIT_PANTS then row[x] = C_PANTS_1
-				if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_1
-			Next x
-		Next y
-    next count
+	for skin = 0 to 2
+		for count = 0 to PL_SPRITES_TOT_N - 1
+			If 0 <> ImageInfo( pl_sprite_0(skin, count),img_w ,img_h,, pitch, pixels ) Then
+				Print "unable to retrieve image information."
+				Sleep
+				End
+			End If
+			'Paint the sprite white the selected color image by directly manipulating pixel memory.
+			For y As Integer = 0 To img_h
+				Dim row As Integer Ptr = pixels + y * pitch
+				For x As Integer = 0 To img_w
+					if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_0
+					if row[x] = C_KIT_PANTS then row[x] = C_PANTS_0
+					if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_0
+				Next x
+			Next y
+			If 0 <> ImageInfo( pl_sprite_1(skin, count),img_w ,img_h,, pitch, pixels ) Then
+				Print "unable to retrieve image information."
+				Sleep
+				End
+			End If
+			'Paint the sprite white the selected color image by directly manipulating pixel memory.
+			For y As Integer = 0 To img_h
+				Dim row As Integer Ptr = pixels + y * pitch
+				For x As Integer = 0 To img_w
+					if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_1
+					if row[x] = C_KIT_PANTS then row[x] = C_PANTS_1
+					if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_1
+				Next x
+			Next y
+		next count
+    next skin
     
 END SUB
 
@@ -2615,7 +2625,7 @@ Sub update_team_editor()
 	if TE_row_sel > TE_ROWS - 2 then TE_row_sel = TE_ROWS -1
 	if TE_row_sel < 0 then TE_row_sel = 0
 	if TE_col_sel > TE_COLS - 2 then TE_col_sel = TE_COLS - 1
-	if TE_col_sel < 0 then TE_row_sel = 0
+	if TE_col_sel < 0 then TE_col_sel = 0
 	
 	'save the file
 	if (Save_team) then
@@ -3572,7 +3582,7 @@ sub tct_ed_draw_players()
             Circle (tct_ed_pl(c).x, tct_ed_pl(c).y),12, &h3F9E4F,,,,F
         end if
             Circle (tct_ed_pl(c).x, tct_ed_pl(c).y),8, &h073C10,,,,F
-        PUT (tct_ed_pl(c).x-10,tct_ed_pl(c).y-20),pl_sprite_1(102), trans
+        PUT (tct_ed_pl(c).x-10,tct_ed_pl(c).y-20),pl_sprite_1(0,102), trans
         draw string (tct_ed_pl(c).x-5,tct_ed_pl(c).y-30), str(c + 2)
     Next c
 END SUB
