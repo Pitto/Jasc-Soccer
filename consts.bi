@@ -3,7 +3,7 @@
 #define GAME_VERSION "0.25"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
-#define GAME_N_TOT_TEAMS 8
+#define GAME_N_TOT_TEAMS 14
 
 'USEFUL CONSTS###########################################################################
 const FIXED_TIME_STEP as double = 1/60.0 'useful for Delta Timing
@@ -101,7 +101,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 'maximum distance to allow the human pl to pass to another player
 #define MAX_DIST_PASS 400
 'total number of kits
-#define KIT_TOT_N 4
+#define KIT_TOT_N 6
 'total number of the player sprites
 #define PL_SPRITES_TOT_N 136
 'possibility % a slide contact become a foul
