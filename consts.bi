@@ -100,6 +100,8 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 #define PL_FIELD_VIEW_HALF PL_FIELD_VIEW/2
 'maximum distance to allow the human pl to pass to another player
 #define MAX_DIST_PASS 400
+'total number of kits
+#define KIT_TOT_N 4
 'total number of the player sprites
 #define PL_SPRITES_TOT_N 136
 'possibility % a slide contact become a foul
@@ -141,6 +143,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 #define C_KIT_LINE RGB(43,154,209)
 #define C_KIT_SKIN RGB(255,125,20)
 #define C_KIT_SOCKS RGB(63,0,63)
+#define C_KIT_OVERLAY &h00FF00
 
 #define MATCH_EVENT_DEFAULT_DELAY 100
 #define DBG_TXT_OFFSET 10

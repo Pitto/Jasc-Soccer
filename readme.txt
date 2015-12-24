@@ -59,6 +59,7 @@ Acknowledgements:
 DEV LOG -------------------------------------
 0.25
 · Team editor
+· Added team kit
 
 0.24.9
 · Fixed a bug in team kit painting

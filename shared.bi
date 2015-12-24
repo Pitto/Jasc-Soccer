@@ -17,6 +17,7 @@ dim shared bhv_tile(0 to 35, 0 to 9) as Integer 'behavior array
 'it gives a percentage table for the behavior of the players owners of the ball
 'see relative sub for details
 
+DIM SHARED Kit_overlay(KIT_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Pl_sprite_0(0 to 2, 0 to PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Pl_sprite_1(0 to 2, 0 to PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)
 DIM SHARED Gk_sprite(0 to 2, 0 to PL_SPRITES_TOT_N) AS ANY PTR ' A pointer that points to a memory buffer (for plrs sprites)

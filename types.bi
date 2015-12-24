@@ -88,6 +88,8 @@ Type Team_proto
     c_1 As Uinteger 'color of the kit
     c_2 As Uinteger
     c_3 As Uinteger
+    c_4 As Uinteger
+    kit as integer
     tact_module As Integer 'tactic module of the team (0-9) see also tct_tile_label(10) 
     att_dir as integer 'direction of the attack 0 or 1 (up or down)
     goal as integer

@@ -55,8 +55,10 @@ DECLARE SUB load_bitmap()
 DECLARE SUB load_player_sprites()
 'paints the kits of the teams with a custom color - and also the color of the skin of
 'the players
-DECLARE SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer, _
-    C_shirt_1 as Integer, C_pants_1 as Integer, C_socks_1 as Integer)
+DECLARE SUB paint_kits(	c_overlay_0 as integer, c_shirt_0 as integer,_
+						c_pants_0 as integer, c_socks_0 as integer, _
+						c_overlay_1 as integer, c_shirt_1 as integer,_
+						c_pants_1 as integer, c_socks_1 as integer)
 'delete the sprites
 DECLARE SUB delete_bitmap()
 'cheks if the sprites have been rightly loaded
@@ -1895,7 +1897,8 @@ SUB init_team_data()
     Team(0).goal = 0
     Team(1).goal = 0
     'fill the kits with the team default colors
-    paint_kits(Team(0).c_1,Team(0).c_2,Team(0).c_3,Team(1).c_1,Team(1).c_2,Team(1).c_3)
+    paint_kits(	Team(0).c_4, Team(0).c_1,Team(0).c_2,Team(0).c_3,_
+				Team(1).c_4,Team(1).c_1,Team(1).c_2,Team(1).c_3)
 END SUB
 
 SUB init_players_proprietes()
@@ -1957,6 +1960,13 @@ SUB load_bitmap()
     img_h = 25
     img_x = 0
     img_y = 0
+    
+    'loading team overlay kits
+    for c = 0 to KIT_TOT_N-1
+    	BLOAD "img\kit_"+ str(c)+".bmp", 0
+		Kit_overlay(c) = IMAGECREATE(357,200)
+		get (0,0)-(356,199), Kit_overlay(c)
+    next c
     
     'loading stadium
     BLOAD "img\stadium_top.bmp", 0
@@ -2077,20 +2087,40 @@ SUB load_player_sprites()
 		img_x = 0
 		img_y = 0
 		BLOAD "img\pl_sprites_" + str(c)+ ".bmp", 0
+		PUT (0,0), Kit_overlay(Team(0).kit), trans
+		
 		for count = 0 to PL_SPRITES_TOT_N -1
 			if (count > 0) and (count MOD 17 = 0) then
 				img_x = 0
 				img_y += img_h
 			end if
 			Pl_sprite_0(c, count) = IMAGECREATE (img_w, img_h)
-			Pl_sprite_1(c, count) = IMAGECREATE (img_w, img_h)
 			gk_sprite(c, count) = IMAGECREATE (img_w, img_h)
 			GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_0(c, count)
-			GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_1(c, count)
 			GET (img_x, img_y)-(img_x + 20, img_y + 24), gk_sprite(c, count)
 			img_x += img_w
 		next count
 	next c
+	
+	for c = 0 to 2
+		img_x = 0
+		img_y = 0
+		BLOAD "img\pl_sprites_" + str(c)+ ".bmp", 0
+		PUT (0,0), Kit_overlay(Team(1).kit), trans
+		
+		for count = 0 to PL_SPRITES_TOT_N -1
+			if (count > 0) and (count MOD 17 = 0) then
+				img_x = 0
+				img_y += img_h
+			end if
+			Pl_sprite_1(c, count) = IMAGECREATE (img_w, img_h)
+			GET (img_x, img_y)-(img_x + 20, img_y + 24), Pl_sprite_1(c, count)
+			img_x += img_w
+		next count
+	next c
+	
+	
+	
 end sub
 
 SUB load_behavior()
@@ -2218,8 +2248,9 @@ Sub Load_teams_list()
     Open "_data/list_teams.team" For Input As #ff
     Do Until Eof(ff) 
         Input #ff, Main_Menu_List_Teams(flc).id, Main_Menu_List_Teams(flc).label,_
-        Main_Menu_List_Teams(flc).c_1,Main_Menu_List_Teams(flc).c_2,Main_Menu_List_Teams(flc).c_3,_
-        Main_Menu_List_Teams(flc).tact_module
+        Main_Menu_List_Teams(flc).c_1,Main_Menu_List_Teams(flc).c_2,_
+        Main_Menu_List_Teams(flc).c_3,Main_Menu_List_Teams(flc).c_4,_
+        Main_Menu_List_Teams(flc).tact_module, Main_Menu_List_Teams(flc).kit
         flc +=1
     Loop
     Close #ff
@@ -2246,8 +2277,8 @@ SUB move_all_players()
     next c
 END SUB
 
-SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer, _
-    C_shirt_1 as Integer, C_pants_1 as Integer, C_socks_1 as Integer)
+SUB paint_kits(c_overlay_0 as integer, c_shirt_0 as integer, c_pants_0 as integer, c_socks_0 as integer, _
+    c_overlay_1 as integer, c_shirt_1 as integer, c_pants_1 as integer, c_socks_1 as integer)
     
     Dim as integer count, pitch, c, skin
     Dim pixels As Any Ptr
@@ -2264,9 +2295,10 @@ SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer,
 			For y As Integer = 0 To img_h
 				Dim row As Integer Ptr = pixels + y * pitch
 				For x As Integer = 0 To img_w
-					if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_0
-					if row[x] = C_KIT_PANTS then row[x] = C_PANTS_0
-					if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_0
+					if row[x] = C_KIT_SHIRT 	then row[x] = c_shirt_0
+					if row[x] = C_KIT_PANTS 	then row[x] = c_pants_0
+					if row[x] = C_KIT_SOCKS 	then row[x] = c_socks_0
+					if row[x] = C_KIT_OVERLAY 	then row[x] = c_overlay_0
 				Next x
 			Next y
 			If 0 <> ImageInfo( pl_sprite_1(skin, count),img_w ,img_h,, pitch, pixels ) Then
@@ -2278,9 +2310,10 @@ SUB paint_kits(C_shirt_0 as Integer, C_pants_0 as Integer, C_socks_0 as Integer,
 			For y As Integer = 0 To img_h
 				Dim row As Integer Ptr = pixels + y * pitch
 				For x As Integer = 0 To img_w
-					if row[x] = C_KIT_SHIRT then row[x] = C_SHIRT_1
-					if row[x] = C_KIT_PANTS then row[x] = C_PANTS_1
-					if row[x] = C_KIT_SOCKS then row[x] = C_SOCKS_1
+					if row[x] = C_KIT_SHIRT 	then row[x] = c_shirt_1
+					if row[x] = C_KIT_PANTS 	then row[x] = c_pants_1
+					if row[x] = C_KIT_SOCKS		then row[x] = c_socks_1
+					if row[x] = C_KIT_OVERLAY 	then row[x] = c_overlay_1
 				Next x
 			Next y
 		next count
