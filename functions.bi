@@ -153,6 +153,7 @@ function find_shoot_angle (pl_id as Integer) as single
     dim as Integer gk_id, att_dir
     
     att_dir = 1 - Team(pl(pl_id).team).att_dir
+    'att_dir = Team(pl(pl_id).team).att_dir
     
     if pl(pl_id).team = 0 then
         gk_id = 0
@@ -405,9 +406,9 @@ function get_ball_tile(att_dir as Integer) as Integer
     end select
 
     if att_dir then
-        return TILES_BALL_N - tile
+      return TILES_BALL_N - tile
     else
-        return tile
+      return tile 
     end if
 end function
 

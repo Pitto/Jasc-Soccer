@@ -31,10 +31,11 @@ DIM SHARED Back_net AS Uinteger PTR '  A pointer that points to a memory buffer 
 DIM SHARED Banner_sprite AS ANY PTR 'idem for banner
 DIM SHARED Shadowed_sprite AS ANY PTR 'idem for shadowed sprite
 DIM SHARED Slider_sprite AS ANY PTR 'idem for shadowed sprite
-DIM SHARED Wallpaper(4) as any ptr 'wallpaper bitmaps
+DIM SHARED Wallpaper(5) as any ptr 'wallpaper bitmaps
 DIM SHARED Amiga_1200_bitmap as Uinteger ptr 'My Old Amiga 1200!
 DIM SHARED Head_sprite(3) as Uinteger ptr 'heads of the players
 DIM SHARED Star_sprite(10) as Uinteger ptr 'stars of the players
+DIM SHARED Splashscreen_sprite as Uinteger ptr 'stars of the players
 
 DIM SHARED Workpage AS INTEGER ' buffer holding the player sprites
 DIM SHARED Addframe as Integer = 0 'to be soon removed
@@ -130,4 +131,4 @@ Dim shared TE_select as integer = 1
 
 
 Dim shared Game_section as proto_game_section
-Game_section = main_menu
+Game_section = splashscreen

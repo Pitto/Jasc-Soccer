@@ -16,7 +16,8 @@ enum proto_pl_action
 end enum
 
 enum proto_game_section
-	main_menu = 0
+	splashscreen
+	main_menu 
 	tactic_editor 
 	team_editor
 	game 

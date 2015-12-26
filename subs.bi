@@ -154,6 +154,9 @@ declare sub check_ball_woods()
 declare sub update_ball_on_goal()
 'display the pre-match teams
 declare sub display_teams()
+declare sub display_splashscreen()
+declare sub update_splashscreen()
+declare sub draw_splashscreen()
 
 'TACTIC EDITOR SUBS
 declare sub tct_ed_key_input_listener() 'checks if some input key are pressed
@@ -464,6 +467,13 @@ SUB delete_bitmap()
     For c = 0 To 7
         If Cameraman_sprite(c) Then ImageDestroy Cameraman_sprite(c)
     Next
+    for c = 0 to KIT_TOT_N-1
+		if Kit_overlay(c) 	then imagedestroy Kit_overlay(c)
+    next c
+    for c = 0 to 4
+		If Wallpaper(c)		Then ImageDestroy Wallpaper(c)
+    next c
+    
     If net_sprite(0)		Then ImageDestroy net_sprite(0)
     If net_sprite(1)		Then ImageDestroy net_sprite(1)
     If Stadium_bitmap(0)	Then ImageDestroy Stadium_bitmap(0)
@@ -472,10 +482,7 @@ SUB delete_bitmap()
     If pitch_sprite(0)		Then ImageDestroy pitch_sprite(0)
     If pitch_sprite(1)		Then ImageDestroy pitch_sprite(1)
     If banner_sprite		Then ImageDestroy banner_sprite
-    If Wallpaper(0)			Then ImageDestroy Wallpaper(0)
-    If Wallpaper(1) 		Then ImageDestroy Wallpaper(1)
-    If Wallpaper(2) 		Then ImageDestroy Wallpaper(2)
-    If Wallpaper(3) 		Then ImageDestroy Wallpaper(3)
+    if Splashscreen_sprite Then ImageDestroy Splashscreen_sprite
 END SUB
 
 SUB delete_player_sprites()
@@ -502,6 +509,22 @@ SUB display_menu()
 		SLEEP SLEEP_TIME, 1
 	LOOP UNTIL Exit_flag = 1
 	Exit_flag = 0
+END SUB
+
+SUB display_splashscreen ()
+	DO
+		update_splashscreen()
+		Screensync
+		screenlock ' Lock the screen
+		screenset workpage, workpage xor 1 ' Swap work pages.
+		cls
+		draw_splashscreen()
+		workpage xor = 1 ' Swap work pages.
+		screenunlock
+		SLEEP SLEEP_TIME, 1
+	LOOP UNTIL Exit_flag = 1
+	Exit_flag = 0
+	game_section = main_menu
 END SUB
 
 SUB display_match()
@@ -1138,15 +1161,17 @@ sub draw_button (x as integer, y as integer, w as integer,_
 end sub
 
 
-Sub Draw_main_menu()
+Sub draw_main_menu()
     Dim As Integer a, i
     dim btn_w as integer = 220 'width of the button
     dim btn_h as integer = 20 'height of the button
     dim btn_v_space as integer = 15 'vertical spacing of each button
     Dim top_margin as integer = 100
+
     'graphic statements
     'wallpaper
     PUT (0, 0), Wallpaper(1),pset
+    
     draw_button 	(SCREEN_W\2 - 150, 20, 300, 20, _
 					str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR),_
 					C_WHITE, C_GRAY,0,0)
@@ -1162,6 +1187,7 @@ Sub Draw_main_menu()
 						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 						Main_Menu_List_Teams(i).label,_
 						C_GRAY, C_GRAY,0,0)
+						
 			next i
 			draw_button (SCREEN_W\2 - btn_w\2,_
 			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
@@ -1497,6 +1523,28 @@ SUB draw_players()
     next c
 END SUB
 
+SUB draw_splashscreen()
+	static as single x1, x2, x3, y1, y2, y3
+		
+	dim easing as integer = 20
+	x1 = SCREEN_W\2 - 130
+	if (y1 < 50) then y1 = y1 + (50 - y1)/easing
+	if (y2 < SCREEN_H\2 - 90) then y2 = y2 + (SCREEN_H\2 - 90 - y2)/easing
+	if (y3 < SCREEN_H - 50) then y3 = y3 + (SCREEN_H - 50 - y3)/easing
+	put (0,0), Wallpaper(4), pset
+
+	PrintFont x1 , y1, _
+	GAME_NAME + " by " + GAME_AUTHOR  + " - Version " + GAME_VERSION + _
+	" - " + GAME_AUTHOR_SITE, SmallFont, 1, 1 
+	
+	PrintFont x1 - 15, y1 + 30, _
+	"This software is released under the Terms of the GNU GPL license v. 2.0", _
+	SmallFont, 1, 1 
+	
+	PrintFont SCREEN_W\2 - 95, y3, "PRESS ESC TO PLAY", CoolFont, 1, 1
+	put (SCREEN_W\2 - 75, y2), Splashscreen_sprite, trans	
+END SUB
+
 Sub draw_team_editor()
 	
 	dim as integer col, row, x, y, w, h, x_padding, y_padding, mask_color, label_w
@@ -1646,7 +1694,7 @@ SUB get_pl_behavior(pl_id as Integer)
     dim pl_to_pass as Integer = 0
     
     decision = rnd*100
-    tile = get_ball_tile(pl(pl_id).team)
+    tile = get_ball_tile(Team(pl(pl_id).team).att_dir)
     '--------------------------------------------------------------------
     'if there is enough room AND THE NET IS FAR - run to the opponent net
     if d_b_t_p(pl(pl_id).x,pl(pl_id).y, PITCH_MIDDLE_W, _
@@ -1968,6 +2016,11 @@ SUB load_bitmap()
 		get (0,0)-(356,199), Kit_overlay(c)
     next c
     
+    'loading logo
+    BLOAD "img\splashscreen.bmp", 0
+    Splashscreen_sprite = IMAGECREATE(150, 180)
+    get (0,0)-(149,179), Splashscreen_sprite
+    
     'loading stadium
     BLOAD "img\stadium_top.bmp", 0
     Stadium_bitmap(0) = IMAGECREATE(305, 192)
@@ -2055,22 +2108,13 @@ SUB load_bitmap()
     shadowed_sprite = IMAGECREATE(32,32)
     GET (0,0)-(31,31), shadowed_sprite
     
-    BLOAD "img\wallp_0.bmp",0
-    Wallpaper(0)= IMAGECREATE(640,480)
-    GET (0,0)-(639,479), Wallpaper(0)
-    
-    BLOAD "img\wallp_1.bmp",0
-    Wallpaper(1)= IMAGECREATE(640,480)
-    GET (0,0)-(639,479), Wallpaper(1)
-    
-    BLOAD "img\wallp_2.bmp",0
-    Wallpaper(2)= IMAGECREATE(640,480)
-    GET (0,0)-(639,479), Wallpaper(2)
-    
-    BLOAD "img\wallp_3.bmp",0
-    Wallpaper(3)= IMAGECREATE(640,480)
-    GET (0,0)-(639,479), Wallpaper(3)
-    
+    'wallpapers
+    for c = 0 to 4
+    BLOAD "img\wallp_" + str(c) + ".bmp",0
+    Wallpaper(c)= IMAGECREATE(640,480)
+    GET (0,0)-(639,479), Wallpaper(c)
+    next c
+        
 END SUB
 
 SUB load_player_sprites()
@@ -2240,7 +2284,7 @@ SUB load_team_data_for_team_editor(n_team as string)
     Close #ff
 END SUB
 
-Sub Load_teams_list()
+Sub load_teams_list()
     'File handle statements-------------
     Dim ff As Ubyte
     ff = Freefile
@@ -2532,6 +2576,18 @@ SUB store_ball_position()
     
 END SUB
 
+SUB update_splashscreen()
+	dim e As EVENT
+	If (ScreenEvent(@e)) Then
+		Select Case e.type
+			Case EVENT_KEY_RELEASE
+				If (e.scancode = SC_ESCAPE) then
+					Exit_flag = 1
+				end if
+		End Select
+	End If
+END SUB
+
 Sub update_team_editor()
 	dim e As EVENT
 	dim Save_team as integer = 0
@@ -2742,7 +2798,7 @@ SUB update_camera_position()
     c_y_o = camera.y - camera.h/2
 END SUB
 
-Sub Update_main_menu()
+Sub update_main_menu()
 	dim e As EVENT
 	dim scroll as integer
 	scroll = 0

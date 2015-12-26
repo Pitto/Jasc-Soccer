@@ -55,6 +55,10 @@ load_pitch_data()
 '---------------------------------------------------------
 DO
 	Select case Game_section
+		'splashscreen
+		case splashscreen
+			'display splashscreen
+			display_splashscreen()
 		'MAIN MENU
 		case main_menu
 			'display main menu
