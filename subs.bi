@@ -1179,11 +1179,11 @@ Sub draw_main_menu()
 					str("This software is released under the Terms of the GNU GPL license v. 2.0"),_
 					C_WHITE, C_GRAY,0,0)
 	
-	For a = 0 To Main_menu_Items_total
+	For a = 0 To MAIN_MENU_ITEMS_TOTAL
         Select Case a
         Case 0
 			for i = lbound(Main_Menu_List_Teams) to ubound (Main_Menu_List_Teams) - 1
-				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_Team_0_selected - i),_
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_Team_0_selected - i) +  btn_w * Main_Menu_dimmer(a),_
 						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 						Main_Menu_List_Teams(i).label,_
 						C_GRAY, C_GRAY,0,0)
@@ -1195,7 +1195,7 @@ Sub draw_main_menu()
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 1
 			for i = lbound(Main_Menu_List_Teams) to ubound (Main_Menu_List_Teams) - 1
-				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_Team_1_selected - i),_
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_Team_1_selected - i) +  btn_w * Main_Menu_dimmer(a),_
 						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 						Main_Menu_List_Teams(i).label,_
 						C_GRAY, C_GRAY,0,0)
@@ -1206,7 +1206,7 @@ Sub draw_main_menu()
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 2
 			for i = lbound(Pitch_data) to ubound (Pitch_data) - 1
-				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_pitch_type_selected - i),_
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_pitch_type_selected - i) +  btn_w * Main_Menu_dimmer(a),_
 						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 						Pitch_data(i).label,_
 						C_GRAY, C_GRAY,0,0)
@@ -1217,7 +1217,7 @@ Sub draw_main_menu()
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 3
 			for i = lbound(Main_Menu_List_mins) to ubound (Main_Menu_List_mins) - 1
-				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_mins_selected - i),_
+				draw_button (	SCREEN_W\2 - btn_w\2 - btn_w*(Main_menu_mins_selected - i) +  btn_w * Main_Menu_dimmer(a),_
 						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 						Str(Main_Menu_List_mins(i)),_
 						C_GRAY, C_GRAY,0,0)
@@ -1228,7 +1228,7 @@ Sub draw_main_menu()
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 4
 			for i = lbound(Main_Menu_Mode) to ubound (Main_Menu_Mode) - 1
-				draw_button (SCREEN_W\2 - btn_w\2 - btn_w*(Main_Menu_mode_selected - i),_
+				draw_button (SCREEN_W\2 - btn_w\2 - btn_w*(Main_Menu_mode_selected - i) +  btn_w * Main_Menu_dimmer(a),_
 						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 						Str(Main_Menu_Mode(i)),_
 						C_GRAY, C_GRAY,0,0)
@@ -1239,7 +1239,7 @@ Sub draw_main_menu()
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 5
 			for i = lbound(Main_Menu_control) to ubound (Main_Menu_control) - 1
-				draw_button (SCREEN_W\2 - btn_w\2 - btn_w*(Main_Menu_control_selected - i),_
+				draw_button (SCREEN_W\2 - btn_w\2 - btn_w*(Main_Menu_control_selected - i) +  btn_w * Main_Menu_dimmer(a),_
 						top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 						Str(Main_Menu_control(i)),_
 						C_GRAY, C_GRAY,0,0)
@@ -1696,16 +1696,18 @@ SUB get_pl_behavior(pl_id as Integer)
     decision = rnd*100
     tile = get_ball_tile(Team(pl(pl_id).team).att_dir)
     '--------------------------------------------------------------------
-    'if there is enough room AND THE NET IS FAR - run to the opponent net
-    if d_b_t_p(pl(pl_id).x,pl(pl_id).y, PITCH_MIDDLE_W, _
-        PITCH_Y + PITCH_H * (1 - Team(pl(pl_id).team).att_dir)) > PITCH_PENALTY_AREA and _
-        d_b_t_p (pl(pl_id).x,pl(pl_id).y,_
-        pl(get_nrst_pl_ball(pl(pl_id).team xor 1)).x,_
-        pl(get_nrst_pl_ball(pl(pl_id).team xor 1)).y) > PL_RUN_SPACE then
+    'if there is enough room or THE Pl is outside penalty area - run to the opponent net
+    if is_ball_into_penalty_area (1 - Team(pl(pl_id).team).att_dir) = 0 and _
+        d_b_t_p (	pl(pl_id).x,pl(pl_id).y,_
+					pl(get_nrst_pl_ball(1-pl(pl_id).team)).x,_
+					pl(get_nrst_pl_ball(1-pl(pl_id).team)).y)_
+					> PL_RUN_SPACE then
+		
             ball.rds = _abtp (pl(pl_id).x, pl(pl_id).y,_
             PITCH_MIDDLE_W, PITCH_Y + (PITCH_H * (1 - Team(pl(pl_id).team).att_dir))) + rnd * .5 -.25
-            ball.speed += ((rnd*5 + 5) * M_Pixel)
+            ball.speed = pl(pl_id).speed
             SHELL_message = "run to opponent"
+    '--------------------------------------------------------------------
     'else get standard behaviour table
     else
         select case decision
@@ -1730,9 +1732,6 @@ SUB get_pl_behavior(pl_id as Integer)
             exit sub
         case bhv_tile(tile, 2)+1 to bhv_tile(tile, 3)	'3: pass_long_side
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Long Side"
-            'shoot_ball  (pl_id, get_longside_pl_to_pass(pl_id),_
-                        'pl(get_longside_pl_to_pass(pl_id)).x,_
-                        'pl(get_longside_pl_to_pass(pl_id)).y, 0.3,0)
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
                         pl(get_nrst_pl_pass(pl_id)).y, 0.3, 0)
@@ -1743,11 +1742,11 @@ SUB get_pl_behavior(pl_id as Integer)
                         pl(get_nrst_pl_pass(pl_id)).x,_
                         pl(get_nrst_pl_pass(pl_id)).y, 0.5,0)
             exit sub
-        case bhv_tile(tile, 4)+1 to bhv_tile(tile, 5)'5: pass_center 
+        case bhv_tile(tile, 4)+1 to bhv_tile(tile, 5) '5: pass_center 
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS center"
             shoot_ball  (pl_id, get_centerest_pl_to_pass(pl_id),_
                         pl(get_centerest_pl_to_pass(pl_id)).x,_
-                        pl(get_centerest_pl_to_pass(pl_id)).y, 0.2, 0)
+                        pl(get_centerest_pl_to_pass(pl_id)).y, 0.6, 0)
             exit sub
         case bhv_tile(tile, 5)+1 to bhv_tile(tile, 6)	'6: run_to_centre
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " R U N centre"
@@ -1771,9 +1770,10 @@ SUB get_pl_behavior(pl_id as Integer)
         case bhv_tile(tile, 7)+1 to bhv_tile(tile, 8)	'8: run_to_endline
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " R U N to endline"
             
-            ball.rds = _abtp (pl(pl_id).x, pl(pl_id).y,_
-            PITCH_X + (PITCH_W * (1 - Team(pl(pl_id).team).att_dir)), pl(pl_id).y+1) + rnd * .25 -.125
-            ball.speed += ((rnd*5 + 5) * M_Pixel)
+            ball.rds = _abtp (	pl(pl_id).x, pl(pl_id).y,_
+								pl(pl_id).x, PITCH_Y + (PITCH_H * (1 - Team(pl(pl_id).team).att_dir)))
+            
+            ball.speed += pl(pl_id).speed
             PL_target_id = -1 ' The pl is not passing to anyone
             
             PL_team_owner_id = pl(pl_id).team
@@ -1783,15 +1783,18 @@ SUB get_pl_behavior(pl_id as Integer)
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " SHOOT in TARGET"
             
             ball.rds = find_shoot_angle(pl_id)
+            'ball.rds = ball.rds + ((100 - pl(pl_id).precision) * PI_2 / 100)
             ball.spin = 0.5 * rnd - 0.25
             
             if decision mod 2 = 0 then 
                 reset_ball_z()
-                ball.speed = (50 * rnd + 50) * M_PIXEL
-                ball.z_speed_init = 14 * M_PIXEL : ball.z_speed=ball.z_speed_init
+                ball.speed = (pl(pl_id).pwr_kick/100) * BALL_MAX_SPEED
+                ball.z_speed_init = rnd(10)+10 * M_PIXEL
+                ball.z_speed=ball.z_speed_init
             else
                 reset_ball_z()
-                ball.speed = (50 * rnd + 50) * M_PIXEL
+                ball.speed = (pl(pl_id).pwr_kick/100) * BALL_MAX_SPEED
+                ball.z_speed_init = rnd(3)+10 * M_PIXEL
             end if
             
             PL_target_id = -1 ' The pl is not passing to anyone
@@ -2801,7 +2804,17 @@ END SUB
 Sub update_main_menu()
 	dim e As EVENT
 	dim scroll as integer
+	dim c as integer
 	scroll = 0
+	
+	for c = 0 to Ubound(Main_Menu_Dimmer)-1
+		if abs(Main_Menu_Dimmer(c)) > 0.1 then
+			Main_Menu_Dimmer(c) *= MAIN_MENU_DIMMER_EASING
+		else
+			Main_Menu_Dimmer(c) = 0
+		end if
+	next c
+	
     If (ScreenEvent(@e)) Then
         Select Case e.type
         Case EVENT_KEY_RELEASE
@@ -2813,9 +2826,11 @@ Sub update_main_menu()
             End If
             If (e.scancode = SC_RIGHT) Then
                 scroll = 1
+                Main_Menu_Dimmer(Main_menu_Item_selected) = 1
             End If
             If (e.scancode = SC_LEFT) Then
                 scroll = -1
+                Main_Menu_Dimmer(Main_menu_Item_selected) = -1
             End If
             If (e.scancode = SC_Escape) Then
                 Game_section = credits
@@ -2824,8 +2839,8 @@ Sub update_main_menu()
         End Select
     End If
 
-    If Main_menu_Item_selected > Main_menu_Items_total _
-		Then Main_menu_Item_selected = Main_menu_Items_total
+    If Main_menu_Item_selected > MAIN_MENU_ITEMS_TOTAL _
+		Then Main_menu_Item_selected = MAIN_MENU_ITEMS_TOTAL
     If Main_menu_Item_selected < 0 Then Main_menu_Item_selected = 0
     
     Select Case Main_menu_Item_selected
@@ -2980,10 +2995,10 @@ sub update_match_event()
                 else
                     if Match_event = penalty_t0 then
                         ball.x = PITCH_MIDDLE_W + 2
-                        ball.y = PITCH_Y + PITCH_PENALTY_AREA/1.5 - 48
+                        ball.y = PITCH_Y + ((PITCH_H - PITCH_PENALTY_AREA/1.5 - 48) * Team(1).att_dir) + PITCH_PENALTY_AREA/1.5 - 48
                     else
                         ball.x = PITCH_MIDDLE_W + 2
-                        ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/1.5 + 48
+                        ball.y = PITCH_Y + ((PITCH_H - PITCH_PENALTY_AREA/1.5 - 48) * Team(0).att_dir) + PITCH_PENALTY_AREA/1.5 - 48
                     end if
                 pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
                 reset_ball_z()
@@ -3313,11 +3328,6 @@ SUB update_players()
                         ball.y +=  5 *-sin(pl(c).rds) '*pl(c).speed*Dt
                         ball.rds = pl(c).rds
 						ball.speed = pl(c).speed
-						'if ((int(Timer*1000) MOD 20) = 0) and pl(c).speed > 0 then
-							'ball.x +=  10 *cos(pl(c).rds) '*pl(c).speed*Dt
-							'ball.y +=  10 *-sin(pl(c).rds) '*pl(c).speed*Dt
-							'ball.speed += 10
-						'end if
                     end if
                     PL_ball_owner_id = c
                     PL_team_owner_id = pl(c).team

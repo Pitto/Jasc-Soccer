@@ -1,6 +1,6 @@
 '#DEFINE################################################################
 #define GAME_NAME "JASC SOCCER"
-#define GAME_VERSION "0.25"
+#define GAME_VERSION "0.25.1"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 14
@@ -81,6 +81,10 @@ const BALL_Y_BOUND = 25
 const CAMERA_EASING_RATIO as Single = 0.40f
 const PL_DEFAULT_SPEED as single = 15.5 * M_Pixel
 const GK_DEFAULT_SPEED as single = 18 * M_Pixel
+
+'menu consts
+const MAIN_MENU_ITEMS_TOTAL As Integer = 8
+const MAIN_MENU_DIMMER_EASING As single = 0.75
 'PLAYERS CONSTS--------------------------------------------------------------------------
 
 #define PL_N_TOT 11
@@ -94,7 +98,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 'minimum distance between two sliders - see check_pl_collisions sub for details
 #define PL_MIN_SLIDE_DIST 16
 'minimum distance from opponent pl to allow pl owner of the ball to run to the net
-#define PL_RUN_SPACE 15
+#define PL_RUN_SPACE 30
 'field view of the player
 #define PL_FIELD_VIEW 0.70
 #define PL_FIELD_VIEW_HALF PL_FIELD_VIEW/2
@@ -112,8 +116,8 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 #define RND_CONTACT_FALL 0
 
 'moltiplicator of speed for some actions
-#define SPEED_RATIO_SLIDING 3.5
-#define SPEED_RATIO_HEADING 4.8
+#define SPEED_RATIO_SLIDING 2.5
+#define SPEED_RATIO_HEADING 3.5
 
 'lenght in ms of the sleep statement
 #define SLEEP_TIME 20

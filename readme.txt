@@ -49,17 +49,24 @@ Acknowledgements:
 · Replais
 · change other #define with consts
 · Sound effects
-· direction of the player going to the ball has to be corrected
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
-· change ball bound limits
-· when the gk catch the ball all the players have to go outside the penalty area
 · update delete bitmap routine
+· Fix bug on penalty kick position
+
 
 DEV LOG -------------------------------------
+0.25.1
+· Some changes on players Behaviour SUB
+· Some changes on main menu
+· fixed bug on penalty position
+
 0.25
 · Team editor
+· Skin colour
 · Added team kit
+· Intro splashscreen
+· Gameplay on Youtube!
 
 0.24.9
 · Fixed a bug in team kit painting
@@ -112,9 +119,9 @@ DEV LOG -------------------------------------
 · custom font - important! only ASCII charset in range 0-127
 · enhanced Debug messages display
 · Key "R" in debug mode reverses the attack direction of the teams
-· changed on Find_shoot_angle() Function
-· changed on get_ball_tile() Function
-· changed SUB check_ball_goals() SUB
+· changed Find_shoot_angle() Function
+· changed get_ball_tile() Function
+· changed check_ball_goals() SUB
 
 0.23.5
 · minor changes on update_ball SUB

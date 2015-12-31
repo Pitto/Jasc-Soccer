@@ -103,10 +103,6 @@ Type Match_options_proto
     mins_sel as integer '=0 -> 3 mins
     pitch_sel As Integer '= 0 -> MUDDY
     mode_sel As Integer = 0
-'    Dim Shared Main_Menu_List_Teams(GAME_N_TOT_TEAMS) As Team_proto
-'    Dim Shared Main_Menu_List_mins(4) As Integer = {3,5,7,10}
-'    Dim Shared Main_Menu_List_pitch(4) As String*8 = {"MUDDY", "WET", "SOFT","HARD", "FROZEN"}
-'    Dim Shared Main_Menu_Mode(2) As String*8= {"PC v PC","PL v PC"}
 End Type
 
 Type Match_timing_proto

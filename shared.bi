@@ -75,7 +75,6 @@ dim shared Training_mode as integer = 0
 
 'MAIN MENU ITEMS-------------------------------------------------------------------------
 Dim Shared Main_menu_Item_selected As Integer = 0
-Dim Shared Main_menu_Items_total As Integer = 8
 Dim Shared Main_menu_Team_0_selected As Integer = 5
 Dim Shared Main_menu_Team_1_selected As Integer = 6
 Dim Shared Main_menu_mins_selected As Integer = 0
@@ -87,6 +86,14 @@ Dim Shared Main_Menu_List_pitch(4) As String*8 = {"MUDDY", "WET", "SOFT","HARD",
 Dim Shared Main_Menu_Mode(2) As String*8= {"PC v PC","PL v PC"}
 Dim Shared Main_Menu_control(2) As String*17= {"CONTROL: Keyboard","CONTROL: Joystick"}
 Dim Shared Main_Menu_control_selected as integer = 0
+Dim Shared Main_Menu_dimmer(MAIN_MENU_ITEMS_TOTAL) as single
+scope
+	dim c as integer
+	for c = 0 to Ubound(Main_Menu_dimmer) - 1
+		Main_Menu_Dimmer(c) = 0
+	next c
+end scope
+
 
 'MATCH ENVIRONNEMENT VARIABLES-----------------------------------------------------------
 
