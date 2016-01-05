@@ -78,6 +78,8 @@ declare function print_pl_action(action as integer) as string
 declare function player_money_value(average as integer) as string
 'TACTIC EDITOR FUNCTIONS
 declare function tct_ed_get_ball_tile() as integer
+'bhv editor functions
+declare function be_checksum(tile as integer) as integer
 
 function d_t_r (degree as integer) as single
     return int (degree * PI/180)
@@ -89,6 +91,18 @@ end function
 
 function d_b_t_p (x1 as single, y1 as single, x2 as single, y2 as single) as single
     return Sqr(((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)))
+end function
+
+function be_checksum(tile as integer) as integer
+	dim as integer sum, c
+	sum = 0
+	for c = 0 to 9
+		sum += Bhv_tile_edit_copy(tile, c)
+	next c
+	if sum < 100 then return -1
+	if sum = 100 then return 1
+	if sum > 100 then return 0
+	
 end function
 
 function start_frame (radiants as single) as integer

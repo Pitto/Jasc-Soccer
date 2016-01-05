@@ -20,6 +20,7 @@ enum proto_game_section
 	main_menu 
 	tactic_editor 
 	team_editor
+	bhv_editor
 	game 
 	credits
 	exit_game

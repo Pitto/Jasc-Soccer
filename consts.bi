@@ -48,7 +48,7 @@ const GRAVITY as single = 0.980665f
 'friction of the air
 const AIR_FRICTION as single = 0.995
 'maximum speed the ball can reach so it doesn't become a ball flame
-const BALL_MAX_SPEED as Integer = 50 * M_PIXEL
+const BALL_MAX_SPEED as Integer = 55 * M_PIXEL
 'minimum speed of the ball
 const BALL_MIN_SPEED as Single = 0.2 * M_PIXEL 
 'spin
@@ -83,7 +83,7 @@ const PL_DEFAULT_SPEED as single = 15.5 * M_Pixel
 const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 
 'menu consts
-const MAIN_MENU_ITEMS_TOTAL As Integer = 8
+const MAIN_MENU_ITEMS_TOTAL As Integer = 9
 const MAIN_MENU_DIMMER_EASING As single = 0.75
 'PLAYERS CONSTS--------------------------------------------------------------------------
 

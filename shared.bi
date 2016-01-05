@@ -13,7 +13,13 @@ DIM SHARED goal_team_1 as integer = 0
 dim shared tct_tile(0 to 9, 0 to 9, 0 to 35) as Integer 'tactic array
 dim shared tct_tile_label(10) as String*3 = {"442","433","352","532","424","451","541","swp","att","def"} 
 '--------------------------------------------------------------------------------------
-dim shared bhv_tile(0 to 35, 0 to 9) as Integer 'behavior array
+dim shared Bhv_tile(0 to 35, 0 to 9) as Integer 'behavior array
+dim shared Bhv_tile_edit_copy(0 to 35, 0 to 9) as Integer 'behavior array
+dim shared Bhv_actions_labels(10) as String*16 =  {	"PASS NEAREST", "PASS 2ND NEAREST",_
+													"PASS SHORT SIDE","PASS LONG SIDE",_
+													"PASS ENDLINE","PASS CENTER",_
+													"RUN CENTRE","RUN TO NET",_
+													"RUN TO ENDLINE","SHOOT IN TARGET"}
 'it gives a percentage table for the behavior of the players owners of the ball
 'see relative sub for details
 
@@ -135,6 +141,9 @@ Dim shared tct_ed_pl(10) as player_proto
 Dim shared TE_col_sel as integer = 0
 Dim shared TE_row_sel as integer = 0
 Dim shared TE_select as integer = 1
+
+Dim shared BE_row_sel as integer = 0
+Dim shared BE_select as integer = 1 
 
 
 Dim shared Game_section as proto_game_section

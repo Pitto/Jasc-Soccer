@@ -71,6 +71,10 @@ DO
 		case tactic_editor
 			init_pitch_dimensions(10, 10, 320, 320, 0)
 			display_tactic_editor()
+		case bhv_editor
+			load_bhv_data_for_editor()
+			init_pitch_dimensions(20, 60, 320, 384, 0)
+			display_bhv_editor()
 		'GAME
 		case game
 			load_player_sprites()

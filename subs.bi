@@ -175,6 +175,29 @@ declare sub tct_ed_save_data(slot_to_save as integer)
 declare sub init_pitch_dimensions(x as integer, y as integer,_
                         w as integer, h as integer, slot as integer)
 declare sub display_tactic_editor()
+declare sub update_bhv_editor()
+declare sub draw_bhv_editor()
+declare sub display_bhv_editor()
+declare sub load_bhv_data_for_editor()
+declare sub armonize_bhv_values(tile as integer)
+
+
+SUB armonize_bhv_values(tile as integer)
+	dim c as integer = 0
+	while be_checksum(tile) <> 1
+		c = Int(rnd*10)
+		'if sum < 100
+		if 	be_checksum(tile) = -1 and c <> BE_row_sel and _
+			Bhv_tile_edit_copy(tile, c) < 100 then
+			Bhv_tile_edit_copy(tile, c) +=1
+		end if
+		'if sum > 100
+		if be_checksum(tile) = 0 and c <> BE_row_sel and _
+			Bhv_tile_edit_copy(tile, c) > 0 then
+			Bhv_tile_edit_copy(tile, c) -=1
+		end if
+	wend
+end sub
 
 sub draw_arrow(x as single, y as single, rds as single, a_l as single, cl as Uinteger)
     line (x, y)-(x + a_l * cos(rds), y + a_l *  -sin(rds)),cl
@@ -364,6 +387,22 @@ SUB check_pl_collisions()
     next c
 END SUB
 
+SUB load_bhv_data_for_editor()
+	dim as integer tile, slot
+    Dim ff As Ubyte
+    ff = Freefile
+    'read and store into array
+    Open "_data/bhv.dat" For input As #ff
+		for tile = 0 to TILES_BALL_N
+				Input #ff, 	Bhv_tile_edit_copy(tile,0),Bhv_tile_edit_copy(tile,1),_
+							Bhv_tile_edit_copy(tile,2),Bhv_tile_edit_copy(tile,3),_
+							Bhv_tile_edit_copy(tile,4),Bhv_tile_edit_copy(tile,5),_
+							Bhv_tile_edit_copy(tile,6),Bhv_tile_edit_copy(tile,7),_
+							Bhv_tile_edit_copy(tile,8),Bhv_tile_edit_copy(tile,9)
+		next tile
+    Close #ff
+END SUB
+
 SUB check_throw_in_corner_kick()
     'throw in rside check
     if Ball.x > PITCH_X + PITCH_W then
@@ -526,6 +565,22 @@ SUB display_splashscreen ()
 	Exit_flag = 0
 	game_section = main_menu
 END SUB
+
+sub display_bhv_editor()
+	DO
+		update_bhv_editor()
+		Screensync
+		screenlock ' Lock the screen
+		screenset workpage, workpage xor 1 ' Swap work pages.
+		cls
+		draw_bhv_editor()
+		workpage xor = 1 ' Swap work pages.
+		screenunlock
+		SLEEP SLEEP_TIME, 1
+	LOOP UNTIL Exit_flag = 1
+	Exit_flag = 0
+	game_section = main_menu
+end sub
 
 SUB display_match()
 	
@@ -912,6 +967,39 @@ SUB draw_ball()
     
 END SUB
 
+sub draw_bhv_editor()
+	dim as integer x, y, w, c, padding, h
+	padding = 5
+	w = 32
+	x = 360
+	y = 50
+	h = 16
+	'uses some routines of tactic editor - the soccer field is the same
+	tct_ed_draw_pitch(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
+	
+	draw_pitch_lines ( Pitch_data(0).x, 	Pitch_data(0).y,	Pitch_data(0).w,_
+						Pitch_data(0).h,	Pitch_data(0).xm,	Pitch_data(0).ym,_
+						Pitch_data(0).paw,	Pitch_data(0).pah,	Pitch_data(0).pac,_
+						Pitch_data(0).padw,	Pitch_data(0).padd,	Pitch_data(0).gkw,_
+						Pitch_data(0).gkh,	C_WHITE, 0, 0)
+	
+	'tct_ed_draw_pl_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
+	tct_ed_draw_ball_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
+	
+	for c = 0 to 9
+		draw_button (	x, y, w, h, str(Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, c)),_
+						C_GRAY, C_RED, is_equal(BE_row_sel, c) * BE_select, C_YELLOW)
+		draw_button (	x + w + padding, y, 150, h, Bhv_actions_labels(c),_
+						C_GRAY, C_DARK_RED, is_equal(BE_row_sel, c) * BE_select, C_YELLOW)
+		line 	(x + w + padding + 150 + padding, y)- _
+				(x + w + padding + 150 + padding + Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, c) * 2, y + h),C_DARK_GREEN, BF
+		y = y + h + padding
+	next c
+	
+	draw string (SCREEN_W - 100, SCREEN_H -20), "be_checksum" + str(be_checksum(tct_ed_Ball_Current_Tile))
+	
+end sub
+
 SUB draw_bottom_info()
     dim d as Integer
     'show mins on the upper right corner of the monitor
@@ -1250,13 +1338,13 @@ Sub draw_main_menu()
 			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
         Case 6
             If Main_Menu_mode_selected Then
-				draw_button (SCREEN_W\2 - btn_w\2,_
-				top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+				draw_button (SCREEN_W\2 - btn_w,_
+				top_margin + ((btn_h + btn_v_space) * a), btn_w*2, btn_h, _
 				"PLAY",_
 				C_WHITE, C_DARK_GREEN,is_equal(a,Main_menu_Item_selected),C_WHITE)
             Else
-            	draw_button (SCREEN_W\2 - btn_w\2,_
-				top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+            	draw_button (SCREEN_W\2 - btn_w,_
+				top_margin + ((btn_h + btn_v_space) * a), btn_w*2, btn_h, _
 				"WATCH MATCH",_
 				C_WHITE, C_GREEN,is_equal(a,Main_menu_Item_selected),C_WHITE)
             end if
@@ -1264,11 +1352,16 @@ Sub draw_main_menu()
 			draw_button (SCREEN_W\2 - btn_w\2,_
 			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 			"Edit TACTICS",_
-			C_WHITE, C_BLUE,is_equal(a,Main_menu_Item_selected),C_WHITE)
+			C_WHITE, C_GRAY,is_equal(a,Main_menu_Item_selected),C_WHITE)
 		Case 8
 			draw_button (SCREEN_W\2 - btn_w\2,_
 			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
 			"Edit Team - " + Main_Menu_List_Teams(Main_menu_Team_0_selected).label,_
+			C_WHITE, C_GRAY,is_equal(a,Main_menu_Item_selected),C_WHITE)
+		Case 9
+			draw_button (SCREEN_W\2 - btn_w\2,_
+			top_margin + ((btn_h + btn_v_space) * a), btn_w, btn_h, _
+			"Edit Behaviour",_
 			C_WHITE, C_GRAY,is_equal(a,Main_menu_Item_selected),C_WHITE)
         End Select
     Next a
@@ -1697,7 +1790,7 @@ SUB get_pl_behavior(pl_id as Integer)
     tile = get_ball_tile(Team(pl(pl_id).team).att_dir)
     '--------------------------------------------------------------------
     'if there is enough room or THE Pl is outside penalty area - run to the opponent net
-    if is_ball_into_penalty_area (1 - Team(pl(pl_id).team).att_dir) = 0 and _
+    if is_pl_into_opponent_penalty_area(pl_id) = 0 and _
         d_b_t_p (	pl(pl_id).x,pl(pl_id).y,_
 					pl(get_nrst_pl_ball(1-pl(pl_id).team)).x,_
 					pl(get_nrst_pl_ball(1-pl(pl_id).team)).y)_
@@ -1715,7 +1808,8 @@ SUB get_pl_behavior(pl_id as Integer)
             SHELL_message =  str(decision) + " TILE " + str(tile) + " PASS to nearest"
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
-                        pl(get_nrst_pl_pass(pl_id)).y, 0.1, 0)
+                        pl(get_nrst_pl_pass(pl_id)).y, 0.05, 0)
+            PL_target_id = get_nrst_pl_pass(pl_id)
             exit sub
         case bhv_tile(tile, 0)+1 to bhv_tile(tile, 1)	'1: pass_to_2nd_nearest
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS 2nd nearest"
@@ -1723,30 +1817,35 @@ SUB get_pl_behavior(pl_id as Integer)
             shoot_ball  (pl_id, get_nrst2_pl_pass(pl_id, pl_to_pass),_
                         pl(get_nrst2_pl_pass(pl_id, pl_to_pass)).x,_
                         pl(get_nrst2_pl_pass(pl_id, pl_to_pass)).y, 0.1, 0)
+            PL_target_id = get_nrst2_pl_pass(pl_id, pl_to_pass)
             exit sub
         case bhv_tile(tile, 1)+1 to bhv_tile(tile, 2)	'2: pass_short_side
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Short Side"
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
                         pl(get_nrst_pl_pass(pl_id)).y, 0.2, 0)
+            PL_target_id = get_nrst_pl_pass(pl_id)
             exit sub
         case bhv_tile(tile, 2)+1 to bhv_tile(tile, 3)	'3: pass_long_side
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Long Side"
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
                         pl(get_nrst_pl_pass(pl_id)).y, 0.3, 0)
+            PL_target_id = get_nrst_pl_pass(pl_id)
             exit sub
         case bhv_tile(tile, 3)+1 to bhv_tile(tile, 4)	'4: pass_endline
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS Endline"
             shoot_ball  (pl_id, get_nrst_pl_pass(pl_id),_
                         pl(get_nrst_pl_pass(pl_id)).x,_
                         pl(get_nrst_pl_pass(pl_id)).y, 0.5,0)
+            PL_target_id = get_nrst_pl_pass(pl_id)
             exit sub
         case bhv_tile(tile, 4)+1 to bhv_tile(tile, 5) '5: pass_center 
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " PASS center"
             shoot_ball  (pl_id, get_centerest_pl_to_pass(pl_id),_
                         pl(get_centerest_pl_to_pass(pl_id)).x,_
                         pl(get_centerest_pl_to_pass(pl_id)).y, 0.6, 0)
+            PL_target_id = get_centerest_pl_to_pass(pl_id)
             exit sub
         case bhv_tile(tile, 5)+1 to bhv_tile(tile, 6)	'6: run_to_centre
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " R U N centre"
@@ -1765,7 +1864,7 @@ SUB get_pl_behavior(pl_id as Integer)
             ball.speed += ((rnd*5 + 5) * M_Pixel)
             PL_target_id = -1 ' The pl is not passing to anyone
             
-            PL_team_owner_id = pl(pl_id).team
+            
             exit sub
         case bhv_tile(tile, 7)+1 to bhv_tile(tile, 8)	'8: run_to_endline
             SHELL_message =  str(decision) + " - TILE " + str(tile) + " R U N to endline"
@@ -1776,7 +1875,6 @@ SUB get_pl_behavior(pl_id as Integer)
             ball.speed += pl(pl_id).speed
             PL_target_id = -1 ' The pl is not passing to anyone
             
-            PL_team_owner_id = pl(pl_id).team
             
             exit sub
         case bhv_tile(tile, 8)+1 to 100             '9: shoot_in_target
@@ -1789,12 +1887,12 @@ SUB get_pl_behavior(pl_id as Integer)
             if decision mod 2 = 0 then 
                 reset_ball_z()
                 ball.speed = (pl(pl_id).pwr_kick/100) * BALL_MAX_SPEED
-                ball.z_speed_init = rnd(10)+10 * M_PIXEL
+                ball.z_speed_init = rnd(8)+15 * M_PIXEL
                 ball.z_speed=ball.z_speed_init
             else
                 reset_ball_z()
                 ball.speed = (pl(pl_id).pwr_kick/100) * BALL_MAX_SPEED
-                ball.z_speed_init = rnd(3)+10 * M_PIXEL
+                ball.z_speed_init = rnd(8)+5 * M_PIXEL
             end if
             
             PL_target_id = -1 ' The pl is not passing to anyone
@@ -1884,7 +1982,7 @@ SUB get_user_input_action(c as Integer)
             end if
         else 
             ball.rds = pl(c).rds
-            ball.speed = pl(c).speed + 70 * Key_pressed_gap * M_Pixel
+            ball.speed = pl(c).pwr_kick * Key_pressed_gap * M_Pixel
             ball.z_speed = 20 * M_Pixel
             ball.z_speed_init = ball.z_speed
             'no pass anyone
@@ -2926,6 +3024,11 @@ Sub update_main_menu()
 			Exit_flag = 1
 			Game_section = Team_Editor
         End If
+    Case 9
+        If Multikey(SC_ENTER) Then
+			Exit_flag = 1
+			Game_section = Bhv_Editor
+        End If
     End Select
     'important! resets to 0 the horizontal scroll of the selected item
     scroll = 0
@@ -3236,6 +3339,67 @@ case happy_t0, happy_t1
 end select
 end sub
 
+sub update_bhv_editor()
+	dim e As EVENT
+	If (ScreenEvent(@e)) Then
+		Select Case e.type
+			Case EVENT_KEY_RELEASE
+				If (e.scancode = SC_ESCAPE) then
+					Exit_flag = 1
+					BE_select = 1
+				end if
+				'ball tile position update by user
+				if BE_select = 0 then
+					if (e.scancode = SC_RIGHT) and tct_ed_Ball_Current_Tile + 1 < 36 and (tct_ed_Ball_Current_Tile + 1)mod 6 <>0 then
+						tct_ed_Ball_Current_Tile +=1
+					end if
+					if (e.scancode = SC_LEFT) and tct_ed_Ball_Current_Tile - 1 >= 0 and tct_ed_Ball_Current_Tile mod 6 <>0  then
+						tct_ed_Ball_Current_Tile -=1
+					end if
+					if (e.scancode = SC_UP) and tct_ed_Ball_Current_Tile - 6 >= 0 then
+						tct_ed_Ball_Current_Tile -=6
+					end if
+					if (e.scancode = SC_DOWN) and tct_ed_Ball_Current_Tile + 6 < 36 then
+						tct_ed_Ball_Current_Tile +=6
+					end if
+				end if
+				'on enter key access to modify values
+				if (e.scancode = SC_ENTER)  then
+					BE_select = 1 - BE_select
+				end if
+				if BE_select then
+					if (e.scancode = SC_UP) then
+						BE_row_sel -= 1
+					end if
+					if (e.scancode = SC_DOWN)then
+						BE_row_sel += 1
+					end if
+				end if
+		End Select
+	End If
+	'right and left cursor to increase values
+	if BE_row_sel > 9 then BE_row_sel = 9
+	if BE_row_sel < 0 then BE_row_sel = 0
+	
+	if Multikey (SC_RIGHT) and BE_select then
+		Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, BE_row_sel) += 1
+	end if
+	if Multikey (SC_LEFT) and BE_select then
+		Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, BE_row_sel) -= 1
+	end if
+	'input value check - not less than 0 or more than 100
+	if Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, BE_row_sel) < 0 then
+		Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, BE_row_sel) = 0
+	end if
+	if Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, BE_row_sel) > 100 then
+		Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, BE_row_sel) = 100
+	end if
+	'correct ratio of % values
+	armonize_bhv_values(tct_ed_Ball_Current_Tile)
+
+end sub
+
+
 SUB update_players()
     dim as Integer c, d
     dim decision as Integer = 0
@@ -3324,8 +3488,8 @@ SUB update_players()
                     if PL_ball_owner_id = c then
                         ball.x = pl(c).x
                         ball.y = pl(c).y
-                        ball.x +=  5 *cos(pl(c).rds) '*pl(c).speed*Dt
-                        ball.y +=  5 *-sin(pl(c).rds) '*pl(c).speed*Dt
+                        ball.x +=  5 *cos(pl(c).rds) 
+                        ball.y +=  5 *-sin(pl(c).rds)
                         ball.rds = pl(c).rds
 						ball.speed = pl(c).speed
                     end if
@@ -3337,7 +3501,7 @@ SUB update_players()
             pl(c).speed = pl(c).speed_default
             pl(c).rds =  _abtp(pl(c).x,pl(c).y, ball.x,ball.y)
             ' try to catch the ball with SLIDING###############################
-            if (decision > 95 and is_ball_slidable(c)) then
+            if (decision > 95 and is_ball_slidable(c) and PL_team_owner_id <> pl(c).team) then
                 pl(c).speed *= SPEED_RATIO_SLIDING
                 pl(c).delay =  20
                 pl(c).action = sliding
