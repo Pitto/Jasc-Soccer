@@ -116,7 +116,7 @@ dim shared main_menu_selected_item as UShort = 0
 
 Dim shared Timing as Match_timing_proto
 dim shared Joystick as proto_Joystick
-Joystick.id = 0
+Joystick.id = 1
 
 'TACTIC EDITOR SHARED VARIABLES
 dim shared tct_ed_TILE_W as integer = tct_ed_PITCH_W\6

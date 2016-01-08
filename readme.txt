@@ -60,6 +60,9 @@ DEV LOG -------------------------------------
 · Some changes on players Behaviour SUB
 · Some changes on main menu
 · fixed bug on penalty position
+· Tactic editor saving routing updated
+· Wiki aivalable
+· Behaviour editor
 
 0.25
 · Team editor

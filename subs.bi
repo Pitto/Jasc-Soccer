@@ -848,6 +848,16 @@ SUB display_tactic_editor()
 				If (e.scancode = SC_Escape) Then
 					Exit_flag = 1
 				End If
+				If (e.scancode = SC_S) Then
+					tct_ed_Save_data(tct_ed_tactic_slot)
+					tct_ed_Has_Saved = 1
+					tct_ed_Has_saved_display_time = Timer
+				End If
+				If (e.scancode = SC_A) Then
+					tct_ed_Save_data(-1)
+					tct_ed_Has_Saved = 1
+					tct_ed_Has_saved_display_time = Timer
+				End If
 			End Select
 		End If
 	
@@ -3853,22 +3863,6 @@ END SUB
 
 sub tct_ed_key_input_listener()
 
-    dim e As EVENT
-    If (ScreenEvent(@e)) Then
-        Select Case e.type
-        Case EVENT_KEY_RELEASE
-            If (e.scancode = SC_S) Then
-                tct_ed_Save_data(tct_ed_tactic_slot)
-                tct_ed_Has_Saved = 1
-                tct_ed_Has_saved_display_time = Timer
-            End If
-            If (e.scancode = SC_A) Then
-                tct_ed_Save_data(-1)
-                tct_ed_Has_Saved = 1
-                tct_ed_Has_saved_display_time = Timer
-            End If
-        End Select
-    End If
     'ball tile position update by user
     if MULTIKEY(SC_RIGHT) and tct_ed_Ball_Current_Tile + 1 < 36 and (tct_ed_Ball_Current_Tile + 1)mod 6 <>0 then
         tct_ed_Ball_Current_Tile +=1
