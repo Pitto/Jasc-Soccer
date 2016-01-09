@@ -509,7 +509,7 @@ SUB delete_bitmap()
     for c = 0 to KIT_TOT_N-1
 		if Kit_overlay(c) 	then imagedestroy Kit_overlay(c)
     next c
-    for c = 0 to 4
+    for c = 0 to Ubound(Wallpaper) - 1
 		If Wallpaper(c)		Then ImageDestroy Wallpaper(c)
     next c
     
@@ -866,7 +866,7 @@ SUB display_tactic_editor()
 		screenlock ' Lock the screen
 		screenset workpage, workpage xor 1 ' Swap work pages.
 		cls
-		
+		PUT (0, 0), Wallpaper(6),pset
 		tct_ed_draw_pitch(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
 		
 		draw_pitch_lines ( Pitch_data(0).x,_
@@ -984,6 +984,7 @@ sub draw_bhv_editor()
 	x = 360
 	y = 50
 	h = 16
+	PUT (0, 0), Wallpaper(7),pset
 	'uses some routines of tactic editor - the soccer field is the same
 	tct_ed_draw_pitch(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
 	
@@ -993,7 +994,6 @@ sub draw_bhv_editor()
 						Pitch_data(0).padw,	Pitch_data(0).padd,	Pitch_data(0).gkw,_
 						Pitch_data(0).gkh,	C_WHITE, 0, 0)
 	
-	'tct_ed_draw_pl_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
 	tct_ed_draw_ball_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
 	
 	for c = 0 to 9
@@ -1247,12 +1247,13 @@ sub draw_button (x as integer, y as integer, w as integer,_
 		Line 	(x - offset_line,y - offset_line)-_
 				(x+w + offset_line,_
 				y+h + offset_line),stroke_color_selected,B
+		Line 	(x - offset_line,y - offset_line -1)-_
+				(x+w + offset_line,_
+				y+h + offset_line + 1),stroke_color_selected,B
 		
 		draw string 	(x + (w \ 2) - len(label)*4 + offset_shadow,_
 						y + 5 + offset_shadow), label, C_BLACK		
 	end if
-	
-	'PrintFont x + w\2 - len(label)*4, y+5, label, CoolFont, 1, 1
 	
 	draw string (x + (w \ 2) - len(label)*4, y + 5), label		
 	
@@ -2220,10 +2221,10 @@ SUB load_bitmap()
     GET (0,0)-(31,31), shadowed_sprite
     
     'wallpapers
-    for c = 0 to 4
-    BLOAD "img\wallp_" + str(c) + ".bmp",0
-    Wallpaper(c)= IMAGECREATE(640,480)
-    GET (0,0)-(639,479), Wallpaper(c)
+    for c = 0 to WALLPAPER_TOT_N - 1
+		BLOAD "img\wallp_" + str(c) + ".bmp",0
+		Wallpaper(c)= IMAGECREATE(640,480)
+		GET (0,0)-(639,479), Wallpaper(c)
     next c
         
 END SUB
@@ -3991,58 +3992,42 @@ sub tct_ed_pos_paste()
 END SUB
 
 sub tct_ed_print_tact_data()
-    'the "tct_tile" array indicates in wich tile the player must be with corresponding
-    'ball position. For example: ball in tile 0 -> read from tct_tile(0) = player in tile 1
-    dim tl as Integer = 0
-    dim c as Integer = 0
-    dim offset_txt_x as integer = Pitch_data(0).x + Pitch_data(0).w + 32
-    
-    For c = 0 To 9
-        for tl = 0 to 35
-            if (tct_ed_Pl_selected = c) then
-                draw string (Pitch_data(0).x + (tl*21), Pitch_data(0).y + Pitch_data(0).h + 20 + c * 8), hex(tct_ed_tct_tile(tct_ed_Tactic_slot,c,tl)), RGB(100,100,100)
-                if (tl = tct_ed_Ball_Current_Tile) then
-                    draw string (Pitch_data(0).x + (tl*21), Pitch_data(0).y + Pitch_data(0).h + 20 + c * 8), hex(tct_ed_tct_tile(tct_ed_Tactic_slot,c,tl)), C_WHITE
-                end if
-            else
-                draw string (Pitch_data(0).x + (tl*21), Pitch_data(0).y + Pitch_data(0).h + 20 + c * 8), hex(tct_ed_tct_tile(tct_ed_Tactic_slot,c,tl)), RGB(25,25,25)
-            end if
-        next tl
-    Next c
-    
-    draw string (offset_txt_x, 20), "Tactic Name " + str(tct_tile_label(tct_ed_Tactic_slot))
-    draw string (offset_txt_x, 40), "Tactic Slot " + str(tct_ed_Tactic_slot)
-    draw string (offset_txt_x, 60), "PL Tile     " + hex(tct_ed_Pl_Current_Tile)
-    draw string (offset_txt_x, 80), "Ball Tile   " + str(tct_ed_Ball_Current_Tile)
-    draw string (offset_txt_x, 100), "Pl Selected " + str(tct_ed_Pl_Selected)
 
-    'instructions
-    draw string (offset_txt_x, 200), "CURSOR KEYS - Move the ball", RGB(63,63,63)
-    draw string (offset_txt_x, 220), "MOUSE WHEEL - Select previous player", RGB(63,63,63)
-    draw string (offset_txt_x, 240), "MOUSE CLICK - Set new tile for the player", RGB(63,63,63)
-    draw string (offset_txt_x, 260), "KEYS [0-9]  - Select a Tactic Slot", RGB(63,63,63)
-    draw string (offset_txt_x, 280), "CTRL + C    - Copy Pl pos. on Clipboard", RGB(63,63,63)
-    draw string (offset_txt_x, 300), "CTRL + V    - Paste Pl pos. from Clipboard",RGB(63,63,63)
-    draw string (offset_txt_x, 320), "S           - Save current Tactic Slot",RGB(63,63,63)
-    draw string (offset_txt_x, 340), "A           - Save all Tactic Slots",RGB(63,63,63)
-    draw string (offset_txt_x, 360), "Attack way is top-down",RGB(63,63,63)
+	dim as integer c, w, h, offset_txt_x
+    w = 160
+    h = 16
+	offset_txt_x = Pitch_data(0).x + Pitch_data(0).w + 32
     
-    for c = 0 to 9
-        if c = tct_ed_Tactic_slot then
-            line (SCREEN_W - 72, 16 + c*20)-(SCREEN_W - 16, 30 + c*20), RGB(0,0,127), BF
-            draw string (SCREEN_W - 64, 20 + (c*20)), str(c) + " " + str(tct_tile_label(c)), C_WHITE
-        else
-            draw string (SCREEN_W - 64, 20 + (c*20)), str(c) + " " + str(tct_tile_label(c)), RGB(63,63,63)
-        end if
+    dim instructions(9) as string = { 	"CURSOR KEYS - Move the ball", _
+										"MOUSE WHEEL - Select previous/next player", _
+										"MOUSE CLICK - Set new tile for the player", _
+										"KEYS [0-9]  - Select a Tactic Slot", _
+										"CTRL + C    - Copy Pl pos. on Clipboard", _
+										"CTRL + V    - Paste Pl pos. from Clipboard", _
+										"S           - Save current Tactic Slot", _
+										"A           - Save all Tactic Slots", _
+										"ESC         - Back to Main Menu", _
+										"Attack direction is top-down"}
+									   
+    draw_button (offset_txt_x, 50, w, h, "Tactic Name     " + str(tct_tile_label(tct_ed_Tactic_slot)), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 70, w, h, "Tactic Slot     " + str(tct_ed_Tactic_slot), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 90, w, h, "Payer Tile      " + hex(tct_ed_Pl_Current_Tile), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 110, w, h, "Ball Tile       " + str(tct_ed_Ball_Current_Tile), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 130, w, h, "Player Sel. (id)" + str(tct_ed_Pl_Selected), C_WHITE, C_GRAY, 0, C_YELLOW)
+
+    ' draw instructions
+    for c = 0 to Ubound(instructions) - 1
+		draw string (Pitch_data(0).x, Pitch_data(0).y + Pitch_data(0).h + 10 + c * 10), instructions(c), C_GRAY
     next c
-    
+    'draw current selected tactic
+    for c = 0 to 9
+		draw_button (	SCREEN_W - 80 - 20, 16 + c*20, 80, h, str(c) + " : " + str(tct_tile_label(c)),_
+						C_GRAY, C_BLUE, is_equal(c, tct_ed_Tactic_slot), C_YELLOW)
+    next c
+    'display confirm if the tacitc has been correctly saved
     if tct_ed_Has_Saved then
-        line (Pitch_data(0).w + Pitch_data(0).x + 32, Pitch_data(0).y + Pitch_data(0).h - 32)-_
-             (SCREEN_W - 32, Pitch_data(0).y + Pitch_data(0).h), RGB(127,0,0), BF
-        line (Pitch_data(0).w + Pitch_data(0).x + 32, Pitch_data(0).y + Pitch_data(0).h - 32)-_
-             (SCREEN_W - 32, Pitch_data(0).y + Pitch_data(0).h), RGB(255,0,0), B
-        draw string (SCREEN_W - Pitch_data(0).w + Pitch_data(0).x + (len("DATA SUCCESSFULLY SAVED")*8)/2,_
-                    Pitch_data(0).h + Pitch_data(0).y - 20), "DATA SUCCESSFULLY SAVED", C_WHITE
+		draw_button (	SCREEN_W - 220, SCREEN_H - 30, 200, 20, "DATA SUCCESSFULLY SAVED",_
+						C_GRAY, C_RED, 0, C_YELLOW)
         if timer - tct_ed_Has_saved_display_time > 3 then tct_ed_Has_Saved = 0
     end if
 END SUB
