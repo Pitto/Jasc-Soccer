@@ -66,7 +66,7 @@ DECLARE SUB paint_kits(	c_overlay_0 as integer, c_shirt_0 as integer,_
 						c_overlay_1 as integer, c_shirt_1 as integer,_
 						c_pants_1 as integer, c_socks_1 as integer)
 'print a whole array to screen
-declare sub print_whole_array(array() As String)
+declare sub print_whole_array(array() As String, x as integer, y as integer)
 'delete the sprites
 DECLARE SUB delete_bitmap()
 'cheks if the sprites have been rightly loaded
@@ -608,6 +608,10 @@ SUB display_match()
 		If (ScreenEvent(@e)) Then
 			Select Case e.type
 			Case EVENT_KEY_RELEASE
+				'show / hide in-game manual
+			    If (e.scancode = SC_F1) Then
+					Display_Help = 1 - Display_Help 
+				End If
 				'show/hide tactic selection
 				If (e.scancode = SC_T) Then
 					selecting_tactic = 1 - selecting_tactic
@@ -652,6 +656,7 @@ SUB display_match()
 				
 				If (e.scancode = SC_ESCAPE) Then
 					Exit_flag = 1
+					Display_Help = 0
 				End If
 				'activate vaious level of debug messages
 				If (e.scancode = SC_D) Then
@@ -734,7 +739,7 @@ SUB display_match()
 							C_GRAY)
 				next c
 			end if
-			
+			'display change formation menu
 			if (change_formation) then
 				draw_button (50, 72, 200,_
 							20, "Formation of " + Team(0).label,_
@@ -749,6 +754,11 @@ SUB display_match()
 							C_BLACK, C_DARK_RED, 0, C_GRAY)
 					end if
 				next c
+			end if
+			' display context-help
+			if (Display_Help) then
+				draw_whole_screen_shadowed()
+				print_whole_array(UM_txt_in_game_controls(), 20, 20)
 			end if
 			
 			workpage xor = 1 ' Swap work pages.
@@ -857,6 +867,7 @@ SUB display_tactic_editor()
 			Case EVENT_KEY_RELEASE
 				If (e.scancode = SC_Escape) Then
 					Exit_flag = 1
+					Display_Help = 0
 				End If
 				'save selected tactic
 				If (e.scancode = SC_S) Then
@@ -1397,7 +1408,7 @@ Sub draw_main_menu()
     'context-help
     if (Display_Help) then
 		draw_whole_screen_shadowed()
-		print_whole_array(UM_txt_main_menu())
+		print_whole_array(UM_txt_main_menu(), 20, 20)
 	end if
    
 End Sub
@@ -1765,6 +1776,13 @@ Sub draw_team_editor()
 		x = 20
 		y += h + y_padding
 	next row
+	
+	'context-help
+    if (Display_Help) then
+		draw_whole_screen_shadowed()
+		print_whole_array(UM_txt_team_editor(), 20, 20)
+	end if
+	
 End sub
 
 SUB draw_top_net()
@@ -2521,12 +2539,17 @@ SUB paint_kits(c_overlay_0 as integer, c_shirt_0 as integer, c_pants_0 as intege
     
 END SUB
 
-sub print_whole_array(array() As String)
-	dim as integer c, x, y
-	x = 20
-	y = 20
+sub print_whole_array(array() As String, x as integer, y as integer)
+	dim c as integer
 	for c = 0 to Ubound(array)
-		draw string (x, y + c * 10), array(c)
+		draw string (x, y), array(c), C_BLACK
+		'draw in yellow lines that begins with '#' char
+		if (left(array(c),1)="#") then
+			draw string (x - 1, y - 1), array(c), C_YELLOW
+		else
+			draw string (x - 1, y - 1), array(c), C_WHITE
+		end if
+		y += 10
 	next c
 end sub
 
@@ -2767,11 +2790,17 @@ Sub update_team_editor()
 	If (ScreenEvent(@e)) Then
 		Select Case e.type
 		Case EVENT_KEY_RELEASE
+		    'context help show/hide
+		    If (e.scancode = SC_F1) Then
+                Display_Help = 1 - Display_Help 
+            End If
+		
 			If (e.scancode = SC_Escape) Then
 				Exit_flag = 1
 				TE_select = 0
 				TE_row_sel = 0
 				TE_col_sel = 0
+				Display_Help = 0
 			End If
 			If (e.scancode = SC_Enter) Then
 				TE_select = 1 - TE_select
@@ -4090,7 +4119,7 @@ sub tct_ed_print_tact_data()
         'context-help
     if (Display_Help) then
 		draw_whole_screen_shadowed()
-		print_whole_array(UM_txt_tactic_editor())
+		print_whole_array(UM_txt_tactic_editor(),20,20)
 	end if
    
     

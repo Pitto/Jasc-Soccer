@@ -1,0 +1,44 @@
+# IN-GAME USER GUIDE
+
+User input while in game - only one button to perform all actions:
+
+    Keyboard control......Arrow keys
+                          & RIGHT CONTROL Key
+                          to perform actions such
+                          kicking, heading, sliding.
+
+    Joystick control......Analogue control is supported.
+    
+# Aftertouch:
+  after kicking the ball is possible
+  to bend it turning a little the kick direction
+
+To change on-the-fly both tactic & formation:
+
+    "F".........change formation, formation menu will appear.
+                Use + and - key to navigate & Enter to swap positions.
+
+    "T".........Key to change tactic, tactic menu will appear.
+                Use + and - key to navigate
+                & Enter to select a tactic.
+
+    "ESC".......Exit from the match
+
+# How show debug informations.
+
+    "D".........enter debug mode. There are 10 levels of debug
+                with further displayed informations
+                press again "D" key to show these informations.
+    
+    While in debug mode....
+    "R".........to flip the attack directions of the teams
+    Keys 0-7....to override some Match_Events
+                0...Ball in game
+                1...corner_tl_side_t0
+                2...corner_tr_side_t0
+                3...corner_tr_side_t0
+                4...throw_in_rside_t0
+                5...penalty_t0
+                6...penalty_t1
+                7...foul_t0
+                8...foul_t1

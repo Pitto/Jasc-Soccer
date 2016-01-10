@@ -52,11 +52,15 @@ load_player_sprites()
 'loads the teams
 load_teams_list()
 load_pitch_data()
-'load user manual
+'load user manual ------------------------------------------------------
 	'Main menu
-load_whole_txt_file("_data/UM_txt_Main_Menu.txt",  UM_txt_main_menu())
+load_whole_txt_file("_data/UM_txt_Main_Menu.txt", UM_txt_main_menu())
 	'Tactic Editor
-load_whole_txt_file("_data/UM_txt_tactic_editor.txt",  UM_txt_tactic_editor())
+load_whole_txt_file("_data/UM_txt_tactic_editor.txt", UM_txt_tactic_editor())
+	'Team Editor
+load_whole_txt_file("_data/UM_txt_team_editor.txt", UM_txt_team_editor())
+	'In game controls
+load_whole_txt_file("_data/UM_txt_in_game_controls.txt", UM_txt_in_game_controls())
 
 '---------------------------------------------------------
 DO

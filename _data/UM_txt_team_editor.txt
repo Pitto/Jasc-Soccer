@@ -1,0 +1,37 @@
+# TEAM EDITOR USER GUIDE
+
+Team editor allows to edit the first team selected.
+
+# It's possible to customize MANY FEATURES of the players:
+
+    Player number...............not editable yet
+    Role........................not editable yet
+    Name........................(max 32 chars)
+    SKIN........................ 
+    SPEED.............(0-100)...
+    STAMINA...........(0-100)...available but not implemented yet
+    Kicking Power.....(0-100)...
+    Heading Power.....(0-100)...available but not implemented yet
+    Tackle Power......(0-100)...available but not implemented yet
+    Goalkeeping Power (0-100)...available but not implemented yet
+    Precision.........(0-100)...available but not implemented yet
+
+The player's value is dinamically calculated
+(maximum allowed 15M - like in SWOS).
+
+# Use arrow key to navigate, enter to select a value...
+    * EDITING A NAME,
+      press BACKSPACE to delete the whole name and type it,
+      press Enter again
+    * EDITING A VALUE,
+      use arrow key to increase/decrease
+      (UP DOWN +-10 / LEFT/RIGHT +-1)
+      then press Enter again
+    * EDITING THE SKIN,
+      use arrow key to select a skin and press Enter again.
+
+# IMPORTANT!
+Don't forget to press CONTROL + S to SAVE and back to Main menu
+
+--------------------------------------
+# PRESS F1 AGAIN TO CLOSE THIS GUIDE #

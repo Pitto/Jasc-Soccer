@@ -1,14 +1,17 @@
-*** Main Menu ***
+# Main Menu #
 From main menu it's possible to select various thinghs such:
 
 * TWO TEAMS FOR THE MATCH
-* GAME LENGHT (MINS: 3, 5, 7, 10)
+* GAME LENGHT      (MINS: 3, 5, 7, 10)
 * PITCH TYPE
+* GAME CONTROLS    (Keybard or Joystick [analogue supported])
+* PLAYER Vs PC or PC Vs PC
 * TACTIC EDITOR
-* TEAM EDITOR (of the first selected team)
+* TEAM EDITOR      (of the first selected team)
 * BEHAVIOUR EDITOR
 
-Use arrow keys to navigate the menu and Enter key to select a section.
+Use arrow keys to navigate the menu
+and Enter key to select a section.
 
 ------------------------------------------
 *** PRESS F1 AGAIN TO CLOSE THIS GUIDE ***

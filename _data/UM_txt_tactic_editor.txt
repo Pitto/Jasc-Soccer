@@ -1,34 +1,22 @@
-*** TEAM EDITOR ***
-Team editor allows to edit the first team selected.
-It's possible to customize many features of the players:
-    Player number,
-    Role,
-    Name (max 32 chars),
-    SKIN 
-    SPEED (0-100)
-    STAMINA (0-100)             available but not implemented yet
-    Kicking Power (0-100)
-    Heading Power (0-100        available but not implemented yet
-    Tackle Power (0-100)        available but not implemented yet
-    Goalkeeping Power (0-100)	available but not implemented yet
-    Precision (0-100)           available but not implemented yet
+# TACTIC EDITOR USER GUIDE #
 
-The player's value is dinamically calculated
-(maximum allowed 15M - like in SWOS).
+It's possible to customize tactics.
+There are 10 tactic slot available.
 
-Use arrow key to navigate, enter to select a value and:
-    * if you are editing a name,
-      press BACKSPACE to delete the name and type it,
-      press Enter again
-    * if you are editing a value,
-      use arrow key to increase/decrease
-      (UP DOWN +-10 / LEFT/RIGHT +-1)
-      then press Enter again
-    * if you are editing the skin,
-      use arrow key to select a skin and press Enter again.
+For each of the 36 ball positions
+there are 256 player's positions along the playfield.
 
-IMPORTANT!
-Don't forget to press CONTROL + S to SAVE and back to Main menu
+    Arrow keys.....move the ball along the playfield,
+    Mouse wheel....select a player,
+    Mouse click....select a player position
+    Key from 0-9...select a tactic slot to edit.
+    CTRL + C.......Copy the whole team position
+    CTRL + V.......Paste the whole team position
+    S..............Save current Tactic slot
+    A..............Save all Tactic slot
+    ESC............Back to main menu
+    
+Tactic name is not editable yet.
 
 ------------------------------------------
 *** PRESS F1 AGAIN TO CLOSE THIS GUIDE ***
