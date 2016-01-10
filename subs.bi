@@ -2441,12 +2441,13 @@ SUB load_whole_txt_file(Byref fn As String,  filearr() As String)
 
 	While (Not Eof(filenum))
 		Line Input #filenum, ln ' Get one whole text line
-		ln 	= Trim(ln)
-		If (Left(ln,1) <> "#") And (Len(ln)>0) Then
+		'ln 	= Trim(ln)
+		
+		'If (Left(ln,1) <> "#") And (Len(ln)>0) Then
 			Redim Preserve filearr(outpos)
 			filearr(outpos)	= ln
 			outpos += 1
-		end if
+		'end if
 	Wend
 
     Close #filenum
