@@ -1,4 +1,6 @@
 'SUBS DECLARATIONS-----------------------------------------------------------------------
+'draw whole screen shadowed
+declare sub draw_whole_screen_shadowed()
 'draw the button
 declare sub draw_button (	x as integer, y as integer, w as integer,_
 							h as integer, label as string,_
@@ -53,12 +55,18 @@ DECLARE SUB load_behavior()
 DECLARE SUB load_bitmap()
 'load player_sprites
 DECLARE SUB load_player_sprites()
+'load a whole text file and put it into an array
+'thanks to Bulrush @ http://www.freebasic.net/forum/viewtopic.php?f=7&t=24284
+DECLARE SUB load_whole_txt_file(Byref fn As String,  filearr() As String)
+
 'paints the kits of the teams with a custom color - and also the color of the skin of
 'the players
 DECLARE SUB paint_kits(	c_overlay_0 as integer, c_shirt_0 as integer,_
 						c_pants_0 as integer, c_socks_0 as integer, _
 						c_overlay_1 as integer, c_shirt_1 as integer,_
 						c_pants_1 as integer, c_socks_1 as integer)
+'print a whole array to screen
+declare sub print_whole_array(array() As String)
 'delete the sprites
 DECLARE SUB delete_bitmap()
 'cheks if the sprites have been rightly loaded
@@ -521,7 +529,9 @@ SUB delete_bitmap()
     If pitch_sprite(0)		Then ImageDestroy pitch_sprite(0)
     If pitch_sprite(1)		Then ImageDestroy pitch_sprite(1)
     If banner_sprite		Then ImageDestroy banner_sprite
-    if Splashscreen_sprite Then ImageDestroy Splashscreen_sprite
+    if Splashscreen_sprite	Then ImageDestroy Splashscreen_sprite
+    if Shadowed_dark_sprite then ImageDestroy Shadowed_dark_sprite
+    if Shadowed_sprite 		then ImageDestroy Shadowed_sprite
 END SUB
 
 SUB delete_player_sprites()
@@ -848,16 +858,23 @@ SUB display_tactic_editor()
 				If (e.scancode = SC_Escape) Then
 					Exit_flag = 1
 				End If
+				'save selected tactic
 				If (e.scancode = SC_S) Then
 					tct_ed_Save_data(tct_ed_tactic_slot)
 					tct_ed_Has_Saved = 1
 					tct_ed_Has_saved_display_time = Timer
 				End If
+				'save all tactic slots
 				If (e.scancode = SC_A) Then
 					tct_ed_Save_data(-1)
 					tct_ed_Has_Saved = 1
 					tct_ed_Has_saved_display_time = Timer
 				End If
+				If (e.scancode = SC_F1) Then
+					Display_Help = 1 - Display_Help 
+				End If
+				
+				
 			End Select
 		End If
 	
@@ -1376,6 +1393,12 @@ Sub draw_main_menu()
 			C_WHITE, C_GRAY,is_equal(a,Main_menu_Item_selected),C_WHITE)
         End Select
     Next a
+    
+    'context-help
+    if (Display_Help) then
+		draw_whole_screen_shadowed()
+		print_whole_array(UM_txt_main_menu())
+	end if
    
 End Sub
 
@@ -1742,31 +1765,19 @@ Sub draw_team_editor()
 		x = 20
 		y += h + y_padding
 	next row
-	''put the slider instructions for changing values
-	'x = 20
-	'y = 50
-	'for row = 0 to TE_ROWS-1
-		'for col = 0 to TE_COLS
-			'if col = 2 then
-				'w = 150
-			'elseif col = 3 then
-				'w = 14
-			'else
-				'w = 28
-			'end if
-			'if col = TE_col_sel and row = TE_row_sel and TE_select and col > 3 then
-				'put (x-33, y-20), Slider_sprite, trans
-			'end if
-			'x += w + x_padding
-		'next col
-		'x = 20
-		'y += h + y_padding
-	'next row
-	''-------------------------------------------------------
 End sub
 
 SUB draw_top_net()
     PUT (PITCH_MIDDLE_W - 53 - c_x_o, PITCH_Y - 38 - c_y_o ), net_sprite(0), trans
+end sub
+
+sub draw_whole_screen_shadowed()
+    dim as integer col, row
+    for row = 0 to int (SCREEN_H \ 32) +1
+		for col = 0 to int (SCREEN_W \ 32) +1
+			PUT (32*col, row * 32), Shadowed_dark_sprite, trans
+		next col
+    next row
 end sub
 
 SUB dbg_display_tct_file_check() 
@@ -2220,6 +2231,10 @@ SUB load_bitmap()
     shadowed_sprite = IMAGECREATE(32,32)
     GET (0,0)-(31,31), shadowed_sprite
     
+    BLOAD "img\shadowed_dark.bmp",0
+    Shadowed_dark_sprite = IMAGECREATE(32,32)
+    GET (0,0)-(31,31), Shadowed_dark_sprite
+    
     'wallpapers
     for c = 0 to WALLPAPER_TOT_N - 1
 		BLOAD "img\wallp_" + str(c) + ".bmp",0
@@ -2412,6 +2427,34 @@ Sub load_teams_list()
     Close #ff
 End Sub
 
+SUB load_whole_txt_file(Byref fn As String,  filearr() As String)
+    'Thanks to bulrush for this very useful sub
+    'this is a snippet based on his source
+    'http://www.freebasic.net/forum/viewtopic.php?f=7&t=24284
+    'this sub read a whole text file and put it into an array
+    Dim As Integer filenum,res,outpos,i,ub
+    Dim As String procname,ln
+
+    outpos 	= 1
+    filenum = Freefile
+    res 	= Open (fn, For Input, As #filenum)
+
+	While (Not Eof(filenum))
+		Line Input #filenum, ln ' Get one whole text line
+		ln 	= Trim(ln)
+		If (Left(ln,1) <> "#") And (Len(ln)>0) Then
+			Redim Preserve filearr(outpos)
+			filearr(outpos)	= ln
+			outpos += 1
+		end if
+	Wend
+
+    Close #filenum
+
+    ub = Ubound(filearr)
+END SUB
+
+
 SUB move_player(c as integer)
     '###IMPORTANT!#####
     'update pl position moving him
@@ -2476,6 +2519,15 @@ SUB paint_kits(c_overlay_0 as integer, c_shirt_0 as integer, c_pants_0 as intege
     next skin
     
 END SUB
+
+sub print_whole_array(array() As String)
+	dim as integer c, x, y
+	x = 20
+	y = 20
+	for c = 0 to Ubound(array)
+		draw string (x, y + c * 10), array(c)
+	next c
+end sub
 
 SUB put_ball_on_centre()
     ball.rds = 0
@@ -2940,6 +2992,9 @@ Sub update_main_menu()
             If (e.scancode = SC_LEFT) Then
                 scroll = -1
                 Main_Menu_Dimmer(Main_menu_Item_selected) = -1
+            End If
+            If (e.scancode = SC_F1) Then
+                Display_Help = 1 - Display_Help 
             End If
             If (e.scancode = SC_Escape) Then
                 Game_section = credits
@@ -4030,6 +4085,14 @@ sub tct_ed_print_tact_data()
 						C_GRAY, C_RED, 0, C_YELLOW)
         if timer - tct_ed_Has_saved_display_time > 3 then tct_ed_Has_Saved = 0
     end if
+    
+        'context-help
+    if (Display_Help) then
+		draw_whole_screen_shadowed()
+		print_whole_array(UM_txt_tactic_editor())
+	end if
+   
+    
 END SUB
 
 

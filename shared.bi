@@ -36,6 +36,7 @@ DIM SHARED Pitch_sprite(12) AS Uinteger PTR '  A pointer that points to a memory
 DIM SHARED Back_net AS Uinteger PTR '  A pointer that points to a memory buffer (for back net sprite)
 DIM SHARED Banner_sprite AS ANY PTR 'idem for banner
 DIM SHARED Shadowed_sprite AS ANY PTR 'idem for shadowed sprite
+DIM SHARED Shadowed_dark_sprite AS ANY PTR 'idem for shadowed sprite
 DIM SHARED Slider_sprite AS ANY PTR 'idem for shadowed sprite
 DIM SHARED Wallpaper(WALLPAPER_TOT_N) as any ptr 'wallpaper bitmaps
 DIM SHARED Amiga_1200_bitmap as Uinteger ptr 'My Old Amiga 1200!
@@ -145,6 +146,14 @@ Dim shared TE_select as integer = 1
 Dim shared BE_row_sel as integer = 0
 Dim shared BE_select as integer = 1 
 
+'User Manual context-help
+Dim shared UM_txt_main_menu()			as string
+Dim shared UM_txt_tactic_editor()		as string
+Dim shared UM_txt_bhv_editor()			as string
+Dim shared UM_txt_team_editor()			as string
+Dim shared UM_txt_in_game_controls()	as string
+
+Dim shared Display_Help as integer = 0
 
 Dim shared Game_section as proto_game_section
 Game_section = splashscreen
