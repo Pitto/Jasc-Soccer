@@ -3,7 +3,7 @@
 #define GAME_VERSION "0.25.1"
 #define GAME_AUTHOR "Pitto"
 #define GAME_AUTHOR_SITE "github.com/Pitto/Jasc-Soccer"
-#define GAME_N_TOT_TEAMS 14
+#define GAME_N_TOT_TEAMS 15
 
 'USEFUL CONSTS###########################################################################
 const FIXED_TIME_STEP as double = 1/60.0 'useful for Delta Timing
@@ -50,7 +50,7 @@ const AIR_FRICTION as single = 0.995
 'maximum speed the ball can reach so it doesn't become a ball flame
 const BALL_MAX_SPEED as Integer = 55 * M_PIXEL
 'minimum speed of the ball
-const BALL_MIN_SPEED as Single = 0.2 * M_PIXEL 
+const BALL_MIN_SPEED as Single = 0.1 * M_PIXEL 
 'spin
 const BALL_SPIN_RATIO as Single = 30.0
 
