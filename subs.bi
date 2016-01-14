@@ -1,4 +1,5 @@
 'SUBS DECLARATIONS-----------------------------------------------------------------------
+'declare sub show_message (message as string, begin_time as integer, show_time as integer)
 'draw whole screen shadowed
 declare sub draw_whole_screen_shadowed()
 'draw the button
@@ -532,6 +533,7 @@ SUB delete_bitmap()
     if Splashscreen_sprite	Then ImageDestroy Splashscreen_sprite
     if Shadowed_dark_sprite then ImageDestroy Shadowed_dark_sprite
     if Shadowed_sprite 		then ImageDestroy Shadowed_sprite
+    if Dish_sprite	 		then ImageDestroy Dish_sprite
 END SUB
 
 SUB delete_player_sprites()
@@ -1030,11 +1032,17 @@ sub draw_bhv_editor()
 		draw_button (	x + w + padding, y, 150, h, Bhv_actions_labels(c),_
 						C_GRAY, C_DARK_RED, is_equal(BE_row_sel, c) * BE_select, C_YELLOW)
 		line 	(x + w + padding + 150 + padding, y)- _
-				(x + w + padding + 150 + padding + Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, c) * 2, y + h),C_DARK_GREEN, BF
+				(x + w + padding + 150 + padding + Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, c), y + h),C_DARK_GREEN, BF
 		y = y + h + padding
 	next c
 	
 	draw string (SCREEN_W - 100, SCREEN_H -20), "be_checksum" + str(be_checksum(tct_ed_Ball_Current_Tile))
+	
+	'context-help
+    if (Display_Help) then
+		draw_whole_screen_shadowed()
+		print_whole_array(UM_txt_bhv_editor(), 20, 20)
+	end if
 	
 end sub
 
@@ -1302,9 +1310,11 @@ Sub draw_main_menu()
     draw_button 	(SCREEN_W\2 - 150, 20, 300, 20, _
 					str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR),_
 					C_WHITE, C_GRAY,0,0)
-    draw_button 	(SCREEN_W\2 - 300, SCREEN_H - 30, 600, 20, _
-					str("This software is released under the Terms of the GNU GPL license v. 2.0"),_
-					C_WHITE, C_GRAY,0,0)
+	'blinking "press F1"
+	if (Timer MOD 2) then
+    draw_button 	(SCREEN_W\2 - (len("Press F1 for HELP")\2) * 16, SCREEN_H - 30, (len("Press F1 for HELP")) * 16, 20, _
+					str("Press F1 for HELP"), C_WHITE, C_DARK_RED,0,0)
+	end if
 	
 	For a = 0 To MAIN_MENU_ITEMS_TOTAL
         Select Case a
@@ -1457,7 +1467,7 @@ SUB draw_pitch()
     
 END SUB
 
-sub draw_pitch_lines (   x as integer,_
+sub draw_pitch_lines (  x as integer,_
                         y as integer,_
                         w as integer,_
                         h as integer,_
@@ -1475,26 +1485,25 @@ sub draw_pitch_lines (   x as integer,_
                         cyo as integer)
     'drawing the pitch's border lines
     Line (x - cxo, y - cyo)-(w + x - cxo, h + y - cyo), lc, b
-    'middle line and circle
+    'middle line, circle , dish
     Line (x - cxo, ym - cyo)-(x + w - cxo, ym - cyo),lc
-    Circle (xm - cxo, ym - cyo), pac,lc
-    Circle (xm - cxo, ym - cyo), padw,lc
+    put (xm - cxo - 8, ym - cyo - 8), Dish_sprite,trans
+    circle (xm - cxo, ym - cyo), pac, lc
+    
     'Top penalty area
     Line (xm - paw - cxo, y - cyo)-(xm + paw - cxo, y + pah - cyo), lc,B
     'Top Gk area
     Line (xm - gkw - cxo, y - cyo)-(xm + gkw - cxo, y + gkh - cyo), lc,B
     'top penalty dish
-    Circle (xm - cxo, y + padd - cyo), padw,lc,,,,F
-    'top penalty circle
+    put (xm - cxo - 8, y + padd - cyo - 8), Dish_sprite,trans
     'Circle (xm - cxo, y + padd - cyo), pac,lc,3.75,5.65
     'Bottom penalty area
     Line (xm - paw - cxo, y + h - cyo)-(xm + paw - cxo, y + h - pah - cyo), lc,B
     'Bottom Gk area
     Line (xm - gkw - cxo, y + h - cyo)-(xm + gkw - cxo, y + h - gkh - cyo), lc,B
     'Bottom penalty dish
-    Circle (xm - cxo, y + h - padd - cyo), padw,lc,,,,F
-    'Bottom penalty circle
-    'Circle (xm - cxo, y + h - padd - cyo), pac,lc,0.61,2.52
+    put (xm - cxo - 8, y + h - padd - cyo - 8), Dish_sprite,trans
+    
 end sub
 
 SUB draw_players()
@@ -2175,6 +2184,11 @@ SUB load_bitmap()
     Bench_bitmap = IMAGECREATE(80, 150)
     get (0,0)-(79,149), Bench_bitmap
     
+    'loading penalty dish
+    BLOAD "img\dish.bmp", 0
+    Dish_sprite = IMAGECREATE(16, 16)
+    get (0,0)-(15,15), Dish_sprite
+    
 	'loading my old Amiga 1200
 	BLOAD "img\amiga_1200.bmp", 0
     Amiga_1200_bitmap = IMAGECREATE(256, 131)
@@ -2460,11 +2474,10 @@ SUB load_whole_txt_file(Byref fn As String,  filearr() As String)
 	While (Not Eof(filenum))
 		Line Input #filenum, ln ' Get one whole text line
 		'ln 	= Trim(ln)
-		
 		'If (Left(ln,1) <> "#") And (Len(ln)>0) Then
-			Redim Preserve filearr(outpos)
-			filearr(outpos)	= ln
-			outpos += 1
+		Redim Preserve filearr(outpos)
+		filearr(outpos)	= ln
+		outpos += 1
 		'end if
 	Wend
 
@@ -2737,6 +2750,13 @@ SUB shoot_ball(pl_id as integer, pl_trg_id as integer, x_trg as single, y_trg as
     PL_team_owner_id = pl(pl_id).team
     PL_target_id = pl_trg_id
 END SUB
+
+'sub show_message (message as string, begin_time as integer, show_time as integer)
+'	if Timer < begin_time + show_time then
+'		draw_button (	20, SCR_H - 20, len(message)*10, 16, message,_
+'						C_WHITE, C_BLUE as Uinteger,0,0)
+'	end if
+'end sub
 
 SUB record_ball_position()
     'record n. BALL_RECORD_FRAME each time is called
@@ -3437,12 +3457,23 @@ end sub
 
 sub update_bhv_editor()
 	dim e As EVENT
+	dim as integer c, tile
+	Dim ff As Ubyte
+    ff = Freefile
+	
 	If (ScreenEvent(@e)) Then
 		Select Case e.type
 			Case EVENT_KEY_RELEASE
+				If (e.scancode = SC_F1) Then
+					Display_Help = 1 - Display_Help 
+				End If
 				If (e.scancode = SC_ESCAPE) then
 					Exit_flag = 1
 					BE_select = 1
+					Display_Help = 0
+				end if
+				If (e.scancode = SC_S) then
+					Save_bhv = 1
 				end if
 				'ball tile position update by user
 				if BE_select = 0 then
@@ -3492,6 +3523,21 @@ sub update_bhv_editor()
 	end if
 	'correct ratio of % values
 	armonize_bhv_values(tct_ed_Ball_Current_Tile)
+	
+	'save the behaviour file
+	if (Save_bhv) then
+		Open "_data/bhv.dat" For Output As #ff
+			for tile = 0 to TILES_BALL_N
+				Write #ff,_
+				Bhv_tile_edit_copy(tile, 0),Bhv_tile_edit_copy(tile, 1),_
+				Bhv_tile_edit_copy(tile, 2),Bhv_tile_edit_copy(tile, 3),_
+				Bhv_tile_edit_copy(tile, 4),Bhv_tile_edit_copy(tile, 5),_
+				Bhv_tile_edit_copy(tile, 6),Bhv_tile_edit_copy(tile, 7),_
+				Bhv_tile_edit_copy(tile, 8),Bhv_tile_edit_copy(tile, 9)
+			next tile
+		Close #ff
+		Save_bhv = 0
+	end if
 
 end sub
 

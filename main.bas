@@ -1,5 +1,7 @@
 ' Jasc Soccer Just Another Sensi Clone - by Pitto
 
+'Compiling instructions: fbc -w all -exx "%f"
+
 'This program is free software; you can redistribute it and/or
 'modify it under the terms of the GNU General Public License
 'as published by the Free Software Foundation; either version 2
@@ -52,15 +54,18 @@ load_player_sprites()
 'loads the teams
 load_teams_list()
 load_pitch_data()
-'load user manual ------------------------------------------------------
+'load user manual from plain txt files------------------------------------------------------
+'contextual user manual will be shown/hide with F1
 	'Main menu
-load_whole_txt_file("_data/UM_txt_Main_Menu.txt", UM_txt_main_menu())
+load_whole_txt_file("_data/UM_txt_Main_Menu.txt", 		UM_txt_main_menu())
 	'Tactic Editor
-load_whole_txt_file("_data/UM_txt_tactic_editor.txt", UM_txt_tactic_editor())
+load_whole_txt_file("_data/UM_txt_tactic_editor.txt", 	UM_txt_tactic_editor())
 	'Team Editor
-load_whole_txt_file("_data/UM_txt_team_editor.txt", UM_txt_team_editor())
+load_whole_txt_file("_data/UM_txt_team_editor.txt", 	UM_txt_team_editor())
 	'In game controls
-load_whole_txt_file("_data/UM_txt_in_game_controls.txt", UM_txt_in_game_controls())
+load_whole_txt_file("_data/UM_txt_in_game_controls.txt",UM_txt_in_game_controls())
+	'Behaviour editor
+load_whole_txt_file("_data/UM_txt_bhv_editor.txt",		UM_txt_bhv_editor())
 
 '---------------------------------------------------------
 DO

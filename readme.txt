@@ -45,24 +45,30 @@ Acknowledgements:
 · get_short_side_pl_to_pass
 · get_short_endline_pl_to_pass
 · New sprite set
-· 3 kind of skin for the player
 · Replais
 · change other #define with consts
 · Sound effects
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
 · update delete bitmap routine
-· Fix bug on penalty kick position
+· use boolean operators instead of integer variables
+
 
 
 DEV LOG -------------------------------------
+0.25.2
+· Context-help via F1 key
+· Bheaviour editor Saving feature
+· Minor graphic update
+
 0.25.1
 · Some changes on players Behaviour SUB
 · Some changes on main menu
 · fixed bug on penalty position
-· Tactic editor saving routing updated
+· Tactic editor saving routine updated
 · Wiki aivalable
 · Behaviour editor
+· Gameplay on Youtube!
 
 0.25
 · Team editor

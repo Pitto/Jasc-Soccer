@@ -50,7 +50,7 @@ const AIR_FRICTION as single = 0.995
 'maximum speed the ball can reach so it doesn't become a ball flame
 const BALL_MAX_SPEED as Integer = 55 * M_PIXEL
 'minimum speed of the ball
-const BALL_MIN_SPEED as Single = 0.1 * M_PIXEL 
+const BALL_MIN_SPEED as Single = 0.01 * M_PIXEL 
 'spin
 const BALL_SPIN_RATIO as Single = 30.0
 

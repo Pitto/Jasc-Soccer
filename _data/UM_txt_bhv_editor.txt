@@ -1,0 +1,18 @@
+# Behaviour editor #
+
+This is a AI section. It's a Develop utility to edit the behaviour of
+the CPU's controlled player
+
+    * Arrow keys..........move the ball
+    * Enter ..............Edit mode on/off
+    * S ..................Save
+    
+    While in edit mode...
+    * cursor up/down......select a behavior
+    * cursor left/right...change percentage
+
+Dont' forget to close the whole program and reload it again
+to make effective the changes
+
+------------------------------------------
+*** PRESS F1 AGAIN TO CLOSE THIS GUIDE ***

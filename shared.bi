@@ -42,6 +42,7 @@ DIM SHARED Wallpaper(WALLPAPER_TOT_N) as any ptr 'wallpaper bitmaps
 DIM SHARED Amiga_1200_bitmap as Uinteger ptr 'My Old Amiga 1200!
 DIM SHARED Head_sprite(3) as Uinteger ptr 'heads of the players
 DIM SHARED Star_sprite(10) as Uinteger ptr 'stars of the players
+DIM SHARED Dish_sprite as Uinteger ptr 'dish of penalty kick
 DIM SHARED Splashscreen_sprite as Uinteger ptr 'stars of the players
 
 DIM SHARED Workpage AS INTEGER ' buffer holding the player sprites
@@ -101,7 +102,6 @@ scope
 	next c
 end scope
 
-
 'MATCH ENVIRONNEMENT VARIABLES-----------------------------------------------------------
 
 'MATCH EVENTS ---------------------------------------------------------------------------
@@ -144,7 +144,8 @@ Dim shared TE_row_sel as integer = 0
 Dim shared TE_select as integer = 1
 
 Dim shared BE_row_sel as integer = 0
-Dim shared BE_select as integer = 1 
+Dim shared BE_select as integer = 1
+Dim shared Save_bhv as integer= 0
 
 'User Manual context-help
 Dim shared UM_txt_main_menu()			as string
