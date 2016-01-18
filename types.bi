@@ -55,7 +55,7 @@ TYPE player_proto
                             
     role as string*1
     speed_default as single     'speed default of the player
-    stamina as single
+    control as single
 	pwr_kick	as single
     pwr_head	as single
     pwr_tackle as single

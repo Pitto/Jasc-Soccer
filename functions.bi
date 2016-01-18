@@ -1,4 +1,5 @@
 ' FUNCTIONS DECLARATIONS---------------------------------------------------------------------
+
 'return 1 if two numers are equal
 declare function is_equal(a as integer, b as integer) as integer
 'converts radiants to degree
@@ -80,6 +81,8 @@ declare function player_money_value(average as integer) as string
 declare function tct_ed_get_ball_tile() as integer
 'bhv editor functions
 declare function be_checksum(tile as integer) as integer
+'checks if the ball is controllable by a player
+declare function is_in_pl_control (c as integer, angle as single, dist as single) as Integer
 
 function d_t_r (degree as integer) as single
     return int (degree * PI/180)
@@ -106,6 +109,9 @@ function be_checksum(tile as integer) as integer
 end function
 
 function start_frame (radiants as single) as integer
+    'if radiants > PI then radiants = -PI + radiants MOD PI
+    'if radiants < -PI then radiants = PI - radiants MOD PI
+    
     dim degree as Short
     'convert radiants to 360° degree
     degree = (180-int(radiants*180/PI))
@@ -203,12 +209,26 @@ function find_shoot_angle (pl_id as Integer) as single
 
 end function
 
+'function get_diff_angle(alfa as single, beta as single) as single
+  '  if alfa <> beta  then
+  '      return sin(alfa-beta+PI_2)
+ '   else
+   '     return 0
+ '   end if
+'end function
+
+
 function get_diff_angle(alfa as single, beta as single) as single
     if alfa <> beta  then
-        return sin(alfa-beta+PI_2)
-    else
-        return 0
-    end if
+        return _abtp(0,0,cos(alfa-beta),-sin(alfa-beta))
+	else
+		return 0
+	end if
+   ' if alfa <> beta  then
+   '     return -sin(alfa-beta)
+   ' else
+   '     return 0
+   ' end if
 end function
 
 function get_dist_from_tile(tile as Integer, pl_x as single, pl_y as single) as single
@@ -555,6 +575,17 @@ function is_ball_controllable_by_human (c as Integer) as Integer
         else
             return 1
         end if
+    else
+        return 0
+    end if
+end function
+
+
+function is_in_pl_control (c as integer, angle as single, dist as single) as Integer
+    if  abs(cos(pl(c).rds) - cos(_abtp(pl(c).x,pl(c).y,ball.x, ball.y))) < angle and _
+        abs(sin(pl(c).rds) - sin(_abtp(pl(c).x,pl(c).y,ball.x, ball.y))) < angle and _
+        d_b_t_p (pl(c).x, pl(c).y, ball.x,ball.y) < dist then
+        return 1
     else
         return 0
     end if

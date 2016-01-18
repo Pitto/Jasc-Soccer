@@ -1108,8 +1108,6 @@ SUB draw_debug()
             (PITCH_NET_R_WOOD + PITCH_NET_WOOD_RADIUS - c_x_o, PITCH_NET_TOP_Y - PITCH_NET_H + PITCH_NET_WOOD_RADIUS - c_y_o),C_DARK_RED, BF
     end if
 	if debug > 3 then
-		
-	
         if get_pl_to_pass(Pl_ball_owner_id) then
             line (pl(get_nrst_pl_ball(0)).x-c_x_o, pl(get_nrst_pl_ball(0)).y-c_y_o)-_
             (pl(get_pl_to_pass(Pl_ball_owner_id)).x-c_x_o,pl(get_pl_to_pass(Pl_ball_owner_id)).y-c_y_o), RGB(255,255,0)
@@ -1123,9 +1121,9 @@ SUB draw_debug()
             end if
             if pl(c).id = PL_ball_owner_id then
                 circle (pl(c).x - C_x_o, pl(c).y - c_y_o),10, C_DARK_RED,,,,F
-                'draws the ball control area of the selected player	 		int(pl(c).pwr_tackle/10)
-				draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds + (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
-				draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds - (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
+                'draws the ball control area of the selected player	 		
+				draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds + (pl(c).control * PI_2) / 100, pl(c).pwr_tackle, C_YELLOW)
+				draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds - (pl(c).control * PI_2) / 100, pl(c).pwr_tackle, C_YELLOW)
             end if
             if pl(c).id = PL_target_id then
                 circle (pl(c).x - C_x_o, pl(c).y - c_y_o),8, C_GREEN,,,,F
@@ -1142,9 +1140,6 @@ SUB draw_debug()
             draw_arrow  (pl(pl_ball_owner_id).x - c_x_o, pl(pl_ball_owner_id).y - c_y_o, _
                         find_shoot_angle(pl_ball_owner_id), 50, C_WHITE)
         end if
-        'BALL RDS
-        draw_arrow  (ball.x - c_x_o, ball.y - c_y_o, _
-                        ball.rds, 40, C_WHITE)
     end if
     if debug > 4 then
         for c = 0 to Ubound(pl)-1
@@ -3639,34 +3634,26 @@ SUB update_players()
                 else    
                    pl(c).speed = 0
                 end if
-                if is_ball_controllable_by_human(c) then
-                    reset_ball_z()
-                    if PL_ball_owner_id = c then
-                    	'ball control
-						if is_in_pl_control(c, (pl(c).control * PI_2) / 100, pl(c).pwr_tackle ) then
-							'the ball must be close to the player
-							ball.x = pl(c).x + cos(ball.rds) * 1
-							ball.y = pl(c).y + -sin(ball.rds) * 1
-							'easing of the ball control
-							ball.rds += get_diff_angle(pl(c).rds, _abtp(pl(c).x, pl(c).y, ball.x, ball.y)) / 2.5
-							'updating ball position
-							ball.x = pl(c).x + cos(ball.rds) * 5
-							ball.y = pl(c).y + -sin(ball.rds) * 5
-							ball.speed = pl(c).speed
-
-						end if
-                    
-                        'ball.x = pl(c).x
-                        'ball.y = pl(c).y
-                        'ball.x +=  5 *cos(pl(c).rds) 
-                        'ball.y +=  5 *-sin(pl(c).rds)
-                        'ball.rds = pl(c).rds
-						'ball.speed = pl(c).speed
-                    end if
-                    PL_ball_owner_id = c
-                    PL_team_owner_id = pl(c).team
-                end if
-                exit select
+					'ball control
+				if is_in_pl_control(PL_ball_owner_id, (pl(PL_ball_owner_id).control * PI_2) / 100,_
+									pl(PL_ball_owner_id).pwr_tackle) then
+					reset_ball_z()
+					ball.rds += get_diff_angle(pl(PL_ball_owner_id).rds, ball.rds) / 2.5
+					'if ball.rds > PI then ball.rds = -PI + (ball.rds MOD PI)
+					'if ball.rds < -PI then ball.rds = PI - (ball.rds MOD PI)
+					ball.x = pl(PL_ball_owner_id).x + cos(ball.rds) * 10
+					ball.y = pl(PL_ball_owner_id).y + -sin(ball.rds) * 10
+					ball.speed = pl(PL_ball_owner_id).speed
+					PL_ball_owner_id = c
+					PL_team_owner_id = pl(c).team
+				end if
+				exit select
+				'ball.x = pl(c).x
+				'ball.y = pl(c).y
+				'ball.x +=  5 *cos(pl(c).rds) 
+				'ball.y +=  5 *-sin(pl(c).rds)
+				'ball.rds = pl(c).rds
+				'ball.speed = pl(c).speed
             end if
             pl(c).speed = pl(c).speed_default
             pl(c).rds =  _abtp(pl(c).x,pl(c).y, ball.x,ball.y)

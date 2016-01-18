@@ -60,6 +60,7 @@ DEV LOG -------------------------------------
 · Context-help via F1 key
 · Bheaviour editor Saving feature
 · Minor graphic update
+· New ball control method
 
 0.25.1
 · Some changes on players Behaviour SUB
@@ -165,7 +166,7 @@ DEV LOG -------------------------------------
 · Added some Pitch feature (Soft, Wet, Muddy, etc…)
 · Added mins of game selection (3, 5, 7, 10)
 · Teams & Players stored into a .txt file
-· Player with features (speed, stamina, etc…)… they maybe loaded and stored also if arent'all yet used
+· Player with features (speed, control, etc…)… they maybe loaded and stored also if arent'all yet used
 · changhed Update_Main_Menu() SUB
 · changhed Draw_Main_Menu() SUB
 · changhed Run_tactic() SUB
