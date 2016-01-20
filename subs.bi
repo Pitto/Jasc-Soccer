@@ -1124,8 +1124,8 @@ SUB draw_debug()
             if pl(c).id = PL_ball_owner_id then
                 circle (pl(c).x - C_x_o, pl(c).y - c_y_o),10, C_DARK_RED,,,,F
                 'draws the ball control area of the selected player	 		int(pl(c).pwr_tackle/10)
-				draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds + (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
-				draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds - (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
+				'draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds + (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
+				'draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds - (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
             end if
             if pl(c).id = PL_target_id then
                 circle (pl(c).x - C_x_o, pl(c).y - c_y_o),8, C_GREEN,,,,F
