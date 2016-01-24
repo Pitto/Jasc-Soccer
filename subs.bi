@@ -1709,7 +1709,7 @@ Sub draw_team_editor()
 	dim labels(12) As String*16 = {"NUMBER","ROLE","NAME","SKIN","SPEED", "control", _
                        "POWER KICK", "POWER HEAD", "POWER TACKLE", "POWER GK", "PRECISION", "AVERAGE"}
 	dim label as string = ""
-	dim as integer pl_avg_value, star
+	dim as integer pl_avg_value, star, box_height, dashed_line
 	
 	x = 20
 	y = 50
@@ -1748,18 +1748,25 @@ Sub draw_team_editor()
 					label = "" 'str(pl(row).skin)
 				case 4
 					label = str(pl(row).speed_default)
+					box_height = pl(row).speed_default
 				case 5
 					label = str(pl(row).control)
+					box_height = pl(row).control
 				case 6
 					label = str(pl(row).pwr_kick)
+					box_height = pl(row).pwr_kick
 				case 7
 					label = str(pl(row).pwr_head)
+					box_height = pl(row).pwr_head
 				case 8
 					label = str(pl(row).pwr_tackle)
+					box_height = pl(row).pwr_tackle
 				case 9
 					label = str(pl(row).pwr_gk)
+					box_height = pl(row).pwr_gk
 				case 10
 					label = str(pl(row).precision)
+					box_height = pl(row).precision
 				case 11
 					label = player_money_value(pl_avg_value)
 			end select
@@ -1777,17 +1784,38 @@ Sub draw_team_editor()
 			else
 				mask_color = C_GRAY
 			end if
-			if col = TE_col_sel and row = TE_row_sel then
-				draw_button (x, y - h - y_padding, label_w, h, labels(col),	C_GRAY, C_DARK_RED, 0, 0)
+			'mark selected line
+			'draws boxes with a height in proportion of the value
+			if TE_row_sel = row then
+				if col > 3 and col < 11 then
+					for dashed_line = 0 to box_height
+						if dashed_line mod 2 then
+							Line (x, y - dashed_line)-(x + w, y - dashed_line),  C_WHITE, , &b1010101010101010
+						else
+							Line (x, y - dashed_line)-(x + w, y - dashed_line),  C_WHITE, , &b0101010101010101
+						end if
+					next dashed_line
+				end if
 			end if
+			'show the label for each value
+			if col = TE_col_sel and row = TE_row_sel then
+				if col > 2 then
+				draw_button (x - label_w - x_padding, y, label_w, h, labels(col), C_GRAY, C_DARK_RED, 0, 0)
+				else
+				draw_button (x, y - h - y_padding, label_w, h, labels(col),	C_GRAY, C_DARK_RED, 0, 0)
+				end if
+			end if
+			'mark selected value
 			if col = TE_col_sel and row = TE_row_sel and TE_select then
 				draw_button (x, y, w, h, label,	C_WHITE xor mask_color, C_BLUE xor mask_color, TE_select, C_WHITE)
 			else
 				draw_button (x, y, w, h, label,	C_GRAY xor mask_color, C_BLUE xor mask_color, 0, C_WHITE)
 			end if
+			'puts the stars
 			if col = 11 then
 				put (x + w + x_padding,y), Star_sprite(star), trans
 			end if
+			'head of the player
 			if col = 3 then
 				put (x + 2,y + 2), Head_sprite(pl(row).skin), trans
 			end if

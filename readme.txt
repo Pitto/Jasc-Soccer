@@ -60,6 +60,7 @@ DEV LOG -------------------------------------
 · Context-help via F1 key
 · Bheaviour editor Saving feature
 · Minor graphic update
+· Graphs on team editor values
 · New ball control method
 
 0.25.1
