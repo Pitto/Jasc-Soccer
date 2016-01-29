@@ -60,6 +60,7 @@ dim shared Ball_record(BALL_FRAMES_RECORD) as ball_proto 'ball type
 dim shared Team(2) as Team_proto 'team
 dim shared Pitch_data(6) as pitch_proto 'features of the pitch
 
+
 dim shared PL_target_id as Integer = -1 '-1: none; 0-etc. indicates the id of the pl that's receiving pass
 dim shared PL_ball_owner_id as Integer = -1 '-1: none; 0-etc. indicates the id of the pl owning the ball
 dim shared PL_ball_owner_delay as Integer = PL_DELAY_TIME*2 'for how much time owning the ball after the touch

@@ -98,6 +98,7 @@ DECLARE SUB reset_players_positions()
 DECLARE SUB put_ball_on_centre()
 ' update the beahovior of the players
 DECLARE SUB update_players()
+declare sub update_single_player(id as integer)
 ' checks if the ball gest the limits of the pitch
 ' or if the ball goes into any net
 DECLARE SUB check_ball_border_pitch_limit()
@@ -254,18 +255,22 @@ SUB check_ball_goals()
         if is_goal(0) and (Team(0).att_dir = 1) then
             Team(0).goal += 1
             match_event = happy_t0
+            Team(1).kick_off = true
         end if
         if is_goal(0) and (Team(0).att_dir = 0) then
             Team(1).goal += 1
             match_event = happy_t1
+            Team(0).kick_off = true
         end if
         if is_goal(1) and (Team(0).att_dir = 1) then
             Team(1).goal += 1
             match_event = happy_t1
+            Team(0).kick_off = true
         end if
         if is_goal(1) and (Team(0).att_dir = 0) then
             Team(0).goal += 1
             match_event = happy_t0
+            Team(1).kick_off = true
         end if
 		Timing.time_diff = Timer
         match_event_delay = MATCH_EVENT_DEFAULT_DELAY*2
@@ -2135,6 +2140,16 @@ SUB init_team_data()
     'fill the kits with the team default colors
     paint_kits(	Team(0).c_4, Team(0).c_1,Team(0).c_2,Team(0).c_3,_
 				Team(1).c_4,Team(1).c_1,Team(1).c_2,Team(1).c_3)
+				
+	Team(0).kick_off = false
+	Team(1).kick_off = false
+	
+	if int(rnd*1) then
+		Team(0).kick_off = true
+	else
+		Team(1).kick_off = true
+	end if
+	
 END SUB
 
 SUB init_players_proprietes()
@@ -2168,7 +2183,7 @@ SUB init_players_proprietes()
             pl(c).y = PITCH_Y + (PITCH_H\4) + ((PITCH_H\2)*(t xor 1))
             'assign id
             pl(c).id = c
-            pl(c).in_place = 0
+            pl(c).is_in_place = false
             pl(c).x = PITCH_X - 100
             pl(c).y = PITCH_H\2 + PITCH_Y
         next c
@@ -2608,6 +2623,8 @@ SUB put_ball_on_centre()
     ball.rds = 0
     ball.x = 1+ PITCH_MIDDLE_W
     ball.y = 1+ PITCH_MIDDLE_H
+    Match_event_old_ball_x = ball.x
+    Match_event_old_ball_y = ball.y
     ball.z = 0
     ball.z_speed = 0
     ball.speed = 0
@@ -2669,10 +2686,7 @@ SUB reset_player_start_positions(c as integer)
 	tile =  tct_tile    (Team(pl(c).team).tact_module, _
                             pl(c).tct_id, _
                             32)
-	'reversing coords if attack way is different from bottom-up
-	if (team(pl(c).team).att_dir) then
-'		tile = TILES_PL_N - tile
-	end if
+
 	'get the row and the column
 	tile_row = tile MOD 16
 	tile_col = 16-int(tile\16)
@@ -2688,9 +2702,9 @@ SUB reset_player_start_positions(c as integer)
 	'if the distance is less than 5 then the pl has reached the position
 	if d_b_t_p(pl(c).x,pl(c).y,x_trg,y_trg) < 5 then
 		pl(c).speed = 0
-		pl(c).in_place = 1
+		pl(c).is_in_place = true
 	else
-		pl(c).in_place = 0
+		pl(c).is_in_place = false
 		pl(c).speed = pl(c).speed_default
 	end if
 END SUB
@@ -3429,9 +3443,31 @@ case gk_t0_owner, gk_t1_owner
         pl(p).action = free_kicker
         update_players()
     end if
-        
-case ball_on_centre_t0 
-case ball_on_centre_t1
+		' #############################################################
+		' BALL ON CENTRE AT THE BEGINNING  OF THE MATCH OR AFTER A GOAL
+		' #############################################################
+		case ball_on_centre_t0, ball_on_centre_t1
+			Timing.status = 0
+		
+			if Match_event = ball_on_centre_t0 then
+				p = get_nrst_pl_ball_free_kick(0)
+			else
+				p = get_nrst_pl_ball_free_kick(1)
+			end if
+			
+			if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
+				pl(p).action = free_kicker
+				pl(p).x = Ball.x
+				pl(p).y = Ball.y
+				'accept input from only one player
+				update_single_player(p)
+			else
+				pl(p).speed = pl(p).speed_default
+				pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
+				pl(p).action = running
+				move_player(p)
+			end if
+			
 case foul_t0, foul_t1
 
 	Timing.status = 0
@@ -3469,7 +3505,11 @@ case foul_t0, foul_t1
 case presentation
 case resetting_start_position
 	if Timer - Timing.time_diff > TIME_PAUSE_EVENT*2 then
-		Match_event = ball_in_game
+		if Team(0).kick_off then
+			Match_event = ball_on_centre_t0
+		else
+			Match_event = ball_on_centre_t1
+		end if
 	end if
 	for c = 0 to Ubound(pl) - 1
 		if pl(c).role<>"G" then
@@ -3579,7 +3619,6 @@ sub update_bhv_editor()
 
 end sub
 
-
 SUB update_players()
     dim as Integer c, d
     dim decision as Integer = 0
@@ -3595,8 +3634,6 @@ SUB update_players()
         pl(c).old_y = pl(c).y
         
     select case pl(c).action
-        case 0
-        'RUNNING########################################################
         case running
             'countdown of the delay
             if pl(c).delay > 1 then
@@ -3657,7 +3694,7 @@ SUB update_players()
                     pl(c).rds = get_pl_input_rds()
                     
                     'if the player doesn't own the ball and is running
-                    'to get it - the PC helps himself to get the ball
+                    'to get it - the PC helps him to get the ball
                     'correcting the angle of the player
                     if 	PL_ball_owner_id <> c and _
 						abs(cos(pl(c).rds) - cos(_abtp(pl(c).x,pl(c).y,Ball.x, Ball.y))) < PL_FIELD_VIEW_HALF and _
@@ -3683,13 +3720,6 @@ SUB update_players()
 							ball.speed = pl(c).speed
 
 						end if
-                    
-                        'ball.x = pl(c).x
-                        'ball.y = pl(c).y
-                        'ball.x +=  5 *cos(pl(c).rds) 
-                        'ball.y +=  5 *-sin(pl(c).rds)
-                        'ball.rds = pl(c).rds
-						'ball.speed = pl(c).speed
                     end if
                     PL_ball_owner_id = c
                     PL_team_owner_id = pl(c).team
@@ -3778,7 +3808,6 @@ case sliding
             if 	int(get_diff_angle(pl(c).rds,pl(d).rds)*100) > RND_SLIDE_FOUL and _
 				pl(c).team <> pl(d).team then
             
-            'if int(rnd*100) < RND_SLIDE_FOUL and pl(c).team <> pl(d).team then
                 if pl(c).team = 0 then
                     'if is into penalty area the referee whistles a penalty kick
                    if is_pl_into_opponent_penalty_area (d) then
@@ -3905,6 +3934,7 @@ case free_kicker
         exit select
     else
         select case Match_event
+			   
             case foul_t0, foul_t1
                 'if is near to the net then shoon on goal
                 if d_b_t_p(pl(c).x, pl(c).y,_
@@ -3961,6 +3991,36 @@ if pl(c).y < PITCH_Y then pl(c).rds = _abtp(pl(c).x, pl(c).y,PITCH_MIDDLE_W,PITC
 move_player(c)
 next c
 END SUB
+
+sub update_single_player(id as integer)
+select case pl(id).action
+	case free_kicker
+		if Human_control and pl(id).team = 0 then
+		'checks if the Human player is pressing some input way key
+			if is_pl_input_rds() then
+				pl(id).rds = get_pl_input_rds()
+			end if
+			ball.rds = pl(id).rds
+			get_user_input_action(id)
+			exit select
+		else
+			select case Match_event
+			'when the game restarts from the center of the pitch pass to nearest
+				case ball_on_centre_t0, ball_on_centre_t1
+					shoot_ball  (id, get_nrst_pl_pass(id),_
+					pl(get_nrst_pl_pass(id)).x,_
+					pl(get_nrst_pl_pass(id)).y, rnd*1.1,0) 
+			end select
+			PL_ball_owner_id = id
+			PL_team_owner_id = pl(id).team
+			pl(id).action = running
+			pl(id).speed = pl(id).speed_default
+			pl(id).active = 0
+			'IMPORTANT!
+			match_event = ball_in_game
+		end if
+end select
+end sub
 
 sub tct_ed_draw_ball_grid(px as integer, py as integer, pw as integer, ph as integer)
     dim as integer x, y, x2,y2, col, row, count

@@ -61,7 +61,7 @@ TYPE player_proto
     pwr_tackle as single
 	pwr_gk as single
 	precision as single
-	in_place as integer ' return 1 if the player has get his place before free kicks
+	is_in_place as boolean ' return 1 if the player has get his place before free kicks
 END TYPE
 
 TYPE ball_proto
@@ -83,16 +83,17 @@ TYPE ball_proto
 END TYPE
 
 Type Team_proto
-    id As String*3   'unique id of the team
-    label As String 'name of the team
-    c_1 As Uinteger 'color of the kit
+    id As String*3		'unique id of the team
+    label As String		'name of the team
+    c_1 As Uinteger		'color of the kit
     c_2 As Uinteger
     c_3 As Uinteger
     c_4 As Uinteger
-    kit as integer
+    kit as integer		'kind of kit
     tact_module As Integer 'tactic module of the team (0-9) see also tct_tile_label(10) 
     att_dir as integer 'direction of the attack 0 or 1 (up or down)
     goal as integer
+    kick_off as boolean
 End Type
 
 Type Match_options_proto

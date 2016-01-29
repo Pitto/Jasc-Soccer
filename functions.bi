@@ -733,6 +733,8 @@ function print_match_event(event as Integer) as String
         return "presentation"
     case happy_t0
         return "happy_t0"
+    case resetting_start_position
+        return " resetting_start_position"
     case happy_t1
         return "happy_t1"
     case else

@@ -27,6 +27,7 @@ Using FB
 'oh yea, I like random numbers, They're so useful and funny! :)
 randomize timer()
 
+
 'MACROS#################################################################
 'calculate angle between two points
 #macro _abtp (x1,y1,x2,y2)
