@@ -1,7 +1,5 @@
 ' Jasc Soccer Just Another Sensi Clone - by Pitto
 
-'Compiling instructions: fbc -w all -exx "%f"
-
 'This program is free software; you can redistribute it and/or
 'modify it under the terms of the GNU General Public License
 'as published by the Free Software Foundation; either version 2
@@ -16,9 +14,21 @@
 'along with this program; if not, write to the Free Software
 'Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 'Also add information on how to contact you by electronic and paper mail.
+
+'#######################################################################
+
+' Compiling instructions: fbc -w all -exx "%f"
+' use 1.04 freebasic compiler
+
+' SOME CODING CONVENTIONS USED IN THIS SOURCE CODE______________________
+' UPPERCASED variables 		are 	global variables
+' First_leter uppercased 	are 	shared variables
+' lovercased variables 		are 	local variables
 '
-'------------------------------------------------------------------------   
-' a must
+' Often the "c" variable name is used as counter variable
+'
+
+'_INITIALIZING GRAPHICS_________________________________________________
 #include "fbgfx.bi"
 #include "24bitcustomfont.bi"
 
@@ -27,14 +37,13 @@ Using FB
 'oh yea, I like random numbers, They're so useful and funny! :)
 randomize timer()
 
-
-'MACROS#################################################################
+'__MACROS_______________________________________________________________
 'calculate angle between two points
 #macro _abtp (x1,y1,x2,y2)
     -Atan2(y2-y1,x2-x1)
 #endmacro
 
-'INCLUDE ###############################################################
+'__INCLUDE______________________________________________________________
 #include "consts.bi"
 #include "enums.bi"
 #include "types.bi"
@@ -42,8 +51,7 @@ randomize timer()
 #include "functions.bi"
 #include "subs.bi"
 
-'initializing and loading variables ---------------------
-'---------------------------------------------------------
+'initializing and loading variables
 init_gfx()
 'IMPORTANT: respect this order 1) load_behavior; 2) load_tact
 load_behavior()
@@ -55,7 +63,8 @@ load_player_sprites()
 'loads the teams
 load_teams_list()
 load_pitch_data()
-'load user manual from plain txt files------------------------------------------------------
+
+'__LOAD CONTEXT-HELP____________________________________________________
 'contextual user manual will be shown/hide with F1
 	'Main menu
 load_whole_txt_file("_data/UM_txt_Main_Menu.txt", 		UM_txt_main_menu())

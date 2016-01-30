@@ -260,7 +260,7 @@ SUB check_ball_goals()
         if is_goal(0) and (Team(0).att_dir = 0) then
             Team(1).goal += 1
             match_event = happy_t1
-            Team(0).kick_off = true
+            Team(1).kick_off = true
         end if
         if is_goal(1) and (Team(0).att_dir = 1) then
             Team(1).goal += 1
@@ -270,7 +270,7 @@ SUB check_ball_goals()
         if is_goal(1) and (Team(0).att_dir = 0) then
             Team(0).goal += 1
             match_event = happy_t0
-            Team(1).kick_off = true
+            Team(0).kick_off = true
         end if
 		Timing.time_diff = Timer
         match_event_delay = MATCH_EVENT_DEFAULT_DELAY*2
@@ -283,15 +283,16 @@ SUB check_ball_goals()
 END SUB
 
 SUB update_ball_on_goal()
-    dim as integer is_hitting_net = 0
+	'update ball phisics when it is into the net and hits the net
+    dim as boolean is_hitting_net = false
     if (ball.x < PITCH_NET_L_WOOD) or (ball.x > PITCH_NET_R_WOOD) then
-        is_hitting_net = 1
+        is_hitting_net = true
         ball.rds = PI - ball.rds
     end if
     if  (ball.y < PITCH_NET_TOP_Y - PITCH_NET_DEPTH) or _
         (ball.y > PITCH_NET_BOTTOM_Y + PITCH_NET_DEPTH) then
-        is_hitting_net = 1
-        ball.rds = PI_DOUBLE - ball.rds   
+        is_hitting_net = true
+        ball.rds = PI - ball.rds   
     end if
     if (is_hitting_net) then
         ball.speed *= PITCH_NET_BOUNCE_RATIO
@@ -340,7 +341,6 @@ SUB check_ball_woods()
     
     if top_check or xl_check or xr_check then
         ball.rds = PI_DOUBLE - ball.rds
-		'ball.rds = _abtp (ball.x, ball.y, ball.x + -cos(ball.x)*PITCH_NET_WOOD_RADIUS, ball.y)
         ball.x += 1 + PITCH_NET_WOOD_RADIUS * cos(ball.rds) 
 		ball.y += 1 + PITCH_NET_WOOD_RADIUS * -sin(ball.rds)
         ball.spin = 0
@@ -2803,13 +2803,6 @@ SUB shoot_ball(pl_id as integer, pl_trg_id as integer, x_trg as single, y_trg as
     PL_target_id = pl_trg_id
 END SUB
 
-'sub show_message (message as string, begin_time as integer, show_time as integer)
-'	if Timer < begin_time + show_time then
-'		draw_button (	20, SCR_H - 20, len(message)*10, 16, message,_
-'						C_WHITE, C_BLUE as Uinteger,0,0)
-'	end if
-'end sub
-
 SUB record_ball_position()
     'record n. BALL_RECORD_FRAME each time is called
     static frame as integer
@@ -3224,7 +3217,10 @@ sub update_match_event()
     end if
     
     select case match_event
-		'when there is the interval all the players have to go outside the pitch
+		' #############################################################
+		' INTERVAL OF THE MATCH
+		' #############################################################
+		' all the players have to go outside the pitch
 		case interval
 			Timing.status = 0
 			put_ball_on_centre()
@@ -3237,13 +3233,18 @@ sub update_match_event()
 			if Timer - Timing.time_diff > TIME_PAUSE_EVENT then
 				Match_event = ball_in_game
 			end if
+		' #############################################################
+		' BALL IN GAME
+		' #############################################################
         case ball_in_game
 			Timing.status = 1
             store_ball_position() 'store the ball position for free kicks
             check_ball_goals() 'only if the ball is in game, there may be goals
             check_pl_collisions() 'only with ball in game pl may collide each other
             update_players() ' IMPORTANT
-            '--------------------------------------------------------------------------
+        ' #############################################################
+		' PENALTY
+		' #############################################################
         case penalty_t0, penalty_t1
 			Timing.status = 0
             reset_gk_net_position (0,0)
@@ -3279,7 +3280,9 @@ sub update_match_event()
                 move_all_players()
                 end if
             end if
-        'SIDE THROW IN -----------------------------------------------------------------
+        ' #############################################################
+		' THROW IN - BOTH HORIZONTAL SIDES 
+		' #############################################################
         case throw_in_lside_t0, throw_in_rside_t0, throw_in_lside_t1, throw_in_rside_t1
             Timing.status = 0
             reset_gk_net_position (0,25)
@@ -3317,132 +3320,135 @@ sub update_match_event()
                 end if
             end if
     
-        'THROW IN BOTTOM AND UPPER SIDE ------------------------------------------------
-    case throw_in_tl_side_t0, throw_in_tl_side_t1, _
-        throw_in_tr_side_t0, throw_in_tr_side_t1, _
-        throw_in_bl_side_t0, throw_in_bl_side_t1, _
-        throw_in_br_side_t0, throw_in_br_side_t1
+        ' #############################################################
+		' THROW IN - BOTTOM AND UPPER SIDE
+		' #############################################################
+		case throw_in_tl_side_t0, throw_in_tl_side_t1, _
+			throw_in_tr_side_t0, throw_in_tr_side_t1, _
+			throw_in_bl_side_t0, throw_in_bl_side_t1, _
+			throw_in_br_side_t0, throw_in_br_side_t1
         
-        Timing.status = 0
-        
-        if Match_event = throw_in_tl_side_t0 _
-        or Match_event = throw_in_tr_side_t0 _
-        or Match_event = throw_in_bl_side_t0 _
-        or Match_event = throw_in_br_side_t0 then
-            p = 0 'id of gk team 0
-        else
-            p = 11 'id of gk team 1
-        end if
-        if Match_event_delay then
-            run_tactic_all_players(-1) 'all the players run the tactic
-            move_all_players()
-            reset_gk_net_position (0,25)
-            reset_gk_net_position (11,25)
-        else
-            'pl(p).speed = 1
-            'return the right position for the ball
-            select case Match_event
-                case throw_in_tl_side_t0, throw_in_tl_side_t1
-                    ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
-                    ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
-                case throw_in_tr_side_t0, throw_in_tr_side_t1
-                    ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
-                    ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
-                case throw_in_bl_side_t0, throw_in_bl_side_t1
-                    ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
-                    ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
-                case throw_in_br_side_t0, throw_in_br_side_t1
-                    ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
-                    ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
-            end select
-            
-            run_tactic_all_players(-1) 'all the players run the tactic
-            move_all_players()
-            reset_ball_z()
-            restore_players_speed()
-            
-            'the gk goes to get the ball
-            pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
-            'if the gk gets the position then the game may restart
-            if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
-                pl(p).x = Ball.x
-                pl(p).y = Ball.y
-                'the gk launches the ball
-                shoot_ball  (p, -1,_
-                            PITCH_MIDDLE_W ,_
-                            PITCH_MIDDLE_H, 0.75,0)
-                'IMPORTANT!
-                match_event = ball_in_game
-            end if
-            
-            
-        end if
-    case corner_tl_side_t0, corner_tl_side_t1, _
-        corner_tr_side_t0, corner_tr_side_t1, _
-        corner_bl_side_t0, corner_bl_side_t1, _
-        corner_br_side_t0, corner_br_side_t1
+				Timing.status = 0
+				
+				if Match_event = throw_in_tl_side_t0 _
+				or Match_event = throw_in_tr_side_t0 _
+				or Match_event = throw_in_bl_side_t0 _
+				or Match_event = throw_in_br_side_t0 then
+					p = 0 'id of gk team 0
+				else
+					p = 11 'id of gk team 1
+				end if
+				if Match_event_delay then
+					run_tactic_all_players(-1) 'all the players run the tactic
+					move_all_players()
+					reset_gk_net_position (0,25)
+					reset_gk_net_position (11,25)
+				else
+					'pl(p).speed = 1
+					'return the right position for the ball
+				select case Match_event
+					case throw_in_tl_side_t0, throw_in_tl_side_t1
+						ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
+					case throw_in_tr_side_t0, throw_in_tr_side_t1
+						ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
+					case throw_in_bl_side_t0, throw_in_bl_side_t1
+						ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
+					case throw_in_br_side_t0, throw_in_br_side_t1
+						ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
+				end select
+					
+				run_tactic_all_players(-1) 'all the players run the tactic
+				move_all_players()
+				reset_ball_z()
+				restore_players_speed()
+					
+				'the gk goes to get the ball
+				pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
+				'if the gk gets the position then the game may restart
+				if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
+					pl(p).x = Ball.x
+					pl(p).y = Ball.y
+					'the gk launches the ball
+					shoot_ball  (p, -1,_
+								PITCH_MIDDLE_W ,_
+								PITCH_MIDDLE_H, 0.75,0)
+					'IMPORTANT!
+					match_event = ball_in_game
+				end if
+			end if
+        ' #############################################################
+		' CORNER KICKS
+		' #############################################################
+		case corner_tl_side_t0, corner_tl_side_t1, _
+			corner_tr_side_t0, corner_tr_side_t1, _
+			corner_bl_side_t0, corner_bl_side_t1, _
+			corner_br_side_t0, corner_br_side_t1
 
-    Timing.status = 1
-    
-    reset_gk_net_position (0,15)
-    reset_gk_net_position (11,15)
-    
-    if Match_event_delay then
-        if Match_event = corner_tl_side_t0 or Match_event = corner_tr_side_t0 or _
-        Match_event = corner_bl_side_t0 or Match_event = corner_br_side_t0 then
-            p = get_nrst_pl_ball_free_kick(0)
-        else
-            p = get_nrst_pl_ball_free_kick(1)
-        end if
-        'all have to follow tactic but not the pl(p)
-        run_tactic_all_players(p)
-        move_all_players()
-    else
-        select case Match_event
-            case corner_tl_side_t0, corner_tl_side_t1
-                ball.x = PITCH_X + 7
-                ball.y = PITCH_Y + 7
-            case corner_tr_side_t0, corner_tr_side_t1
-                ball.x = PITCH_X + PITCH_W - 7
-                ball.y = PITCH_Y + 7
-            case corner_bl_side_t0, corner_bl_side_t1
-                ball.x = PITCH_X + 7
-                ball.y = PITCH_Y + PITCH_H - 7
-            case corner_br_side_t0, corner_br_side_t1
-                ball.x = PITCH_X + PITCH_W - 7
-                ball.y = PITCH_Y + PITCH_H - 7
-        end select
-        if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
-            pl(p).action = free_kicker
-            pl(p).x = Ball.x
-            pl(p).y = Ball.y
-            update_players()
-        else
-            reset_ball_z()
-            pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
-            restore_players_speed()
-            'all the players still continue to move themselves
-            run_tactic_all_players(p)
-            move_all_players()
-        end if
-    end if
-case gk_t0_owner, gk_t1_owner
-	Timing.status = 0
+		Timing.status = 1
+		
+		reset_gk_net_position (0,15)
+		reset_gk_net_position (11,15)
+		
+		if Match_event_delay then
+			if Match_event = corner_tl_side_t0 or Match_event = corner_tr_side_t0 or _
+			Match_event = corner_bl_side_t0 or Match_event = corner_br_side_t0 then
+				p = get_nrst_pl_ball_free_kick(0)
+			else
+				p = get_nrst_pl_ball_free_kick(1)
+			end if
+			'all have to follow tactic but not the pl(p)
+			run_tactic_all_players(p)
+			move_all_players()
+		else
+			select case Match_event
+				case corner_tl_side_t0, corner_tl_side_t1
+					ball.x = PITCH_X + 7
+					ball.y = PITCH_Y + 7
+				case corner_tr_side_t0, corner_tr_side_t1
+					ball.x = PITCH_X + PITCH_W - 7
+					ball.y = PITCH_Y + 7
+				case corner_bl_side_t0, corner_bl_side_t1
+					ball.x = PITCH_X + 7
+					ball.y = PITCH_Y + PITCH_H - 7
+				case corner_br_side_t0, corner_br_side_t1
+					ball.x = PITCH_X + PITCH_W - 7
+					ball.y = PITCH_Y + PITCH_H - 7
+			end select
+			if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
+				pl(p).action = free_kicker
+				pl(p).x = Ball.x
+				pl(p).y = Ball.y
+				update_players()
+			else
+				reset_ball_z()
+				pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
+				restore_players_speed()
+				'all the players still continue to move themselves
+				run_tactic_all_players(p)
+				move_all_players()
+			end if
+		end if
+		case gk_t0_owner, gk_t1_owner
+			Timing.status = 0
 
-    select case Match_event
-        case gk_t0_owner
-            p = 0
-        case gk_t1_owner
-            p = 11
-    end select
-    if Match_event_delay then
-        run_tactic_all_players(-1) 'all the players run the tactic
-        move_all_players()
-        pl(p).speed = 0
-    else
-        pl(p).action = free_kicker
-        update_players()
-    end if
+			select case Match_event
+				case gk_t0_owner
+					p = 0
+				case gk_t1_owner
+					p = 11
+			end select
+			if Match_event_delay then
+				run_tactic_all_players(-1) 'all the players run the tactic
+				move_all_players()
+				pl(p).speed = 0
+			else
+				pl(p).action = free_kicker
+				update_players()
+			end if
 		' #############################################################
 		' BALL ON CENTRE AT THE BEGINNING  OF THE MATCH OR AFTER A GOAL
 		' #############################################################
@@ -3467,70 +3473,75 @@ case gk_t0_owner, gk_t1_owner
 				pl(p).action = running
 				move_player(p)
 			end if
-			
-case foul_t0, foul_t1
+		' #############################################################
+		' FOULS
+		' #############################################################
+		case foul_t0, foul_t1
 
-	Timing.status = 0
-	
-    reset_gk_net_position (0,15)
-    reset_gk_net_position (11,15)
-    
-    if Match_event_delay then
-        if Match_event = foul_t0 then
-            p = get_nrst_pl_ball_free_kick(0)
-        else
-            p = get_nrst_pl_ball_free_kick(1)
-        end if
-        'all have to follow tactic but not the pl(p)
-        run_tactic_all_players(p)
-        move_all_players()
-    else
-        if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
-            pl(p).action = free_kicker
-            pl(p).x = Ball.x
-            pl(p).y = Ball.y
-            update_players()
-        else
-            Ball.x = Match_event_old_ball_x
-            Ball.y = Match_event_old_ball_y
-            reset_ball_z()
-            pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
-            restore_players_speed()
-            'all the players still continue to move themselves
-            run_tactic_all_players(p)
-            move_all_players()
-        end if
-    end if
-    
-case presentation
-case resetting_start_position
-	if Timer - Timing.time_diff > TIME_PAUSE_EVENT*2 then
-		if Team(0).kick_off then
-			Match_event = ball_on_centre_t0
-		else
-			Match_event = ball_on_centre_t1
-		end if
-	end if
-	for c = 0 to Ubound(pl) - 1
-		if pl(c).role<>"G" then
-			reset_player_start_positions(c)
-		else
+			Timing.status = 0
 			reset_gk_net_position (0,15)
 			reset_gk_net_position (11,15)
-		end if
-	next c
-	move_all_players()
-	
-case happy_t0, happy_t1
-	Timing.status = 0
-
-    if Match_event_delay then
-        update_ball_on_goal()
-    else    
-        put_ball_on_centre()
-        Match_event = resetting_start_position
-    end if
-end select
+			
+			if Match_event_delay then
+				if Match_event = foul_t0 then
+					p = get_nrst_pl_ball_free_kick(0)
+				else
+					p = get_nrst_pl_ball_free_kick(1)
+				end if
+				'all have to follow tactic but not the pl(p)
+				run_tactic_all_players(p)
+				move_all_players()
+			else
+				if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
+					pl(p).action = free_kicker
+					pl(p).x = Ball.x
+					pl(p).y = Ball.y
+					update_players()
+				else
+					Ball.x = Match_event_old_ball_x
+					Ball.y = Match_event_old_ball_y
+					reset_ball_z()
+					pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
+					restore_players_speed()
+					'all the players still continue to move themselves
+					run_tactic_all_players(p)
+					move_all_players()
+				end if
+			end if
+    
+		case presentation
+		' #############################################################
+		' PLAYERS IN START POSITION
+		' #############################################################
+		case resetting_start_position
+			if Timer - Timing.time_diff > TIME_PAUSE_EVENT*2 then
+				if Team(0).kick_off then
+					Match_event = ball_on_centre_t0
+				else
+					Match_event = ball_on_centre_t1
+				end if
+			end if
+			for c = 0 to Ubound(pl) - 1
+				if pl(c).role<>"G" then
+					reset_player_start_positions(c)
+				else
+					reset_gk_net_position (0,15)
+					reset_gk_net_position (11,15)
+				end if
+			next c
+			move_all_players()
+		' #############################################################
+		' AFTER-GOAL CELEBRATIONS
+		' #############################################################
+		case happy_t0, happy_t1
+			Timing.status = 0
+			if Match_event_delay then
+				update_ball_on_goal()
+			else    
+				put_ball_on_centre()
+				Match_event = resetting_start_position
+			end if
+	end select
 end sub
 
 sub update_bhv_editor()

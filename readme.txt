@@ -52,16 +52,19 @@ Acknowledgements:
 · Too much spaghetti code! Clean-up code & design!!!
 · update delete bitmap routine
 · use boolean operators instead of integer variables
+· change Timin.status
 
 
 
 DEV LOG -------------------------------------
 0.25.2
+· New ball control method
 · Context-help via F1 key
-· Bheaviour editor Saving feature
+· Kickoff
+· Behaviour editor Saving feature
 · Minor graphic update
 · Graphs on team editor values
-· New ball control method
+· Some code cleanup
 
 0.25.1
 · Some changes on players Behaviour SUB

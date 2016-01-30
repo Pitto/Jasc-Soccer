@@ -1,18 +1,18 @@
 'ENUMS
 enum proto_pl_action
-    none = 0
-    running = 1
-    jumping = 2
-    sliding = 3
-    falling = 4
-    falled = 5
-    gk_jumping = 6
-    gk_falled = 7
-    gk_falled_w_ball = 8
-    gk_w_ball = 9
-    throw_in = 10
-    free_kicker = 11
-    bench = 12
+    none
+    running
+    jumping
+    sliding
+    falling
+    falled
+    gk_jumping
+    gk_falled
+    gk_falled_w_ball
+    gk_w_ball
+    throw_in
+    free_kicker
+    bench
 end enum
 
 enum proto_game_section
