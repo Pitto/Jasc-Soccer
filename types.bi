@@ -126,11 +126,11 @@ End Type
 Type mouse
     As Integer res, x, y, wheel, clip, old_wheel, diff_wheel
     Union
-        buttons As Integer
+        buttons 		As Integer
         Type
-            Left:1 As Integer
-            Right:1 As Integer
-            middle:1 As Integer
+            Left:1 		As Integer
+            Right:1 	As Integer
+            middle:1 	As Integer
         End Type
     End Union
 End Type

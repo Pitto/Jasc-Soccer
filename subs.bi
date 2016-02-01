@@ -1033,6 +1033,13 @@ sub draw_bhv_editor()
 	
 	tct_ed_draw_ball_grid(pitch_data(0).x, pitch_data(0).y,pitch_data(0).w, pitch_data(0).h)
 	
+	draw_button 	(0, 0, SCREEN_W, 30, _
+					"BEHAVIOR EDITOR", C_WHITE, C_DARK_BLUE,0,0)
+
+	draw_button 	(0, SCREEN_H - 30, SCREEN_W, 30, _
+					"PRESS CTRL + S to SAVE & CLOSE Editor",_
+					C_WHITE, C_DARK_RED,0,0)
+	
 	for c = 0 to 9
 		draw_button (	x, y, w, h, str(Bhv_tile_edit_copy(tct_ed_Ball_Current_Tile, c)),_
 						C_GRAY, C_RED, is_equal(BE_row_sel, c) * BE_select, C_YELLOW)
@@ -1303,29 +1310,27 @@ sub draw_button (x as integer, y as integer, w as integer,_
 				(x+w + offset_line,_
 				y+h + offset_line + 1),stroke_color_selected,B
 		
-		draw string 	(x + (w \ 2) - len(label)*4 + offset_shadow,_
-						y + 5 + offset_shadow), label, C_BLACK		
 	end if
 	
-	draw string (x + (w \ 2) - len(label)*4, y + 5), label		
+	PrintFont x + (w \ 2) - len(label)*7, y + 5, label, ButtonFont, 1, 1 
 	
 end sub
 
 
 Sub draw_main_menu()
     Dim As Integer a, i
-    dim btn_w as integer = 220 'width of the button
-    dim btn_h as integer = 20 'height of the button
-    dim btn_v_space as integer = 15 'vertical spacing of each button
-    Dim top_margin as integer = 100
+    dim btn_w as integer = 350 'width of the button
+    dim btn_h as integer = 26 'height of the button
+    dim btn_v_space as integer = 14 'vertical spacing of each button
+    Dim top_margin as integer = 116
 
     'graphic statements
     'wallpaper
     PUT (0, 0), Wallpaper(1),pset
     
-    draw_button 	(SCREEN_W\2 - 150, 20, 300, 20, _
+    draw_button 	(0, 0, SCREEN_W, 30, _
 					str(GAME_NAME + " " + GAME_VERSION + " by " + GAME_AUTHOR),_
-					C_WHITE, C_GRAY,0,0)
+					C_WHITE, C_DARK_BLUE,0,0)
 	'blinking "press F1"
 	if (Timer MOD 2) then
     draw_button 	(SCREEN_W\2 - (len("Press F1 for HELP")\2) * 16, SCREEN_H - 30, (len("Press F1 for HELP")) * 16, 20, _
@@ -1698,7 +1703,7 @@ SUB draw_splashscreen()
 
 	PrintFont x1 , y1, _
 	GAME_NAME + " by " + GAME_AUTHOR  + " - Version " + GAME_VERSION + _
-	" - " + GAME_AUTHOR_SITE, SmallFont, 1, 1 
+	" - " + GAME_AUTHOR_SITE, ButtonFont, 2, 1 
 	
 	PrintFont x1 - 15, y1 + 30, _
 	"This software is released under the Terms of the GNU GPL license v. 2.0", _
@@ -1719,17 +1724,21 @@ Sub draw_team_editor()
 	x = 20
 	y = 50
 	w = 25
-	h = 16
-	label_w = 120
-	x_padding = 5
+	h = 24
+	label_w = 200
+	x_padding = 2
 	y_padding = 5
 	mask_color = C_WHITE
 	
 	PUT (0, 0), Wallpaper(3),pset
-	PrintFont x, 20, "TEAM EDITOR " + _
-	Main_Menu_List_Teams(Main_menu_Team_0_selected).label, CoolFont, 1, 1
-	
-	PrintFont x, SCREEN_H - 16, "PRESS CTRL + S to SAVE & CLOSE Editor", Unifont, 1, 1
+	draw_button 	(0, 0, SCREEN_W, 30, _
+					"TEAM EDITOR " +_
+					Main_Menu_List_Teams(Main_menu_Team_0_selected).label,_
+					C_WHITE, C_DARK_BLUE,0,0)
+
+	draw_button 	(0, SCREEN_H - 30, SCREEN_W, 30, _
+					"PRESS CTRL + S to SAVE & CLOSE Editor",_
+					C_WHITE, C_DARK_RED,0,0)
 
 	for row = 0 to TE_ROWS-1
 		pl_avg_value = (int((pl(row).speed_default + pl(row).control + _
@@ -1776,13 +1785,13 @@ Sub draw_team_editor()
 					label = player_money_value(pl_avg_value)
 			end select
 			if col = 2 then
-				w = 150
+				w = 180
 			elseif col = 3 then
 				w = 14
 			elseif col = 11 then
-				w = 50
+				w = 80
 			else
-				w = 28
+				w = 44
 			end if
 			if col = TE_col_sel and row = TE_row_sel then
 				mask_color = C_BLACK
@@ -2323,8 +2332,8 @@ SUB load_bitmap()
     'wallpapers
     for c = 0 to WALLPAPER_TOT_N - 1
 		BLOAD "img\wallp_" + str(c) + ".bmp",0
-		Wallpaper(c)= IMAGECREATE(640,480)
-		GET (0,0)-(639,479), Wallpaper(c)
+		Wallpaper(c)= IMAGECREATE(800,600)
+		GET (0,0)-(799,599), Wallpaper(c)
     next c
         
 END SUB
@@ -2415,9 +2424,10 @@ SUB load_behavior()
 END SUB
 
 SUB load_fonts()
-    LoadFont "Fonts\SmallFont.bmp", SmallFont, 1
-    LoadFont "Fonts\UniFont.bmp", UniFont, 1
-    LoadFont "Fonts\CoolFont.bmp", CoolFont, 1
+    LoadFont "Fonts\SmallFont.bmp", 	SmallFont	, 1
+    LoadFont "Fonts\UniFont.bmp", 		UniFont		, 1
+    LoadFont "Fonts\CoolFont.bmp", 		CoolFont	, 1
+    LoadFont "Fonts\ButtonFont.bmp", 	ButtonFont	, 2
 END SUB
 
 SUB load_pitch_data()
@@ -3217,9 +3227,9 @@ sub update_match_event()
     end if
     
     select case match_event
-		' #############################################################
+		' ##############################################################
 		' INTERVAL OF THE MATCH
-		' #############################################################
+		' ##############################################################
 		' all the players have to go outside the pitch
 		case interval
 			Timing.status = 0
@@ -3231,7 +3241,7 @@ sub update_match_event()
 			next c
 			'after some seconds of pause the game restarts
 			if Timer - Timing.time_diff > TIME_PAUSE_EVENT then
-				Match_event = ball_in_game
+				Match_event = resetting_start_position
 			end if
 		' #############################################################
 		' BALL IN GAME
@@ -4252,9 +4262,17 @@ END SUB
 sub tct_ed_print_tact_data()
 
 	dim as integer c, w, h, offset_txt_x
-    w = 160
-    h = 16
-	offset_txt_x = Pitch_data(0).x + Pitch_data(0).w + 32
+    w = 300
+    h = 22
+	offset_txt_x = Pitch_data(0).x + Pitch_data(0).w + 16
+	
+	draw_button 	(0, SCREEN_H - 60, SCREEN_W, 30, _
+					"TACTIC EDITOR", C_WHITE, C_DARK_BLUE,0,0)
+
+	draw_button 	(0, SCREEN_H - 30, SCREEN_W, 30, _
+					"PRESS S to SAVE DATA",_
+					C_WHITE, C_DARK_RED,0,0)
+	
     
     dim instructions(9) as string = { 	"CURSOR KEYS - Move the ball", _
 										"MOUSE WHEEL - Select previous/next player", _
@@ -4268,10 +4286,10 @@ sub tct_ed_print_tact_data()
 										"Attack direction is top-down"}
 									   
     draw_button (offset_txt_x, 50, w, h, "Tactic Name     " + str(tct_tile_label(tct_ed_Tactic_slot)), C_WHITE, C_GRAY, 0, C_YELLOW)
-    draw_button (offset_txt_x, 70, w, h, "Tactic Slot     " + str(tct_ed_Tactic_slot), C_WHITE, C_GRAY, 0, C_YELLOW)
-    draw_button (offset_txt_x, 90, w, h, "Payer Tile      " + hex(tct_ed_Pl_Current_Tile), C_WHITE, C_GRAY, 0, C_YELLOW)
-    draw_button (offset_txt_x, 110, w, h, "Ball Tile       " + str(tct_ed_Ball_Current_Tile), C_WHITE, C_GRAY, 0, C_YELLOW)
-    draw_button (offset_txt_x, 130, w, h, "Player Sel. (id)" + str(tct_ed_Pl_Selected), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 80, w, h, "Tactic Slot     " + str(tct_ed_Tactic_slot), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 110, w, h, "Player Tile      " + hex(tct_ed_Pl_Current_Tile), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 140, w, h, "Ball Tile       " + str(tct_ed_Ball_Current_Tile), C_WHITE, C_GRAY, 0, C_YELLOW)
+    draw_button (offset_txt_x, 170, w, h, "Player Sel. (id)" + str(tct_ed_Pl_Selected), C_WHITE, C_GRAY, 0, C_YELLOW)
 
     ' draw instructions
     for c = 0 to Ubound(instructions) - 1
@@ -4279,12 +4297,12 @@ sub tct_ed_print_tact_data()
     next c
     'draw current selected tactic
     for c = 0 to 9
-		draw_button (	SCREEN_W - 80 - 20, 16 + c*20, 80, h, str(c) + " : " + str(tct_tile_label(c)),_
+		draw_button (	SCREEN_W - 140, 20 + c*h, 120, h, str(c) + " : " + str(tct_tile_label(c)),_
 						C_GRAY, C_BLUE, is_equal(c, tct_ed_Tactic_slot), C_YELLOW)
     next c
     'display confirm if the tacitc has been correctly saved
     if tct_ed_Has_Saved then
-		draw_button (	SCREEN_W - 220, SCREEN_H - 30, 200, 20, "DATA SUCCESSFULLY SAVED",_
+		draw_button (	SCREEN_W - 400, SCREEN_H - 30, 380, 20, "DATA SUCCESSFULLY SAVED",_
 						C_GRAY, C_RED, 0, C_YELLOW)
         if timer - tct_ed_Has_saved_display_time > 3 then tct_ed_Has_Saved = 0
     end if

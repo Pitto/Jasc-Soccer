@@ -32,28 +32,23 @@ Acknowledgements:
 · Unifont developers: http://savannah.gnu.org/projects/unifont
 
 'TODO LIST -------------------------------------
-· matchtime and half-time field switch
-    fix check_throw_in_corner_kick()
+'in order of importance
+· after interval restore kickoff
+· use boolean operators instead of integer variables
+· change Timin.status
 · IMPROVE AI (sooo much!)
 · A better menu
 · AFTERTOUCH Wow! :)
 · Human vs Human
-· cleanup code (heavy work!) :(
 · delay of the players and of the match events
   based not on the program cycles but using the timing
 · commenting code better
 · get_short_side_pl_to_pass
 · get_short_endline_pl_to_pass
-· New sprite set
 · Replais
-· change other #define with consts
 · Sound effects
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
-· update delete bitmap routine
-· use boolean operators instead of integer variables
-· change Timin.status
-
 
 
 DEV LOG -------------------------------------
@@ -65,13 +60,16 @@ DEV LOG -------------------------------------
 · Minor graphic update
 · Graphs on team editor values
 · Some code cleanup
+· graphics 800x600 px optimized
+· draw_button SUB updated with a custom font
+· new menu's font
 
 0.25.1
 · Some changes on players Behaviour SUB
 · Some changes on main menu
 · fixed bug on penalty position
 · Tactic editor saving routine updated
-· Wiki aivalable
+· Wiki available
 · Behaviour editor
 · Gameplay on Youtube!
 

@@ -10,6 +10,7 @@ dim shared Training_mode 				as integer = 0
 DIM SHARED SmallFont 	AS FontType
 DIM SHARED UniFont 		AS FontType
 DIM SHARED CoolFont 	AS FontType
+DIM SHARED ButtonFont 	AS FontType
 
 '__DELTA TIMING_________________________________________________________
 dim SHARED Dt 			as single ' Delta Timing
@@ -178,7 +179,7 @@ Dim shared BE_row_sel 				as integer = 0
 Dim shared BE_select 				as integer = 1
 Dim shared Save_bhv 				as integer= 0
 
-'User Manual context-help
+'__CONTEXTUAL HELP______________________________________________________
 Dim shared UM_txt_main_menu()			as string
 Dim shared UM_txt_tactic_editor()		as string
 Dim shared UM_txt_bhv_editor()			as string

@@ -109,8 +109,6 @@ function be_checksum(tile as integer) as integer
 end function
 
 function start_frame (radiants as single) as integer
-    'if radiants > PI then radiants = -PI + radiants MOD PI
-    'if radiants < -PI then radiants = PI - radiants MOD PI
     
     dim degree as Short
     'convert radiants to 360° degree
@@ -173,8 +171,7 @@ function find_shoot_angle (pl_id as Integer) as single
     dim as Integer gk_id, att_dir
     
     att_dir = 1 - Team(pl(pl_id).team).att_dir
-    'att_dir = Team(pl(pl_id).team).att_dir
-    
+        
     if pl(pl_id).team = 0 then
         gk_id = 0
     else
@@ -209,26 +206,12 @@ function find_shoot_angle (pl_id as Integer) as single
 
 end function
 
-'function get_diff_angle(alfa as single, beta as single) as single
-  '  if alfa <> beta  then
-  '      return sin(alfa-beta+PI_2)
- '   else
-   '     return 0
- '   end if
-'end function
-
-
 function get_diff_angle(alfa as single, beta as single) as single
     if alfa <> beta  then
         return _abtp(0,0,cos(alfa-beta),-sin(alfa-beta))
 	else
 		return 0
 	end if
-   ' if alfa <> beta  then
-   '     return -sin(alfa-beta)
-   ' else
-   '     return 0
-   ' end if
 end function
 
 function get_dist_from_tile(tile as Integer, pl_x as single, pl_y as single) as single
@@ -632,13 +615,13 @@ function is_pl_into_opponent_penalty_area (c as integer) as Integer
 end function
 
 function get_pl_to_pass(c as integer) as Integer
-    dim a as integer 'counter for the pl to check
-    dim max_dist as single = 300 'maximum distance from the passing line
-    dim pl_to_pass as integer = 0 'this is useful for the return value of the function
-    dim dist as single 'distance between pl(c) and pl(a)
-    dim dist_to_passline as single 'distance between passing line and pl(a)
-    dim alfa as single 'know angle (angle between pl(c) and pl(a))
-    dim as single teta 'unknow angle
+    dim a as integer 				'counter for the pl to check
+    dim max_dist as single = 300 	'maximum distance from the passing line
+    dim pl_to_pass as integer = 0 	'this is useful for the return value of the function
+    dim dist as single 				'distance between pl(c) and pl(a)
+    dim dist_to_passline as single 	'distance between passing line and pl(a)
+    dim alfa as single 				'know angle (angle between pl(c) and pl(a))
+    dim as single teta 				'unknow angle
     
     'doesn't try to pass to the goalkeeper
     for a = 0 to PL_N_TOT*2 - 1
