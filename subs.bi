@@ -2094,8 +2094,8 @@ SUB get_user_input_action(c as Integer)
         PL_team_owner_id = pl(c).team
         pl(c).delay = 50
         Match_event = ball_in_game
-        if pl(c).action = throw_in then pl(c).action = running
-        if pl(c).action = free_kicker then pl(c).action = running
+        if pl(c).action = throw_in 		then pl(c).action = running
+        if pl(c).action = free_kicker 	then pl(c).action = running
     end if
     
     'if the CTRL key is released but the pl is not owner of the ball
@@ -2177,7 +2177,6 @@ SUB init_players_proprietes()
                        pl(c).precision
             pl(c).tct_id = pl(c).number - 2
             pl(c).speed_default = (pl(c).speed_default/100)*PL_DEFAULT_SPEED
-'            pl(c).precision = PI/precision 
             pl(c).speed = pl(c).speed_default
             pl(c).team = t
             pl(c).w = 10
@@ -2536,12 +2535,9 @@ SUB load_whole_txt_file(Byref fn As String,  filearr() As String)
 
 	While (Not Eof(filenum))
 		Line Input #filenum, ln ' Get one whole text line
-		'ln 	= Trim(ln)
-		'If (Left(ln,1) <> "#") And (Len(ln)>0) Then
 		Redim Preserve filearr(outpos)
 		filearr(outpos)	= ln
 		outpos += 1
-		'end if
 	Wend
 
     Close #filenum
@@ -2560,7 +2556,6 @@ END SUB
 SUB move_all_players()
     dim c as integer = 0
     for c = 0 to PL_N_TOT * 2 - 1
-        'if pl(c).role="G" then continue for
         'if a player is sliding or jumping, ends this action and begin to run
             if pl(c).delay then
                 pl(c).delay -=1
@@ -2630,25 +2625,25 @@ sub print_whole_array(array() As String, x as integer, y as integer)
 end sub
 
 SUB put_ball_on_centre()
-    ball.rds = 0
-    ball.x = 1+ PITCH_MIDDLE_W
-    ball.y = 1+ PITCH_MIDDLE_H
+    ball.rds 		= 0
+    ball.x 			= 1+ PITCH_MIDDLE_W
+    ball.y 			= 1+ PITCH_MIDDLE_H
     Match_event_old_ball_x = ball.x
     Match_event_old_ball_y = ball.y
-    ball.z = 0
-    ball.z_speed = 0
-    ball.speed = 0
-    ball.spin = 0
-    ball.w = 4
-    ball.frame=0
-    ball.x_spin = 0
-	ball.y_spin = 0
+    ball.z 			= 0
+    ball.z_speed 	= 0
+    ball.speed 		= 0
+    ball.spin 		= 0
+    ball.w 			= 4
+    ball.frame		=0
+    ball.x_spin 	= 0
+	ball.y_spin 	= 0
 END SUB
 
 SUB reset_ball_z()
-    ball.z = 0
-    ball.z_speed = 0
-    ball.z_speed_init = 0
+    ball.z 				= 0
+    ball.z_speed 		= 0
+    ball.z_speed_init 	= 0
 END SUB
 
 SUB reset_gk_net_position (c as integer, distance_from_net as Integer)
@@ -3709,11 +3704,7 @@ SUB update_players()
                 get_user_input_action(c)
                 if is_pl_input_rds() then
                     pl(c).speed = pl(c).speed_default
-					'easing of the rds of the player
-                    'pl(c).rds += get_diff_angle(pl(c).rds + PI_2, get_PL_input_rds()) / 2.25 + rnd*(0.01) 
-                    'OLD VERSION
                     pl(c).rds = get_pl_input_rds()
-                    
                     'if the player doesn't own the ball and is running
                     'to get it - the PC helps him to get the ball
                     'correcting the angle of the player
@@ -3739,7 +3730,6 @@ SUB update_players()
 							ball.x = pl(c).x + cos(ball.rds) * 5
 							ball.y = pl(c).y + -sin(ball.rds) * 5
 							ball.speed = pl(c).speed
-
 						end if
                     end if
                     PL_ball_owner_id = c
@@ -4312,7 +4302,6 @@ sub tct_ed_print_tact_data()
 		draw_whole_screen_shadowed()
 		print_whole_array(UM_txt_tactic_editor(),20,20)
 	end if
-   
     
 END SUB
 

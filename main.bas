@@ -51,7 +51,7 @@ randomize timer()
 #include "functions.bi"
 #include "subs.bi"
 
-'initializing and loading variables
+'initializing graphic environnement and loading fonts
 init_gfx()
 'IMPORTANT: respect this order 1) load_behavior; 2) load_tact
 load_behavior()
