@@ -15,27 +15,43 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-Acknowledgements:
-· The FreeBasic Developers
-· The Fbgfx developers
-· Lachie Dazdarian - for his tutorials about creating a game in FB
-· I3I2UI/I0 for his very useful code tips and cleanup
-· The FBIde Developers
-· All those contibuted to the FreeBasic Manual
-· Ebben Feagan and Richard Clark for their useful book "A Beginner’s Guide to FreeBasic"
-· All the followers of the http://www.freebasic.net/forum/viewtopic.php?f=15&t=20637 thread, thank you for your feedbacks
-· The creators of http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra13, very useful for the ball trajectory calc
-· Original font printing routine was created by Chis Chadwick and it came as a part of his Pixel Plus 256 package. Additional code (font loading subs, font formats, font files, changes, …) by Dean Janjic.
-· Some fonts used are based on GNU Unifont - Project page http://unifoundry.com/unifont.html
-· YSOCCER DEVELOPERS: The stadim bitmap is inspired to their sprites - http://ysoccer.sourceforge.net/
-· Sensible Soccer's developers - They made a beautiful game
-· Unifont developers: http://savannah.gnu.org/projects/unifont
+AKNOWLEDGEMENTS_________________________________________________________
+· 	The FreeBasic Developers
+· 	The Fbgfx developers
+· 	Lachie Dazdarian - for his tutorials about creating a game in FB
+· 	I3I2UI/I0 for his very useful code tips and cleanup
+· 	The FBIde Developers
+· 	All those contibuted to the FreeBasic Manual
+· 	Ebben Feagan and Richard Clark for their useful book "A Beginner’s
+	Guide to FreeBasic"
+· 	All the followers of the
+	http://www.freebasic.net/forum/viewtopic.php?f=15&t=20637 thread,
+	thank you for your feedbacks
+· 	The creators of
+	http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra13,
+	very useful for the ball trajectory calc
+· 	Original font printing routine was created by Chis Chadwick
+	and it came as a part of his Pixel Plus 256 package.
+	Additional code (font loading subs, font formats, font files,
+	changes, …) by Dean Janjic.
+· 	Some fonts used are based on GNU Unifont
+	Project page http://unifoundry.com/unifont.html
+· 	YSOCCER DEVELOPERS: The stadim bitmap is inspired to their sprites
+	http://ysoccer.sourceforge.net/
+· 	Sensible Soccer's developers - They made a beautiful game
+· 	Unifont developers: http://savannah.gnu.org/projects/unifont
 
-'TODO LIST -------------------------------------
-'in order of importance
+TODO LIST - in order of importance______________________________________
+
+· remove edit team button - use enter key on team instead
+· check assignment of attack direction variable
+· in-game substitutions
+· yellow and red cards
+· injury of the players
+· injury time
 · after interval restore kickoff
 · use boolean operators instead of integer variables
-· change Timin.status
+· change Timing.status
 · IMPROVE AI (sooo much!)
 · A better menu
 · AFTERTOUCH Wow! :)
@@ -50,9 +66,16 @@ Acknowledgements:
 · LESS Global variables!
 · Too much spaghetti code! Clean-up code & design!!!
 
+KNOWN BUGS______________________________________________________________
+· During top and down throw-in some players became teleported
 
-DEV LOG -------------------------------------
-0.25.2
+DEV LOG_________________________________________________________________
+
+0.25.4
+· batch file to access directly to the match
+· Minor graphic update
+
+0.25.3
 · New ball control method
 · Context-help via F1 key
 · Kickoff

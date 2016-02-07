@@ -21,9 +21,9 @@
 ' use 1.04 freebasic compiler
 
 ' SOME CODING CONVENTIONS USED IN THIS SOURCE CODE______________________
-' UPPERCASED variables 		are 	global variables
-' First_leter uppercased 	are 	shared variables
-' lovercased variables 		are 	local variables
+' UPPERCASED  				is a constant
+' First_leter uppercased 	is a shared variable
+' first_letter_lowercase 	is a local variable
 '
 ' Often the "c" variable name is used as counter variable
 '
@@ -76,6 +76,19 @@ load_whole_txt_file("_data/UM_txt_team_editor.txt", 	UM_txt_team_editor())
 load_whole_txt_file("_data/UM_txt_in_game_controls.txt",UM_txt_in_game_controls())
 	'Behaviour editor
 load_whole_txt_file("_data/UM_txt_bhv_editor.txt",		UM_txt_bhv_editor())
+
+'__FASTLANE_MATCH - using a batch file with arg[1] as team 0 and so on...
+'__useful for fast debug of match
+if __FB_ARGC__ > 1 then
+	Team(0) = Main_Menu_List_Teams(Valint(Command(1)))
+	Team(1) = Main_Menu_List_Teams(Valint(command(2)))
+	'---------------
+	Human_control = 1
+	Training_mode = 0
+	Match_event = resetting_start_position
+	Timing.time_diff = Timer
+	Game_section = game
+end if
 
 '---------------------------------------------------------
 DO

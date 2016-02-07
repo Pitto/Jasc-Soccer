@@ -21,7 +21,8 @@ enum proto_game_section
 	tactic_editor 
 	team_editor
 	bhv_editor
-	game 
+	game
+	pre_match_formation
 	credits
 	exit_game
 end enum

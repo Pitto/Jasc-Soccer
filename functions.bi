@@ -49,24 +49,24 @@ declare function get_passing_ball_speed (dist as Single, kind_of_pass as Integer
 'transforms the direction key pressed by human pl 1 in radiants
 declare function get_PL_input_rds() as single
 'checks if the human pl1 is doing a direction input
-declare function is_PL_input_rds() as integer
+declare function is_PL_input_rds() as Boolean
 'this function returns 1 if the object is into the camera crop - useful to use less CPU timing for
 'drawing functions
-declare function is_in_camera_crop (x as single, y as single, diam as integer) as Integer
+declare function is_in_camera_crop (x as single, y as single, diam as integer) as Boolean
 'cheks if the pl can perform a slide
-declare function is_ball_slidable (c as integer) as Integer
+declare function is_ball_slidable (c as integer) as Boolean
 'cheks if the pl can perform an headkick
-declare function is_ball_headkickable (c as integer) as Integer
+declare function is_ball_headkickable (c as integer) as Boolean
 'checks if the ball is controllable by human player
-declare function is_ball_controllable_by_human (c as integer) as Integer
+declare function is_ball_controllable_by_human (c as integer) as Boolean
 'checks if the ball is into penalty area
-declare function is_ball_into_penalty_area (c as integer) as Integer
+declare function is_ball_into_penalty_area (c as integer) as Boolean
 'checks if the ball goes into a goal
-declare function is_goal (c as integer) as integer
+declare function is_goal (c as integer) as Boolean
 'return if the pl_to_pass is in the field of view of the player - based upon the player rds
-declare function is_in_pl_fieldview (c as Integer, pl_to_pass as integer) as Integer
+declare function is_in_pl_fieldview (c as Integer, pl_to_pass as integer) as Boolean
 'return 1 if the pl is into his opponent penalty area
-declare function is_pl_into_opponent_penalty_area (c as integer) as Integer
+declare function is_pl_into_opponent_penalty_area (c as integer) as Boolean
 'return the nearest pl to the line of pass - only for Human controlled player
 declare function get_pl_to_pass(c as integer) as Integer
 'return the current match_event - useful for debug
@@ -82,7 +82,7 @@ declare function tct_ed_get_ball_tile() as integer
 'bhv editor functions
 declare function be_checksum(tile as integer) as integer
 'checks if the ball is controllable by a player
-declare function is_in_pl_control (c as integer, angle as single, dist as single) as Integer
+declare function is_in_pl_control (c as integer, angle as single, dist as single) as Boolean
 
 function d_t_r (degree as integer) as single
     return int (degree * PI/180)
@@ -450,21 +450,21 @@ function get_pl_tile (pl_id as integer) as integer
     return tile
 end function
 
-FUNCTION is_PL_input_rds() as integer
+FUNCTION is_PL_input_rds() as Boolean
     'if the input is via joystick
     if (Main_Menu_control_selected) then
         GetJoystick(Joystick.id,Joystick.buttons,Joystick.x,Joystick.y)
         if d_b_t_p(0,0,Joystick.x, Joystick.y) > 0.1 then
-            return 1
+            return true
         else
-            return 0
+            return false
         end if
     else
         If MultiKey(SC_DOWN) or MultiKey(SC_RIGHT)_
         or MultiKey(SC_UP) or MultiKey(SC_LEFT) then
-            return 1
+            return true
         else
-            return 0
+            return false
         end if
     end if
 end function
@@ -497,16 +497,16 @@ function get_passing_ball_speed (dist as Single, kind_of_pass as Integer) as Sin
     end select
 end function
 
-function is_in_camera_crop (x as single, y as single, diam as integer) as Integer
+function is_in_camera_crop (x as single, y as single, diam as integer) as Boolean
     if (x > camera.x - camera.w/2 - diam and x < (camera.x + camera.w\2 + diam))_
     and (y > camera.y - camera.y/2 - diam and y < (camera.y + camera.h\2 + diam)) then
-    return 1
+    return true
 else
-    return 0
+    return false
 end if
 end function
 
-function is_ball_slidable (c as integer) as Integer
+function is_ball_slidable (c as integer) as Boolean
     'if the pl slider is not receiving the ball and if
     'the ball distance is into a specified range (in this case >30 <50)
     '(...) and also important: the ball.z must be less than a fixed value
@@ -517,100 +517,102 @@ function is_ball_slidable (c as integer) as Integer
     and ball.z < 5 _
     and pl(c).action = running and Match_Event = Ball_in_game _
     and get_diff_angle(pl(c).rds,ball.rds) < 0 then
-		return 1
+		return true
 	else
-		return 0
+		return false
 	end if
 end function
 
-function is_ball_headkickable (c as integer) as Integer
+function is_ball_headkickable (c as integer) as Boolean
     'if the ball is near and its z value is greater than a fixed value
     'then the player tries to hit it with headkick
     if (PL_ball_owner_id <> c) and (d_b_t_p(pl(c).x, pl(c).y,ball.x, ball.y)) < 50 _
     and ball.z > 6 and ball.z < 30 _
     and Pl_ball_owner_id <> c _
     and pl(c).action = running and Match_Event = Ball_in_game then
-    return 1
-else
-    return 0
-end if
+		return true
+	else
+		return false
+	end if
 end function
 
-function is_ball_into_penalty_area (c as integer) as Integer
-    'this function checks if the ball is into the opponent area when the referee whistles a foul…
+function is_ball_into_penalty_area (c as integer) as Boolean
+    'this function checks if the ball is into the opponent area when the referee whistles a foul?
     if  (Ball.x > PITCH_MIDDLE_W - PITCH_PENALTY_AREA) and _
         (Ball.x < PITCH_MIDDLE_W + PITCH_PENALTY_AREA) and _
         (Ball.y > PITCH_Y + ((PITCH_H - PITCH_PENALTY_AREA/1.5) * c)) and _
         (Ball.y < PITCH_Y + PITCH_PENALTY_AREA/1.5 + ((PITCH_H - PITCH_PENALTY_AREA/1.5) * c)) then
-        return 1
+        return true
     else
-        return 0
+        return false
     end if
 end function
 
-function is_ball_controllable_by_human (c as Integer) as Integer
+function is_ball_controllable_by_human (c as Integer) as Boolean
     if d_b_t_p(pl(c).x,pl(c).y, ball.x,ball.y) < 12 and ball.z < 6 then
         'in this way the pl can't touch twice the ball
         'because after his touch for passing or kicking the delay is set
         'see get_user_input_action SUB for details
         if pl(c).action = running and pl(c).delay > 1 then
-            return 0
+            return false
         else
-            return 1
+            return true
         end if
     else
-        return 0
+        return false
     end if
 end function
 
 
-function is_in_pl_control (c as integer, angle as single, dist as single) as Integer
+function is_in_pl_control (c as integer, angle as single, dist as single) as Boolean
     if  abs(cos(pl(c).rds) - cos(_abtp(pl(c).x,pl(c).y,ball.x, ball.y))) < angle and _
         abs(sin(pl(c).rds) - sin(_abtp(pl(c).x,pl(c).y,ball.x, ball.y))) < angle and _
         d_b_t_p (pl(c).x, pl(c).y, ball.x,ball.y) < dist then
-        return 1
+        return true
     else
-        return 0
+        return false
     end if
 end function
 
-function is_goal (c as integer) as integer
+function is_goal (c as integer) as Boolean
     select case c
         case 0
             if  (ball.x > PITCH_NET_L_WOOD + PITCH_NET_WOOD_RADIUS) and _
                 (ball.x < PITCH_NET_R_WOOD - PITCH_NET_WOOD_RADIUS) and _
                 (ball.y < PITCH_NET_TOP_Y) and _
                 (ball.z < PITCH_NET_H - PITCH_NET_WOOD_RADIUS) then
-                return 1
+                return true
             end if
         case 1
             if  (ball.x > PITCH_NET_L_WOOD + PITCH_NET_WOOD_RADIUS) and _
                 (ball.x < PITCH_NET_R_WOOD - PITCH_NET_WOOD_RADIUS) and _
                 (ball.y > PITCH_NET_BOTTOM_Y) and _
                 (ball.z < PITCH_NET_H - PITCH_NET_WOOD_RADIUS) then
-                return 1
+                return true
             end if
+        case else
+			return false
     end select
 end function
 
-function is_in_pl_fieldview (c as Integer, pl_to_pass as integer) as Integer
+function is_in_pl_fieldview (c as Integer, pl_to_pass as integer) as Boolean
     if  abs(cos(pl(c).rds) - cos(_abtp(pl(c).x,pl(c).y,pl(pl_to_pass).x,pl(pl_to_pass).y))) < PL_FIELD_VIEW_HALF and _
         abs(sin(pl(c).rds) - sin(_abtp(pl(c).x,pl(c).y,pl(pl_to_pass).x,pl(pl_to_pass).y))) < PL_FIELD_VIEW_HALF then
-        return 1
+        return true
     else
-        return 0
+        return false
     end if
 end function
 
-function is_pl_into_opponent_penalty_area (c as integer) as Integer
-    'this function checks if the ball is into the opponent area when the referee whistles a foul…
+function is_pl_into_opponent_penalty_area (c as integer) as Boolean
+    'this function checks if the ball is into the opponent area when the referee whistles a foul?
     if  (pl(c).x > PITCH_MIDDLE_W - PITCH_PENALTY_AREA) and _
         (pl(c).x < PITCH_MIDDLE_W + PITCH_PENALTY_AREA) and _
         (pl(c).y > PITCH_Y + ((PITCH_H - PITCH_PENALTY_AREA/1.5) * (1 - Team(pl(c).team).att_dir))) and _
         (pl(c).y < PITCH_Y + PITCH_PENALTY_AREA/1.5 + ((PITCH_H - PITCH_PENALTY_AREA/1.5) * (1 - Team(pl(c).team).att_dir))) then
-        return 1
+        return true
     else
-        return 0
+        return false
     end if
 end function
 
@@ -777,7 +779,7 @@ function tct_ed_get_ball_tile() as integer
     return tile
 end function
 
-function is_equal(a as integer, b as integer) as integer
+function is_equal(a as integer, b as integer) as Integer
 	if a = b then 
 		return 1
 	else
@@ -801,3 +803,4 @@ function player_money_value(average as integer) as string
 		return str(million) + "." + str(fraction) + " M"
 	end if
 end function
+

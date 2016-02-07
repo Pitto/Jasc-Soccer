@@ -252,23 +252,23 @@ END SUB
 SUB check_ball_goals()
     'first of all, checks if the ball goes into any net
     if is_goal(0) or is_goal(1) then
-        if is_goal(0) and (Team(0).att_dir = 1) then
-            Team(0).goal += 1
+        if is_goal(0) and CBool((Team(0).att_dir = 0)) then
+            Team(1).goal += 1
             match_event = happy_t0
-            Team(1).kick_off = true
-        end if
-        if is_goal(0) and (Team(0).att_dir = 0) then
-            Team(1).goal += 1
-            match_event = happy_t1
-            Team(1).kick_off = true
-        end if
-        if is_goal(1) and (Team(0).att_dir = 1) then
-            Team(1).goal += 1
-            match_event = happy_t1
             Team(0).kick_off = true
         end if
-        if is_goal(1) and (Team(0).att_dir = 0) then
+        if is_goal(0) and CBool((Team(0).att_dir = 1)) then
             Team(0).goal += 1
+            match_event = happy_t1
+            Team(1).kick_off = true
+        end if
+        if is_goal(1) and CBool((Team(0).att_dir = 0)) then
+            Team(0).goal += 1
+            match_event = happy_t1
+            Team(1).kick_off = true
+        end if
+        if is_goal(1) and CBool((Team(0).att_dir = 1)) then
+            Team(1).goal += 1
             match_event = happy_t0
             Team(0).kick_off = true
         end if
@@ -529,6 +529,7 @@ SUB delete_bitmap()
 		If Wallpaper(c)		Then ImageDestroy Wallpaper(c)
     next c
     
+    if Pl_tact_sprite		Then ImageDestroy Pl_tact_sprite
     If net_sprite(0)		Then ImageDestroy net_sprite(0)
     If net_sprite(1)		Then ImageDestroy net_sprite(1)
     If Stadium_bitmap(0)	Then ImageDestroy Stadium_bitmap(0)
@@ -674,8 +675,7 @@ SUB display_match()
 				End If
 				'reverse attack direction of the teams
 				If DEBUG and (e.scancode = SC_R) Then
-					Team(0).att_dir = 1 - Team(0).att_dir 
-					Team(1).att_dir = 1 - Team(1).att_dir 
+					swap Team(0).att_dir,Team(1).att_dir
 				End if
 			End Select
 		End If
@@ -773,7 +773,7 @@ SUB display_match()
 			workpage xor = 1 ' Swap work pages.
 			screenunlock ' Unlock the page to display what has been drawn on the screen
 		end if
-		if Timer - Timing.time_start > 1 and Timing.status = 1 then
+		if CBool (Timer - Timing.time_start > 1) and Timing.play then
 			Timing.actual_fps = Timing.fps
 			Timing.fps = 0
 			Timing.time_start = Timer
@@ -1135,9 +1135,6 @@ SUB draw_debug()
             end if
             if pl(c).id = PL_ball_owner_id then
                 circle (pl(c).x - C_x_o, pl(c).y - c_y_o),10, C_DARK_RED,,,,F
-                'draws the ball control area of the selected player	 		int(pl(c).pwr_tackle/10)
-				'draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds + (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
-				'draw_custom_line(pl(c).x - c_x_o, pl(c).y - c_y_o, pl(c).rds - (pl(c).control * PI_2) / 100, pl(c).pwr_tackle), C_YELLOW)
             end if
             if pl(c).id = PL_target_id then
                 circle (pl(c).x - C_x_o, pl(c).y - c_y_o),8, C_GREEN,,,,F
@@ -1225,9 +1222,10 @@ SUB draw_debug()
 
         PrintFont 30, 200, "Team(0).att_dir: " + str(Team(0).att_dir), SmallFont, 1, 1
         PrintFont 30, 206, Team(0).label, SmallFont, 1, 1
-        draw_arrow (20,246, (PI * Team(1).att_dir - PI_2), 10, Team(1).c_1)
-        PrintFont 30, 240, "Team(1).att_dir: " + str(Team(1).att_dir), SmallFont, 1, 1
-        PrintFont 30, 246, Team(1).label, SmallFont, 1, 1
+        draw_arrow (20,246, (PI * Team(0).att_dir - PI_2), 10, Team(0).c_1)
+        
+        
+        
         PrintFont DBG_TXT_OFFSET, 50, "PL_Team_owner_id: " + str(PL_team_owner_id), SmallFont, 1, 1
         PrintFont DBG_TXT_OFFSET, 56, "Ball Spin: " + str(Ball.spin), SmallFont, 1, 1
         PrintFont DBG_TXT_OFFSET, 74, "Match_event_delay: " + str(Match_event_delay), SmallFont, 1, 1
@@ -1694,22 +1692,20 @@ END SUB
 SUB draw_splashscreen()
 	static as single x1, x2, x3, y1, y2, y3
 		
-	dim easing as integer = 20
+	dim easing as integer = 15
 	x1 = SCREEN_W\2 - 130
 	if (y1 < 50) then y1 = y1 + (50 - y1)/easing
 	if (y2 < SCREEN_H\2 - 90) then y2 = y2 + (SCREEN_H\2 - 90 - y2)/easing
 	if (y3 < SCREEN_H - 50) then y3 = y3 + (SCREEN_H - 50 - y3)/easing
 	put (0,0), Wallpaper(4), pset
 
-	PrintFont x1 , y1, _
-	GAME_NAME + " by " + GAME_AUTHOR  + " - Version " + GAME_VERSION + _
-	" - " + GAME_AUTHOR_SITE, ButtonFont, 2, 1 
+	PrintFont x1 - (len(GAME_SPLASHSCREEN_TEXT)*7)\2 , y1, GAME_SPLASHSCREEN_TEXT, ButtonFont, 2, 1 
 	
-	PrintFont x1 - 15, y1 + 30, _
+	PrintFont x1 - 10, y1 + 30, _
 	"This software is released under the Terms of the GNU GPL license v. 2.0", _
 	SmallFont, 1, 1 
 	
-	PrintFont SCREEN_W\2 - 95, y3, "PRESS ESC TO PLAY", CoolFont, 1, 1
+	PrintFont SCREEN_W\2 - 95, y3, "PRESS ESC TO START", CoolFont, 1, 1
 	put (SCREEN_W\2 - 75, y2), Splashscreen_sprite, trans	
 END SUB
 
@@ -2026,8 +2022,8 @@ SUB get_user_input()
 END SUB
 
 SUB get_user_spin()
-	if 	Timer - Key_released_time_start > 0.2 and _
-		Timer - Key_released_time_start < 0.4 and is_PL_input_rds() then
+	if 	CBool(Timer - Key_released_time_start > 0.2) and _
+		CBool(Timer - Key_released_time_start < 0.4) and is_PL_input_rds() then
 		if	is_PL_input_rds() then
 			Ball.x_spin += cos(get_PL_input_rds)
 			Ball.y_spin += -sin(get_PL_input_rds)
@@ -2062,7 +2058,7 @@ SUB get_user_input_action(c as Integer)
         Key_released = 1
     end if
     ' if the CTRL key has been released then...
-    if (Key_released) and is_ball_controllable_by_human(c) then
+    if Cbool(Key_released) and is_ball_controllable_by_human(c) then
         Key_pressed_gap = timer - Key_pressed_time_start
         
         Key_released = 0
@@ -2141,8 +2137,8 @@ END SUB
 
 SUB init_team_data()
     'attack directions initializations
-    Team(0).att_dir = 1
-    Team(1).att_dir = 0
+    Team(0).att_dir = rnd*1
+    Team(1).att_dir = 1 - Team(0).att_dir
     'goal initializations
     Team(0).goal = 0
     Team(1).goal = 0
@@ -2295,6 +2291,11 @@ SUB load_bitmap()
         GET (0, c*16)-(79, c*16+15), Star_sprite(c)
     next c
     
+    'loading tactict editor player sprite
+    BLOAD "img\tact_sprite.bmp", 0
+    Pl_tact_sprite = IMAGECREATE (26, 48)
+    GET (0, 0)-(25, 47), Pl_tact_sprite
+        
     BLOAD "img\slider.bmp",0
     Slider_sprite = IMAGECREATE(92,59)
     get (0,0)-(91,58), Slider_sprite
@@ -3157,11 +3158,6 @@ Sub update_main_menu()
             Team(0) = Main_Menu_List_Teams(Main_menu_Team_0_selected)
             Team(1) = Main_Menu_List_Teams(Main_menu_Team_1_selected)
             '---------------
-            Team(0).att_dir = 1
-            Team(1).att_dir = 0
-            Team(0).goal = 0
-            Team(1).goal = 0
-            '----------------
             if Main_Menu_mode_selected then
                 Human_control = 1
             else
@@ -3227,7 +3223,7 @@ sub update_match_event()
 		' ##############################################################
 		' all the players have to go outside the pitch
 		case interval
-			Timing.status = 0
+			Timing.play = false
 			put_ball_on_centre()
 			for c = 0 to Ubound(pl)
 				pl(c).rds = _abtp (pl(c).x,pl(c).y, PITCH_X - 100, PITCH_MIDDLE_H)
@@ -3242,7 +3238,7 @@ sub update_match_event()
 		' BALL IN GAME
 		' #############################################################
         case ball_in_game
-			Timing.status = 1
+			Timing.play = true
             store_ball_position() 'store the ball position for free kicks
             check_ball_goals() 'only if the ball is in game, there may be goals
             check_pl_collisions() 'only with ball in game pl may collide each other
@@ -3251,7 +3247,7 @@ sub update_match_event()
 		' PENALTY
 		' #############################################################
         case penalty_t0, penalty_t1
-			Timing.status = 0
+			Timing.play = false
             reset_gk_net_position (0,0)
             reset_gk_net_position (11,0)
             if Match_event_delay then
@@ -3289,7 +3285,7 @@ sub update_match_event()
 		' THROW IN - BOTH HORIZONTAL SIDES 
 		' #############################################################
         case throw_in_lside_t0, throw_in_rside_t0, throw_in_lside_t1, throw_in_rside_t1
-            Timing.status = 0
+            Timing.play = false
             reset_gk_net_position (0,25)
             reset_gk_net_position (11,25)
             if Match_event_delay then
@@ -3333,7 +3329,7 @@ sub update_match_event()
 			throw_in_bl_side_t0, throw_in_bl_side_t1, _
 			throw_in_br_side_t0, throw_in_br_side_t1
         
-				Timing.status = 0
+				Timing.play = false
 				
 				if Match_event = throw_in_tl_side_t0 _
 				or Match_event = throw_in_tr_side_t0 _
@@ -3393,7 +3389,7 @@ sub update_match_event()
 			corner_bl_side_t0, corner_bl_side_t1, _
 			corner_br_side_t0, corner_br_side_t1
 
-		Timing.status = 1
+		Timing.play = true
 		
 		reset_gk_net_position (0,15)
 		reset_gk_net_position (11,15)
@@ -3438,7 +3434,7 @@ sub update_match_event()
 			end if
 		end if
 		case gk_t0_owner, gk_t1_owner
-			Timing.status = 0
+			Timing.play = false
 
 			select case Match_event
 				case gk_t0_owner
@@ -3458,7 +3454,7 @@ sub update_match_event()
 		' BALL ON CENTRE AT THE BEGINNING  OF THE MATCH OR AFTER A GOAL
 		' #############################################################
 		case ball_on_centre_t0, ball_on_centre_t1
-			Timing.status = 0
+			Timing.play = false
 		
 			if Match_event = ball_on_centre_t0 then
 				p = get_nrst_pl_ball_free_kick(0)
@@ -3483,7 +3479,7 @@ sub update_match_event()
 		' #############################################################
 		case foul_t0, foul_t1
 
-			Timing.status = 0
+			Timing.play = false
 			reset_gk_net_position (0,15)
 			reset_gk_net_position (11,15)
 			
@@ -3539,7 +3535,7 @@ sub update_match_event()
 		' AFTER-GOAL CELEBRATIONS
 		' #############################################################
 		case happy_t0, happy_t1
-			Timing.status = 0
+			Timing.play = false
 			if Match_event_delay then
 				update_ball_on_goal()
 			else    
@@ -3662,7 +3658,7 @@ SUB update_players()
             if pl(c).role = "G" then
 '                ' if the ball is into the area then the GK runs to the ball
                 if is_ball_into_penalty_area (Team(pl(c).team).att_dir) and _
-                pl(c).delay = 0 and PL_team_owner_id <> pl(c).team then
+                Cbool(pl(c).delay = 0) and CBool(PL_team_owner_id <> pl(c).team) then
                     pl(c).rds = _abtp(pl(c).x,pl(c).y, ball.x,ball.y)
                     pl(c).speed = pl(c).speed_default
                     ' if the ball is VERY near, 
@@ -3740,14 +3736,14 @@ SUB update_players()
             pl(c).speed = pl(c).speed_default
             pl(c).rds =  _abtp(pl(c).x,pl(c).y, ball.x,ball.y)
             ' try to catch the ball with SLIDING###############################
-            if (decision > 95 and is_ball_slidable(c) and PL_team_owner_id <> pl(c).team) then
+            if CBool(decision > 95) and is_ball_slidable(c) and CBool(PL_team_owner_id <> pl(c).team) then
                 pl(c).speed *= SPEED_RATIO_SLIDING
                 pl(c).delay =  20
                 pl(c).action = sliding
                 continue for
             end if
             'try to hit the ball with HEADKICK################################
-            if (decision > 90 and is_ball_headkickable(c)) then
+            if CBool(decision > 90) and is_ball_headkickable(c) then
                 pl(c).speed *= SPEED_RATIO_HEADING
                 pl(c).delay = 10
                 pl(c).action = jumping
@@ -3880,8 +3876,8 @@ case gk_jumping 'Only for GoalKeeper - Jumping to catch the ball
     pl(c).delay -= 1
     
     'the Gk can touch the ball only if it is near him and into the penalty area
-    if d_b_t_p(pl(c).x,pl(c).y, ball.x, ball.y) < 15 and ball.z < 20 and _
-    pl(c).active = 1 and is_ball_into_penalty_area (Team(pl(c).team).att_dir) then
+    if Cbool(d_b_t_p(pl(c).x,pl(c).y, ball.x, ball.y) < 15) and Cbool(ball.z < 20) and _
+    Cbool(pl(c).active = 1) and is_ball_into_penalty_area (Team(pl(c).team).att_dir) then
         select case decision
         case 0 to pl(c).pwr_gk ' I have a good GoalKeeper! Him catch the ball
             ball.speed = 0
@@ -4114,8 +4110,8 @@ sub tct_ed_draw_players()
             Circle (tct_ed_pl(c).x, tct_ed_pl(c).y),12, &h3F9E4F,,,,F
         end if
             Circle (tct_ed_pl(c).x, tct_ed_pl(c).y),8, &h073C10,,,,F
-        PUT (tct_ed_pl(c).x-10,tct_ed_pl(c).y-20),pl_sprite_1(0,102), trans
-        draw string (tct_ed_pl(c).x-5,tct_ed_pl(c).y-30), str(c + 2)
+        PUT (tct_ed_pl(c).x-13,tct_ed_pl(c).y-40),Pl_tact_sprite, trans
+        PrintFont tct_ed_pl(c).x-5,tct_ed_pl(c).y-20, str(c + 2), SmallFont, 1, 1
     Next c
 END SUB
 

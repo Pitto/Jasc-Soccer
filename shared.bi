@@ -48,6 +48,7 @@ DIM SHARED Kit_overlay(KIT_TOT_N) 	AS ANY PTR
 DIM SHARED Pl_sprite_0(0 to 2, 0 to PL_SPRITES_TOT_N) 	AS ANY PTR 
 DIM SHARED Pl_sprite_1(0 to 2, 0 to PL_SPRITES_TOT_N) 	AS ANY PTR
 DIM SHARED Gk_sprite(0 to 2, 0 to PL_SPRITES_TOT_N) 	AS ANY PTR 
+DIM SHARED Pl_tact_sprite							 	AS ANY PTR 
 'Other bitmaps stuff
 DIM SHARED Cameraman_sprite(8) 	AS Uinteger ptr 
 DIM SHARED Stadium_bitmap(2) 	AS Uinteger PTR

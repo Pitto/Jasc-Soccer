@@ -65,14 +65,14 @@ TYPE ball_proto
     x 				as single	'x position
     y 				as single	'y position
     z 				as single	'z position
-    old_x 			as single
-    old_y 			as single
-    x_spin 			as single
-    y_spin 			as single
+    old_x 			as single	'store previous x pos
+    old_y 			as single	'store previous y pos
+    x_spin 			as single	'ball spin
+    y_spin 			as single	'ball spin
     z_speed 		as single	'z accel ratio
     z_speed_init 	as single	'z accel ratio
     speed 			as single	'speed 
-    spin 			as single
+    spin 			as single	'ball spin
     w 				as Integer	'width
     rds 			as single	'rotation
     effect 			as single	'effect
@@ -82,15 +82,15 @@ END TYPE
 Type Team_proto
     id 		As String*3		'unique id of the team
     label 	As String		'name of the team
-    c_1 	As Uinteger		'color of the kit
-    c_2 	As Uinteger
-    c_3 	As Uinteger
-    c_4 	As Uinteger
+    c_1 	As Uinteger		'color of the shirt
+    c_2 	As Uinteger		'color of the pants
+    c_3 	As Uinteger		'color of the socks
+    c_4 	As Uinteger		'overlay kit color
     kit 	as integer		'kind of kit
     tact_module As Integer 	'tactic module slot of the team (0-9)
     att_dir 	as integer 	'direction of the attack (0:up - 1:down)
-    goal 		as integer
-    kick_off 	as boolean
+    goal 		as integer	'goals scored
+    kick_off 	as boolean	'has the right to kickoff?
 End Type
 
 Type Match_options_proto
@@ -113,7 +113,7 @@ Type Match_timing_proto
 	seconds_elapsed as single
 	secs_to_play 	as single
 	injury_time 	as single
-	status 			as integer '0/1
+	play 			as Boolean
 End Type
 
 Type proto_Joystick

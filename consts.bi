@@ -1,9 +1,11 @@
 '__#DEFINE______________________________________________________________
 #define GAME_NAME 			"JASC SOCCER"
-#define GAME_VERSION 		"0.25.3"
+#define GAME_VERSION 		"0.25.4"
 #define GAME_AUTHOR 		"Pitto"
 #define GAME_AUTHOR_SITE 	"github.com/Pitto/Jasc-Soccer"
 #define GAME_N_TOT_TEAMS 	15
+#define GAME_SPLASHSCREEN_TEXT 	GAME_NAME " by " GAME_AUTHOR " ver " _
+								GAME_VERSION
 
 '__USEFUL CONSTS________________________________________________________
 const FIXED_TIME_STEP 	as double 	= 1/60.0	'useful for Delta Timing
