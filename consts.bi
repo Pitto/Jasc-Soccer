@@ -3,7 +3,7 @@
 #define GAME_VERSION 		"0.25.4"
 #define GAME_AUTHOR 		"Pitto"
 #define GAME_AUTHOR_SITE 	"github.com/Pitto/Jasc-Soccer"
-#define GAME_N_TOT_TEAMS 	15
+#define GAME_N_TOT_TEAMS 	16
 #define GAME_SPLASHSCREEN_TEXT 	GAME_NAME " by " GAME_AUTHOR " ver " _
 								GAME_VERSION
 
@@ -34,7 +34,7 @@ const PITCH_NET_DEPTH 		as integer = 15
 const PITCH_NET_BOUNCE_RATIO as single = 0.05
 'ball limits outside pitch
 const BALL_X_BOUND 			as integer = 100
-const BALL_Y_BOUND 			as integer = 25
+const BALL_Y_BOUND 			as integer = 20
 
 '__TACTIC STUFF_________________________________________________________
 'tiles on the pitch *NO CHANGE THIS VALUE PLEASE!*** JASC MAY CRASH :(
