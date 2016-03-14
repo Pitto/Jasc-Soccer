@@ -114,6 +114,8 @@ DO
 			init_pitch_dimensions(20, 60, 320, 384, 0)
 			display_bhv_editor()
 		'GAME
+		case pre_match_formation
+		
 		case game
 			load_player_sprites()
 			'initalize the teams selected

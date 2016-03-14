@@ -134,3 +134,9 @@ Type mouse
         End Type
     End Union
 End Type
+
+Type Replay_proto
+	co (0 to 1)					as integer 'x & y offset of the camera					
+	pl(0 to PL_N_TOT*2 -1, 0 to 2) 		as integer 'id: x, y, frame
+	ball (0 to 3)				as integer 'x, y, z, frame
+End Type

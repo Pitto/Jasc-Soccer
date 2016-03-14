@@ -82,6 +82,8 @@ dim shared Ball 					as ball_proto 		'ball type
 dim shared Ball_record(BALL_FRAMES_RECORD) as ball_proto'ball type
 dim shared Team(2) 					as Team_proto 		'team
 dim shared Pitch_data(6) 			as pitch_proto 'feature of the pitch
+dim shared Replay_data(FRAMES_RECORD) 	as Replay_proto 'replay data
+
 
 '__IN GAME USEFUL STUFF_________________________________________________
 '-1: none; 0-etc. indicates the id of the pl that's receiving pass
@@ -179,6 +181,8 @@ Dim shared TE_select 				as integer = 1
 Dim shared BE_row_sel 				as integer = 0
 Dim shared BE_select 				as integer = 1
 Dim shared Save_bhv 				as integer= 0
+
+Dim shared Save_Replay 				as Boolean = false
 
 '__CONTEXTUAL HELP______________________________________________________
 Dim shared UM_txt_main_menu()			as string

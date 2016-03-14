@@ -3,7 +3,7 @@
 #define GAME_VERSION 		"0.25.4"
 #define GAME_AUTHOR 		"Pitto"
 #define GAME_AUTHOR_SITE 	"github.com/Pitto/Jasc-Soccer"
-#define GAME_N_TOT_TEAMS 	16
+#define GAME_N_TOT_TEAMS 	17
 #define GAME_SPLASHSCREEN_TEXT 	GAME_NAME " by " GAME_AUTHOR " ver " _
 								GAME_VERSION
 
@@ -157,6 +157,7 @@ const GK_DEFAULT_SPEED as single = 18 * M_Pixel
 #define MATCH_EVENT_DEFAULT_DELAY 	100
 #define DBG_TXT_OFFSET 				10
 #define BALL_FRAMES_RECORD 			1000
+#define FRAMES_RECORD 				120
 #define TIME_PAUSE_EVENT 			5
 
 '__TACTIC EDITOR CONSTS_________________________________________________

@@ -106,6 +106,8 @@ DECLARE SUB check_ball_border_pitch_limit()
 DECLARE SUB update_camera_position()
 'initialize the players proprietes
 DECLARE SUB init_players_proprietes()
+'record data for replay
+DECLARE SUB record_replay_data (save as boolean)
 'sets to 0 axis z of the ball and z_Speed of the ball
 DECLARE SUB reset_ball_z()
 'display the match on the screen *** IMPORTANT!
@@ -252,6 +254,8 @@ END SUB
 SUB check_ball_goals()
     'first of all, checks if the ball goes into any net
     if is_goal(0) or is_goal(1) then
+		'save replay file
+		Save_Replay = true
         if is_goal(0) and CBool((Team(0).att_dir = 0)) then
             Team(1).goal += 1
             match_event = happy_t0
@@ -622,6 +626,10 @@ SUB display_match()
 			    If (e.scancode = SC_F1) Then
 					Display_Help = 1 - Display_Help 
 				End If
+				'save replay
+				If (e.scancode = SC_S) Then
+					Save_Replay = true
+				End If
 				'show/hide tactic selection
 				If (e.scancode = SC_T) Then
 					selecting_tactic = 1 - selecting_tactic
@@ -724,6 +732,7 @@ SUB display_match()
 			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y - 140 - c_y_o ), back_net, trans
 			draw_top_net()
 			draw_players()
+			record_replay_data(save_replay)
 			draw_bottom_net()
 			'...the lower back net
 			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y + PITCH_H + 10 - c_y_o ), back_net, trans
@@ -1984,12 +1993,12 @@ SUB get_pl_behavior(pl_id as Integer)
             if decision mod 2 = 0 then 
                 reset_ball_z()
                 ball.speed = (pl(pl_id).pwr_kick/100) * BALL_MAX_SPEED
-                ball.z_speed_init = rnd(20)+11 * M_PIXEL
+                ball.z_speed_init = rnd(10)+30 * M_PIXEL
                 ball.z_speed=ball.z_speed_init
             else
                 reset_ball_z()
                 ball.speed = (pl(pl_id).pwr_kick/100) * BALL_MAX_SPEED
-                ball.z_speed_init = rnd(3)+9 * M_PIXEL
+                ball.z_speed_init = rnd(5)+15 * M_PIXEL
             end if
             
             PL_target_id = -1 ' The pl is not passing to anyone
@@ -2819,6 +2828,68 @@ SUB record_ball_position()
     '--------------------------------------------
 END SUB
 
+SUB record_replay_data (save as boolean)
+	Dim ff As UByte
+    ff = FreeFile
+	static frame as integer
+	frame += 1
+	dim as integer b, c
+	
+	if frame > FRAMES_RECORD-1 then frame = 0
+	'store camera x & y offset
+	Replay_data(frame).co(0) = c_x_o
+	Replay_data(frame).co(1) = c_y_o
+	
+	'store player positions, & their frame used
+	for c = 0 to PL_N_TOT*2 -1
+		Replay_data(frame).pl(c,0)= pl(c).x
+		Replay_data(frame).pl(c,1)= pl(c).y
+		Replay_data(frame).pl(c,2)= start_frame(pl(c).rds) + _
+									pl(c).frame_offset + pl(c).frame
+	next c
+	
+	'store ball position
+	Replay_data(frame).ball(0) = int (Ball.x)
+	Replay_data(frame).ball(1) = int (Ball.y)
+	Replay_data(frame).ball(2) = int (Ball.z)
+	Replay_data(frame).ball(3) = Ball.frame
+	
+	'___SAVE REPLAY DATA_______________________
+	if save then
+        Open "replay/" + str(int(rnd*100000000)) + ".rep" For Output As #ff
+        for c = frame + 1 to FRAMES_RECORD-1
+			'store players positions
+			for b = 0 to PL_N_TOT*2-1
+				Write #ff, 	str(Replay_data(c).pl(b,0)) + "," + _
+							str(Replay_data(c).pl(b,1)) + "," + _
+							str(Replay_data(c).pl(b,2))
+			next b
+			'store ball position
+			Write #ff,	str(Replay_data(c).ball(0)) + "," + _
+						str(Replay_data(c).ball(1)) + "," + _
+						str(Replay_data(c).ball(2)) + "," + _
+						str(Replay_data(c).ball(3))
+        next c
+        for c = 0 to frame
+			'store players positions
+			for b = 0 to PL_N_TOT*2-1
+				Write #ff, 	str(Replay_data(c).pl(b,0)) + "," + _
+							str(Replay_data(c).pl(b,1)) + "," + _
+							str(Replay_data(c).pl(b,2))
+			next b
+			'store ball position
+			Write #ff,	str(Replay_data(c).ball(0)) + "," + _
+						str(Replay_data(c).ball(1)) + "," + _
+						str(Replay_data(c).ball(2)) + "," + _
+						str(Replay_data(c).ball(3))
+        next c
+        Close #ff
+		Save_Replay = false
+	end if
+	
+
+END SUB
+
 SUB store_ball_position()
     
     'store old ball x y values INTO the match field
@@ -3538,7 +3609,7 @@ sub update_match_event()
 			Timing.play = false
 			if Match_event_delay then
 				update_ball_on_goal()
-			else    
+			else
 				put_ball_on_centre()
 				Match_event = resetting_start_position
 			end if
