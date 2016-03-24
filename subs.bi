@@ -1642,32 +1642,32 @@ SUB draw_players()
             case jumping, sliding, falling, falled, throw_in, gk_falled_w_ball, free_kicker
                 select case pl(a(c,0)).action
                     case jumping
-                        frame_offset = 8
+                        pl(a(c,0)).frame_offset = 8
                     case sliding
-                        frame_offset = 7
+                        pl(a(c,0)).frame_offset = 7
                     case falling, falled, gk_falled_w_ball
-                        frame_offset = 6
+                        pl(a(c,0)).frame_offset = 6
                     case throw_in
-                        frame_offset = 16
+                        pl(a(c,0)).frame_offset = 16
                     case free_kicker
-                        frame_offset = 0
+                        pl(a(c,0)).frame_offset = 0
                 end select
                 
                 if pl(a(c,0)).team = 0 then
                     if pl(a(c,0)).id < 2 then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame_offset), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_0(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        pl_sprite_0(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame_offset), trans
                     end if
                 else
                     if pl(a(c,0)).id < 2 then
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        gk_sprite(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame_offset), trans
                     else
                         PUT (pl(a(c,0)).x - pl(a(c,0)).w - c_x_o, pl(a(c,0)).y - pl(a(c,0)).w - c_y_o),_
-                        pl_sprite_1(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+frame_offset), trans
+                        pl_sprite_1(pl(a(c,0)).skin, start_frame(pl(a(c,0)).rds)+pl(a(c,0)).frame_offset), trans
                     end if
                 end if
             
