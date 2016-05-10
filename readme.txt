@@ -47,6 +47,7 @@ TODO LIST - in order of importance______________________________________
 · check assignment of attack direction variable
 · in-game substitutions
 · yellow and red cards
+· substitutions
 · injury of the players
 · injury time
 · after interval restore kickoff
@@ -70,6 +71,9 @@ KNOWN BUGS______________________________________________________________
 · During top and down throw-in some players became teleported
 
 DEV LOG_________________________________________________________________
+
+0.25.4
+· Some revisions on Delta Timing
 
 0.25.4
 · batch file to access directly to the match

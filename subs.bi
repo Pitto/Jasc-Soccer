@@ -688,23 +688,26 @@ SUB display_match()
 			End Select
 		End If
 
+		
+		Timing.time_current = Timer
+		Dt = 0.165'Timing.time_current - Timing.time_last
+		
+		'' Fix frame-skipping by limiting the value of our dt
+		'' to the maximum of FIXED_TIME_STEP
+		if( Dt > FIXED_TIME_STEP ) then
+			Dt = FIXED_TIME_STEP
+		end if
+		
 		update_match_event()
 		check_ball_woods()
 		check_ball_limits()
 		update_ball()
 		get_user_input()
 		update_camera_position()
-		
-		Timing.time_current = Timer
-		Dt = Timing.time_current - Timing.time_last
-		
-		'' Fix frame-skipping by limiting the value of our dt
-		'' to the maximum of FIXED_TIME_STEP
-		if( Dt > FIXED_TIME_STEP ) then
-			Dt = FIXED_TIME_STEP
+	
 			screensync
-		else
-			screensync 'wait for vsync
+		
+			'screensync 'wait for vsync
 			'graphic output
 			screenlock ' Lock the screen
 			screenset workpage, workpage xor 1 ' Swap work pages.
@@ -781,7 +784,7 @@ SUB display_match()
 			
 			workpage xor = 1 ' Swap work pages.
 			screenunlock ' Unlock the page to display what has been drawn on the screen
-		end if
+		
 		if CBool (Timer - Timing.time_start > 1) and Timing.play then
 			Timing.actual_fps = Timing.fps
 			Timing.fps = 0
@@ -1614,7 +1617,7 @@ SUB draw_players()
             case running
                 
                 pl(a(c,0)).frame_offset = 0
-                pl(a(c,0)).dist += pl(a(c,0)).speed / 150
+                pl(a(c,0)).dist += pl(a(c,0)).speed / 266
                 if pl(a(c,0)).dist > 1 then
                     pl(a(c,0)).frame+=1
                     pl(a(c,0)).dist = 0
@@ -2567,12 +2570,12 @@ SUB move_all_players()
     dim c as integer = 0
     for c = 0 to PL_N_TOT * 2 - 1
         'if a player is sliding or jumping, ends this action and begin to run
-            if pl(c).delay then
-                pl(c).delay -=1
-            else
-                move_player(c)
-            end if
-            if pl(c).delay = 0 then pl(c).action = running
+            'if pl(c).delay = 0 then
+				pl(c).action = running
+				move_player(c)
+			'else
+				pl(c).delay =0
+			'end if
     next c
 END SUB
 
@@ -2752,15 +2755,15 @@ SUB run_tactic(c as Integer)
 			throw_in_tr_side_t0, throw_in_tr_side_t1, _
 			throw_in_bl_side_t0, throw_in_bl_side_t1, _
 			throw_in_br_side_t0, throw_in_br_side_t1
-			'if (team(pl(c).team).att_dir = 0) then
+			'if (team(pl(c).team).att_dir = 1) then
 				if tile > 2 and tile < 14 then tile +=48
 				if tile > 17 and tile < 30 then tile +=32
 				if tile > 33 and tile < 46 then tile +=16
-			'else
+	'		else
 				if tile > 209 and tile < 222 then tile -=16
 				if tile > 225 and tile < 238 then tile -=32
 				if tile > 241 and tile < 254 then tile -=48
-			'end if
+	'		end if
 		end select
 		
 		if (team(pl(c).team).att_dir) then
@@ -2779,8 +2782,9 @@ SUB run_tactic(c as Integer)
 		'if the distance is less than 5 then the pl has reached the position
 		if d_b_t_p(pl(c).x,pl(c).y,x_trg,y_trg) < 5 then
 			pl(c).speed = 0
+			'watch the ball
+			pl(c).rds = _abtp(pl(c).x, pl(c).y, Ball.x, Ball.y)
 		else
-			'update the pl position moving him
 			pl(c).speed = pl(c).speed_default
 		end if
 	end if
@@ -3410,34 +3414,33 @@ sub update_match_event()
 				else
 					p = 11 'id of gk team 1
 				end if
+				
 				if Match_event_delay then
 					run_tactic_all_players(-1) 'all the players run the tactic
 					move_all_players()
+					'restore_players_speed()
 					reset_gk_net_position (0,25)
 					reset_gk_net_position (11,25)
 				else
-					'pl(p).speed = 1
-					'return the right position for the ball
-				select case Match_event
-					case throw_in_tl_side_t0, throw_in_tl_side_t1
-						ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
-						ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
-					case throw_in_tr_side_t0, throw_in_tr_side_t1
-						ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
-						ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
-					case throw_in_bl_side_t0, throw_in_bl_side_t1
-						ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
-						ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
-					case throw_in_br_side_t0, throw_in_br_side_t1
-						ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
-						ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
-				end select
-					
+				'put the ball in the gk area
+					select case Match_event
+						case throw_in_tl_side_t0, throw_in_tl_side_t1
+							ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
+							ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
+						case throw_in_tr_side_t0, throw_in_tr_side_t1
+							ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
+							ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
+						case throw_in_bl_side_t0, throw_in_bl_side_t1
+							ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
+							ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
+						case throw_in_br_side_t0, throw_in_br_side_t1
+							ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
+							ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
+					end select
 				run_tactic_all_players(-1) 'all the players run the tactic
 				move_all_players()
 				reset_ball_z()
-				restore_players_speed()
-					
+				pl(p).speed =  pl(p).speed_default
 				'the gk goes to get the ball
 				pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
 				'if the gk gets the position then the game may restart
