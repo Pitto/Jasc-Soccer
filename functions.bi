@@ -510,14 +510,12 @@ function is_ball_slidable (c as integer) as Boolean
     'if the pl slider is not receiving the ball and if
     'the ball distance is into a specified range (in this case >30 <50)
     '(...) and also important: the ball.z must be less than a fixed value
-    
     if (PL_ball_owner_id <> c) and (PL_target_id <> c)_
     and (d_b_t_p(pl(c).x, pl(c).y,ball.x, ball.y)) > 10 _
     and (d_b_t_p(pl(c).x, pl(c).y,ball.x, ball.y)) < 60 _
     and ball.z < 5 _
-    and pl(c).action = running and Match_Event = Ball_in_game _
-    and get_diff_angle(pl(c).rds,ball.rds) < 0 then
-		return true
+    and pl(c).action = running and Match_Event = Ball_in_game then
+    	return true
 	else
 		return false
 	end if

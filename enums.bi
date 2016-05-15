@@ -27,6 +27,21 @@ enum proto_game_section
 	exit_game
 end enum
 
+enum proto_ball_position
+	bp_corner_kick_tl = 0
+	bp_corner_kick_tr
+	bp_corner_kick_bl
+	bp_corner_kick_br
+	bp_penalty_top
+	bp_penalty_bottom
+	bp_throw_in_tl
+	bp_throw_in_tr
+	bp_throw_in_bl
+	bp_throw_in_br
+	bp_kick_off
+	bp_free_kick
+end enum
+
 enum proto_match_event
     none = 0
     ball_in_game

@@ -15,8 +15,8 @@ const PITCH_Y 			as Integer 	= 50 		'no change it PLEASE
 
 '__PITCH DIMENSIONS_____________________________________________________
  'use a 32 multiple pitch texture may fit better!
-const PITCH_W 			as Integer 	= 832
-const PITCH_H 			as Integer	= 992
+const PITCH_W 			as Integer 	= 864
+const PITCH_H 			as Integer	= 960
 const PITCH_MIDDLE_W as Integer = PITCH_W\2 + PITCH_X
 const PITCH_MIDDLE_H as Integer = PITCH_H\2 + PITCH_Y
 'see update players sub for details

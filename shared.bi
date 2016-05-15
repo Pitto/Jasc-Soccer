@@ -13,7 +13,7 @@ DIM SHARED CoolFont 	AS FontType
 DIM SHARED ButtonFont 	AS FontType
 
 '__DELTA TIMING_________________________________________________________
-dim SHARED Dt 			as single ' Delta Timing
+dim SHARED Dt 			as single =0.0165' Delta Timing
 DIM SHARED Debug 		as Integer = 0
 
 '__EXIT FLAG - useful for menu navigation_______________________________

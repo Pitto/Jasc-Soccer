@@ -70,6 +70,8 @@ DECLARE SUB paint_kits(	c_overlay_0 as integer, c_shirt_0 as integer,_
 						c_pants_1 as integer, c_socks_1 as integer)
 'print a whole array to screen
 declare sub print_whole_array(array() As String, x as integer, y as integer)
+'put the ball in a specified place
+declare sub put_ball_in_place(position as proto_ball_position)
 'delete the sprites
 DECLARE SUB delete_bitmap()
 'cheks if the sprites have been rightly loaded
@@ -92,8 +94,6 @@ DECLARE SUB draw_custom_line(x as single, y as single, rds as single, a_l as sin
 DECLARE SUB draw_pl_tile(tile as integer, tile_color as uinteger)
 'draws the players
 DECLARE SUB draw_players()
-'resets the position of the players
-DECLARE SUB reset_players_positions()
 'puts the ball into the centre of the pitch
 DECLARE SUB put_ball_on_centre()
 ' update the beahovior of the players
@@ -117,8 +117,6 @@ DECLARE SUB draw_ball()
 'giving the id of the player who owns the ball, calculate in wich tile is,
 'it manages the player behavior (for example: running to the net, passing, shooting, etc...)
 DECLARE SUB get_pl_behavior(pl_id as Integer)
-'checks if two or more players collide
-DECLARE SUB check_pl_collisions()
 'a player without ball and far away from the ball must run the tactic
 DECLARE SUB run_tactic(c as Integer)
 'draws the bottom infos
@@ -380,32 +378,6 @@ SUB check_bitmap()
     sleep 2000
 END SUB
 
-SUB check_pl_collisions()
-    Dim as Integer c, d
-    'check each pl
-    for c = 0 to (PL_N_TOT*2-1)
-        'check collision only if the interested pllayers are int the crop view
-        if is_in_camera_crop (pl(c).x, pl(c).y, 64) then
-            for d  = 0 to (PL_N_TOT*2-1)
-                if d = c or pl(c).active = 0 then continue for 'doesn't check himself obviously :)
-                if d_b_t_p (pl(c).x, pl(c).y,pl(d).x, pl(d).y) < PL_MIN_DIST then
-                    'some fighting betweeen two players
-                    pl(d).x = pl(d).old_x + PL_MIN_DIST/2 - (rnd*PL_MIN_DIST)
-                    pl(d).y = pl(d).old_y + PL_MIN_DIST/2 - (rnd*PL_MIN_DIST)
-                    
-                    'also with running fighting one of the pl may fall
-                    if int(rnd*100) < RND_CONTACT_FALL then
-                        pl(c).active = 0
-                        pl(c).action = falling
-                        pl(c).delay = PL_DELAY_FALLING
-                        continue for, for
-                    end if
-                    continue for, for
-                end if
-            next d
-        end if
-    next c
-END SUB
 
 SUB load_bhv_data_for_editor()
 	dim as integer tile, slot
@@ -622,6 +594,13 @@ SUB display_match()
 		If (ScreenEvent(@e)) Then
 			Select Case e.type
 			Case EVENT_KEY_RELEASE
+				'change delta timing 
+				If (e.scancode = SC_Z) Then
+					Dt -= 0.001
+				End If
+				If (e.scancode = SC_X) Then
+					Dt += 0.001
+				End If
 				'show / hide in-game manual
 			    If (e.scancode = SC_F1) Then
 					Display_Help = 1 - Display_Help 
@@ -690,13 +669,6 @@ SUB display_match()
 
 		
 		Timing.time_current = Timer
-		Dt = 0.165'Timing.time_current - Timing.time_last
-		
-		'' Fix frame-skipping by limiting the value of our dt
-		'' to the maximum of FIXED_TIME_STEP
-		if( Dt > FIXED_TIME_STEP ) then
-			Dt = FIXED_TIME_STEP
-		end if
 		
 		update_match_event()
 		check_ball_woods()
@@ -705,85 +677,86 @@ SUB display_match()
 		get_user_input()
 		update_camera_position()
 	
-			screensync
+		screensync
+	
+		'screensync 'wait for vsync
+		'graphic output
+		screenlock ' Lock the screen
+		screenset workpage, workpage xor 1 ' Swap work pages.
+		draw_pitch()
+		draw_pitch_lines ( Pitch_data(Main_menu_pitch_type_selected).x,_
+						Pitch_data(Main_menu_pitch_type_selected).y,_
+						Pitch_data(Main_menu_pitch_type_selected).w,_
+						Pitch_data(Main_menu_pitch_type_selected).h,_
+						Pitch_data(Main_menu_pitch_type_selected).xm,_
+						Pitch_data(Main_menu_pitch_type_selected).ym,_
+						Pitch_data(Main_menu_pitch_type_selected).paw,_
+						Pitch_data(Main_menu_pitch_type_selected).pah,_
+						Pitch_data(Main_menu_pitch_type_selected).pac,_
+						Pitch_data(Main_menu_pitch_type_selected).padw,_
+						Pitch_data(Main_menu_pitch_type_selected).padd,_
+						Pitch_data(Main_menu_pitch_type_selected).gkw,_
+						Pitch_data(Main_menu_pitch_type_selected).gkh,_
+						C_WHITE, c_x_o, c_y_o)
+		if (Debug) then draw_debug()
+		'draw the top stadium: 305 is the witch in pixel of the stadium tile
+		for c = 0 to int(PITCH_W / 305) + 1
+			PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y - 220 - c_y_o), Stadium_bitmap(0), trans
+		next c
+		'... the upper back net
+		PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y - 140 - c_y_o ), back_net, trans
+		draw_top_net()
+		draw_players()
+		draw_ball()
+		record_replay_data(save_replay)
+		draw_bottom_net()
+		'...the lower back net
+		PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y + PITCH_H + 10 - c_y_o ), back_net, trans
+		'draw the bottom stadium: 305 is the witch in pixel of the stadium tile
+		for c = 0 to int(PITCH_W / 305) + 1
+			PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y + PITCH_H + 30 - c_y_o), Stadium_bitmap(1), pset
+		next c
 		
-			'screensync 'wait for vsync
-			'graphic output
-			screenlock ' Lock the screen
-			screenset workpage, workpage xor 1 ' Swap work pages.
-			draw_pitch()
-			draw_pitch_lines ( Pitch_data(Main_menu_pitch_type_selected).x,_
-                            Pitch_data(Main_menu_pitch_type_selected).y,_
-                            Pitch_data(Main_menu_pitch_type_selected).w,_
-                            Pitch_data(Main_menu_pitch_type_selected).h,_
-                            Pitch_data(Main_menu_pitch_type_selected).xm,_
-                            Pitch_data(Main_menu_pitch_type_selected).ym,_
-                            Pitch_data(Main_menu_pitch_type_selected).paw,_
-                            Pitch_data(Main_menu_pitch_type_selected).pah,_
-                            Pitch_data(Main_menu_pitch_type_selected).pac,_
-                            Pitch_data(Main_menu_pitch_type_selected).padw,_
-                            Pitch_data(Main_menu_pitch_type_selected).padd,_
-                            Pitch_data(Main_menu_pitch_type_selected).gkw,_
-                            Pitch_data(Main_menu_pitch_type_selected).gkh,_
-                            C_WHITE, c_x_o, c_y_o)
-			if (Debug) then draw_debug()
-			'draw the top stadium: 305 is the witch in pixel of the stadium tile
-			for c = 0 to int(PITCH_W / 305) + 1
-				PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y - 220 - c_y_o), Stadium_bitmap(0), trans
-			next c
-			'... the upper back net
-			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y - 140 - c_y_o ), back_net, trans
-			draw_top_net()
-			draw_players()
-			record_replay_data(save_replay)
-			draw_bottom_net()
-			'...the lower back net
-			PUT (PITCH_MIDDLE_W - 146 - c_x_o, PITCH_Y + PITCH_H + 10 - c_y_o ), back_net, trans
-			'draw the bottom stadium: 305 is the witch in pixel of the stadium tile
-			for c = 0 to int(PITCH_W / 305) + 1
-				PUT (PITCH_X - 150 - c_x_o + c * 305, PITCH_Y + PITCH_H + 30 - c_y_o), Stadium_bitmap(1), pset
-			next c
+		draw_bottom_info()
+		'display the selecting tactic menu
+		if (selecting_tactic) then
+			draw_button (50, 72, 180,_
+						20, "TACTIC of " + Team(0).label,_
+						C_WHITE, C_DARK_RED, 0, C_GRAY)
 			
-			draw_bottom_info()
-			'display the selecting tactic menu
-			if (selecting_tactic) then
-				draw_button (50, 72, 180,_
-							20, "TACTIC of " + Team(0).label,_
-							C_WHITE, C_DARK_RED, 0, C_GRAY)
-				
-				for c = 0 to Ubound (tct_tile_label)-1
-					draw_button (50, 100 + c * 22, 32 + 12 * is_equal(Team(0).tact_module, c),_
-							20, tct_tile_label(c),_
-							C_WHITE,_
-							C_BLUE,_
-							is_equal(Team(0).tact_module, c),_
-							C_GRAY)
-				next c
-			end if
-			'display change formation menu
-			if (change_formation) then
-				draw_button (50, 72, 200,_
-							20, "Formation of " + Team(0).label,_
-							C_WHITE, C_DARK_RED, 0, C_GRAY)
-				for c = 1 to 10
-					draw_button (50, 100 + c * 22, 35, 20, str(pl(c).number),_
-							C_WHITE, C_BLUE, is_equal(pl_selected, c), C_GRAY)
+			for c = 0 to Ubound (tct_tile_label)-1
+				draw_button (50, 100 + c * 22, 32 + 12 * is_equal(Team(0).tact_module, c),_
+						20, tct_tile_label(c),_
+						C_WHITE,_
+						C_BLUE,_
+						is_equal(Team(0).tact_module, c),_
+						C_GRAY)
+			next c
+		end if
+		'display change formation menu
+		if (change_formation) then
+			draw_button (50, 72, 200,_
+						20, "Formation of " + Team(0).label,_
+						C_WHITE, C_DARK_RED, 0, C_GRAY)
+			for c = 1 to 10
+				draw_button (50, 100 + c * 22, 35, 20, str(pl(c).number),_
+						C_WHITE, C_BLUE, is_equal(pl_selected, c), C_GRAY)
+				draw_button (90, 100 + c * 22, 180, 20, pl(c).label,_
+						C_WHITE, C_BLUE, is_equal(pl_selected, c), C_GRAY)
+				if pl_sel_0 = c then
 					draw_button (90, 100 + c * 22, 180, 20, pl(c).label,_
-							C_WHITE, C_BLUE, is_equal(pl_selected, c), C_GRAY)
-					if pl_sel_0 = c then
-						draw_button (90, 100 + c * 22, 180, 20, pl(c).label,_
-							C_BLACK, C_DARK_RED, 0, C_GRAY)
-					end if
-				next c
-			end if
-			' display context-help
-			if (Display_Help) then
-				draw_whole_screen_shadowed()
-				print_whole_array(UM_txt_in_game_controls(), 20, 20)
-			end if
-			
-			workpage xor = 1 ' Swap work pages.
-			screenunlock ' Unlock the page to display what has been drawn on the screen
+						C_BLACK, C_DARK_RED, 0, C_GRAY)
+				end if
+			next c
+		end if
+		' display context-help
+		if (Display_Help) then
+			draw_whole_screen_shadowed()
+			print_whole_array(UM_txt_in_game_controls(), 20, 20)
+		end if
+		
+		workpage xor = 1 ' Swap work pages.
+		screenunlock ' Unlock the page to display what has been drawn on the screen
 		
 		if CBool (Timer - Timing.time_start > 1) and Timing.play then
 			Timing.actual_fps = Timing.fps
@@ -1086,7 +1059,7 @@ SUB draw_bottom_info()
             PUT (32*d, SCREEN_H\2 - 6), shadowed_sprite, trans
         next
         PrintFont 32, SCREEN_H \ 2, str(Team(0).label) + " " + str(Team(0).goal) + _
-        " : " + str(Team(1).goal) + " " + str(Team(1).label), CoolFont, 1, 1
+        " : " + str(Team(1).goal) + " " + str(Team(1).label), ButtonFont, 1, 1
         PrintFont 32, SCREEN_H \ 2 + 36, "Match_Event " + print_match_event(Match_event), SmallFont, 1, 1
     end if
     'bottom shadow
@@ -1095,7 +1068,7 @@ SUB draw_bottom_info()
     next
     
     PrintFont SCREEN_W - 50, SCREEN_H - 20, str(Timing.actual_fps) + " Fps", SmallFont, 1, 1
-    PrintFont 50, SCREEN_H - 20, SHELL_message, Unifont, 1, 1
+    PrintFont 50, SCREEN_H - 20, SHELL_message, SmallFont, 1, 1
 END SUB
 
 SUB draw_bottom_net()
@@ -1253,24 +1226,30 @@ end SUB
 SUB draw_grid()
     dim as integer x, y, x2,y2, col, row, count
     count = 0
+    dim col_width as integer = PITCH_W \ COL_TOT_N
+    dim row_height as integer = PITCH_H \ ROW_TOT_N 
     for row = 0 to ROW_TOT_N -1 step 1
         for col = 0 to COL_TOT_N -1 step 1
             'draw the grid
-            x = col * PITCH_W \ COL_TOT_N + PITCH_X 
-            y = row * PITCH_H \ ROW_TOT_N + PITCH_Y
-            x2 = x + PITCH_W \ COL_TOT_N
-            y2 = y + PITCH_H \ ROW_TOT_N
+            x = 	col * col_width + PITCH_X 
+            y = 	row * row_height + PITCH_Y
+            x2 = 	x + col_width
+            y2 = 	y + row_height
             line (x-c_x_o,y-c_y_o)-(x2-c_x_o,y2-c_y_o),C_GRAY,b 
-            draw string (x+ 30-c_x_o,y+5-c_y_o), str(count), C_GRAY
-            'check if the ball is into a box of the grid and fill it using paint function
-            if (ball.x > x) and (ball.x < x2) and (ball.y>y) and (ball.y < y2) then
-                paint (ball.x-c_x_o, ball.y-c_y_o),C_DARK_GREEN,C_GRAY
-                draw string (x+ 30-c_x_o,y+5-c_y_o), str(get_ball_tile(team(0).att_dir)) + ":" + _
-                                                  str(get_ball_tile(team(1).att_dir)), C_WHITE
-            end if
+            draw string 	(x+ 30-c_x_o,y+5-c_y_o), str(count) + " : " _
+							+ str(TILES_BALL_N - count), C_GRAY
             count +=1
         next col
     next row
+    
+    'highlights the Match_event_last_tile
+    x = (Match_event_last_tile MOD COL_TOT_N) * col_width + PITCH_X
+	y = int(Match_event_last_tile / ROW_TOT_N) * row_height + PITCH_Y
+	x2 = x + col_width
+    y2 = y + row_height
+    line (x-c_x_o,y-c_y_o)-(x2-c_x_o,y2-c_y_o),C_YELLOW,B 
+    line (x-c_x_o - 2,y-c_y_o - 2)-(x2-c_x_o + 2,y2-c_y_o + 2),C_YELLOW,B 
+	
     if is_ball_into_penalty_area (0) then
         circle (ball.x - c_x_o, ball.y - c_y_o), 16, C_RED,,,,F
     end if
@@ -1587,23 +1566,6 @@ SUB draw_players()
                 end if
             end if
         end if
-        
-                'DRAW the BALL Z-Sorted - -  doesn't works fine :(
-        
-        select case c
-            case 1 to PL_N_TOT * 2 - 2
-                if pl(a(c,0)).y > ball.y and pl(a(c+1,0)).y < ball.y then
-                    draw_ball()
-                end if
-            case PL_N_TOT * 2 - 1
-                if pl(a(c,0)).y > ball.y then
-                    draw_ball()
-                end if
-            case 0
-                if pl(a(c,0)).y < ball.y then
-                    draw_ball()
-                end if
-        end select
         
         'puts the right set of sprites depending on the pl.action
         if is_in_camera_crop (pl(a(c,0)).x, pl(a(c,0)).y, 128) then
@@ -2569,13 +2531,9 @@ END SUB
 SUB move_all_players()
     dim c as integer = 0
     for c = 0 to PL_N_TOT * 2 - 1
-        'if a player is sliding or jumping, ends this action and begin to run
-            'if pl(c).delay = 0 then
-				pl(c).action = running
-				move_player(c)
-			'else
-				pl(c).delay =0
-			'end if
+		pl(c).action = running
+		move_player(c)
+		pl(c).delay =0
     next c
 END SUB
 
@@ -2682,22 +2640,6 @@ SUB reset_gk_net_position (c as integer, distance_from_net as Integer)
     end if
 END SUB
 
-SUB reset_players_positions()
-    dim t as integer
-    dim c as Integer
-    for t = 0 to 1
-        for c = (PL_N_TOT)*t to PL_N_TOT+((PL_N_TOT)*t)-1 
-                pl(c).speed = pl(c).speed_default
-                pl(c).delay = 0
-                pl(c).active = 1 ' by default the pl is ready to perform any action
-                pl(c).action = running 'by default the pl can run
-                pl(c).delay = 0
-                pl(c).y = PITCH_Y + (PITCH_H\4) + ((PITCH_H\2)*(Team(pl(c).team).att_dir))
-                pl(c).x = c * ((PITCH_W-10)\PL_N_TOT*2) + 10 + PITCH_X
-        next c
-    next t
-END SUB
-
 SUB reset_player_start_positions(c as integer)
 	dim as single x_trg, y_trg
 	dim as integer tile_row, tile_col, tile
@@ -2721,6 +2663,8 @@ SUB reset_player_start_positions(c as integer)
 	if d_b_t_p(pl(c).x,pl(c).y,x_trg,y_trg) < 5 then
 		pl(c).speed = 0
 		pl(c).is_in_place = true
+		'watch the ball
+		pl(c).rds = _abtp(pl(c).x, pl(c).y, Ball.x, Ball.y)
 	else
 		pl(c).is_in_place = false
 		pl(c).speed = pl(c).speed_default
@@ -3316,7 +3260,7 @@ sub update_match_event()
 			Timing.play = true
             store_ball_position() 'store the ball position for free kicks
             check_ball_goals() 'only if the ball is in game, there may be goals
-            check_pl_collisions() 'only with ball in game pl may collide each other
+            'check_pl_collisions() 'only with ball in game pl may collide each other
             update_players() ' IMPORTANT
         ' #############################################################
 		' PENALTY
@@ -3403,58 +3347,56 @@ sub update_match_event()
 			throw_in_tr_side_t0, throw_in_tr_side_t1, _
 			throw_in_bl_side_t0, throw_in_bl_side_t1, _
 			throw_in_br_side_t0, throw_in_br_side_t1
-        
-				Timing.play = false
-				
-				if Match_event = throw_in_tl_side_t0 _
+
+			Timing.play = false
+			
+			if 	Match_event = throw_in_tl_side_t0 _
 				or Match_event = throw_in_tr_side_t0 _
 				or Match_event = throw_in_bl_side_t0 _
 				or Match_event = throw_in_br_side_t0 then
-					p = 0 'id of gk team 0
-				else
-					p = 11 'id of gk team 1
-				end if
-				
-				if Match_event_delay then
-					run_tactic_all_players(-1) 'all the players run the tactic
-					move_all_players()
-					'restore_players_speed()
-					reset_gk_net_position (0,25)
-					reset_gk_net_position (11,25)
-				else
-				'put the ball in the gk area
-					select case Match_event
-						case throw_in_tl_side_t0, throw_in_tl_side_t1
-							ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
-							ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
-						case throw_in_tr_side_t0, throw_in_tr_side_t1
-							ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
-							ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
-						case throw_in_bl_side_t0, throw_in_bl_side_t1
-							ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
-							ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
-						case throw_in_br_side_t0, throw_in_br_side_t1
-							ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
-							ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
-					end select
-				run_tactic_all_players(-1) 'all the players run the tactic
+				p = 0 'id of gk team 0
+			else
+				p = 11 'id of gk team 1
+			end if
+						
+			if Match_event_delay then
+				run_tactic_all_players(-1)
 				move_all_players()
-				reset_ball_z()
-				pl(p).speed =  pl(p).speed_default
-				'the gk goes to get the ball
-				pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
-				'if the gk gets the position then the game may restart
+				reset_gk_net_position (0,25)
+				reset_gk_net_position (11,25)
+			else
+				select case Match_event
+					case throw_in_tl_side_t0, throw_in_tl_side_t1
+						ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
+					case throw_in_tr_side_t0, throw_in_tr_side_t1
+						ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_PENALTY_AREA/4
+					case throw_in_bl_side_t0, throw_in_bl_side_t1
+						ball.x = PITCH_MIDDLE_W - PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
+					case throw_in_br_side_t0, throw_in_br_side_t1
+						ball.x = PITCH_MIDDLE_W + PITCH_PENALTY_AREA/2
+						ball.y = PITCH_Y + PITCH_H - PITCH_PENALTY_AREA/4
+				end select
+
 				if d_b_t_p(pl(p).x, pl(p).y, Ball.x,Ball.y) < 5 then
-					pl(p).x = Ball.x
-					pl(p).y = Ball.y
 					'the gk launches the ball
 					shoot_ball  (p, -1,_
 								PITCH_MIDDLE_W ,_
 								PITCH_MIDDLE_H, 0.75,0)
 					'IMPORTANT!
 					match_event = ball_in_game
+				else
+					pl(p).rds = _abtp(pl(p).x, pl(p).y,Ball.x,Ball.y)
+					reset_ball_z()
+					restore_players_speed()
+					'all the players still continue to move themselves
+					run_tactic_all_players(-1)
+					move_all_players()
 				end if
 			end if
+
         ' #############################################################
 		' CORNER KICKS
 		' #############################################################

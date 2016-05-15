@@ -72,8 +72,10 @@ KNOWN BUGS______________________________________________________________
 
 DEV LOG_________________________________________________________________
 
-0.25.4
+0.25.5
 · Some revisions on Delta Timing
+· Fixed bug on "player teleporting" when there are throw-in by Goalkeeper
+· Removed check_pl_collision SUB
 
 0.25.4
 · batch file to access directly to the match
